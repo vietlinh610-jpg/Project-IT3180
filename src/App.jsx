@@ -1,0 +1,57 @@
+// src/App.jsx
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Sidebar from './components/Sidebar';
+import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
+import HoKhauPage from './pages/HoKhauPage';
+import CanHoPage from './pages/CanHoPage';
+import ProtectedRoute from './components/ProtectedRoute';
+import NhanKhauPage from './pages/NhanKhauPage';
+import TamTruPage from './pages/TamTruPage';
+import TamVangPage from './pages/TamVangPage';
+import KhoanThuPage from './pages/KhoanThuPage';
+import TaiKhoanPage from './pages/TaikhoanPage';
+
+function App() {
+  return (
+    <Routes>
+      {/* 1. Các trang công khai - Ai cũng xem được */}
+      
+      <Route path="/" element={<LoginPage />} />
+
+      {/* 2. Các trang bảo mật - Phải login mới thấy Sidebar và nội dung */}
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute>
+            <div style={{ display: 'flex', minHeight: '100vh' }}>
+              {/* Sidebar cố định bên trái */}
+              <Sidebar />
+
+              {/* Vùng nội dung bên phải tự co giãn */}
+              <div style={{ flex: 1,   width: '1250px',  maxWidth: '100%',  height: '100vh',  overflowY: 'auto', backgroundColor: '#f8f9fa' }}>
+                <Routes>
+                  <Route path="/dashboard" element={<DashboardPage />} />
+                  <Route path="/ho-gia-dinh/ho-khau" element={<HoKhauPage />} />
+                  <Route path="/ho-gia-dinh/can-ho" element={<CanHoPage />} />
+                  <Route path="/quan-ly-nhan-dan/nhan-khau" element={<NhanKhauPage />} />
+                  <Route path="/quan-ly-nhan-dan/tam-tru" element={<TamTruPage />} />
+                  <Route path="/quan-ly-nhan-dan/tam-vang" element={<TamVangPage />} />
+                  <Route path="/quan-ly-khoan-thu" element={<KhoanThuPage />} />
+                  <Route path="/quan-ly-tai-khoan" element={<TaiKhoanPage />} />
+                  
+                  
+                  {/* Nếu gõ đường dẫn lạ bên trong khu vực này, tự về dashboard */}
+                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                </Routes>
+              </div>
+            </div>
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  );
+}
+
+export default App;
