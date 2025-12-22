@@ -1,10 +1,12 @@
 // src/pages/CreateCanHoPage.jsx
 import React, { useState } from 'react';
 import { 
-  Box, Typography, TextField, Button, Grid, Paper, 
-  MenuItem, Select, FormControl, InputLabel, Stack 
+  Box, Typography, TextField, Button, Grid, Paper,
+  MenuItem, Select, FormControl, InputLabel, OutlinedInput, Chip,
+  Stack, IconButton
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 
 const CreateCanHoPage = () => {
@@ -40,9 +42,15 @@ const CreateCanHoPage = () => {
         flexDirection: 'column',
         boxSizing: 'border-box'  
       }}>
-      <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3 }}>
-        Thêm căn hộ mới
-      </Typography>
+      {/* Tiêu đề và nút quay lại */}
+      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
+        <IconButton onClick={() => navigate('/ho-gia-dinh/can-ho')}>
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+          Thêm căn hộ mới
+        </Typography>
+      </Stack>
 
       <Paper elevation={0} sx={{ p: 4, borderRadius: '12px', border: '1px solid #e0e0e0', maxWidth: '1000px' }}>
         <form onSubmit={handleSave}>
