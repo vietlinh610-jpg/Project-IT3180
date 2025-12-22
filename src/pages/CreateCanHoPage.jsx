@@ -30,7 +30,6 @@ const CreateCanHoPage = () => {
     e.preventDefault();
     console.log("Dữ liệu căn hộ mới:", formData);
     alert("Thêm căn hộ thành công!");
-    navigate('/ho-gia-dinh/can-ho');
   };
 
   return (
@@ -110,23 +109,6 @@ const CreateCanHoPage = () => {
                 onChange={handleChange}
                 required
               />
-            </Grid>
-
-            {/* DÒNG 5: Trạng thái căn hộ */}
-            <Grid item xs={12}>
-              <FormControl fullWidth variant="filled">
-                <InputLabel>Trạng thái</InputLabel>
-                <Select
-                  name="trangThai"
-                  value={formData.trangThai}
-                  onChange={handleChange}
-                >
-                  <MenuItem value="Trống">Trống</MenuItem>
-                  <MenuItem value="Đã bàn giao">Đã bàn giao</MenuItem>
-                  <MenuItem value="Đang ở">Đang ở</MenuItem>
-                  <MenuItem value="Bảo trì">Bảo trì</MenuItem>
-                </Select>
-              </FormControl>
             </Grid>
 
             {/* NÚT LƯU */}
