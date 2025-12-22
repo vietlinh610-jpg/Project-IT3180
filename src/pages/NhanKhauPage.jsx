@@ -126,13 +126,6 @@ const NhanKhauPage = () => {
         Quản lý nhân khẩu
       </Typography>
 
-      <Button 
-        variant="contained" 
-        onClick={() => navigate('/quan-ly-nhan-dan/nhan-khau/create')}
-        sx={{ mb: 3, backgroundColor: '#008ecc', textTransform: 'none', fontWeight: 'bold', width: 'fit-content' }}
-      >
-        THÊM NHÂN KHẨU
-      </Button>
 
       <Paper elevation={0} sx={{ flexGrow: 1, border: '1px solid #e0e0e0', borderRadius: '8px' }}>
         <DataGrid
@@ -162,6 +155,9 @@ const NhanKhauPage = () => {
         </DialogContent>
         {/* DialogActions phải nằm TRONG Dialog */}
         <DialogActions sx={{ p: 2, gap: 1 }}>
+          <Button variant="outlined" color="success" onClick={() => navigate('/ho-gia-dinh/ho-khau/create')} sx={{ textTransform: 'none' }}>
+            Thêm
+          </Button>
           <Button 
             variant="contained" 
             color={isEditing ? "success" : "primary"} 

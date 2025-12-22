@@ -40,19 +40,6 @@ const HoKhauPage = () => {
           >
             <DeleteIcon fontSize="small" />
           </IconButton>
-          <Button 
-            variant="contained" 
-            size="small" 
-            startIcon={<AccountBalanceWalletIcon />}
-            sx={{ 
-                backgroundColor: '#008ecc', 
-                textTransform: 'none', 
-                fontSize: '0.75rem',
-                '&:hover': { backgroundColor: '#0076a8' }
-            }}
-          >
-            KHOẢN THU
-          </Button>
         </Stack>
       ),
     },

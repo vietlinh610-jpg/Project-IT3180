@@ -18,15 +18,8 @@ const CreateHoKhauPage = () => {
     diaChiThuongTru: '',
     noiCap: '',
     ngayCap: '2024-01-11',
-    danhSachNhanKhau: []
   });
 
-  // Giả lập danh sách nhân khẩu chưa có hộ khẩu để chọn
-  const nhanKhauAvailable = [
-    { id: 'NK001', hoTen: 'Nguyễn Hùng An' },
-    { id: 'NK002', hoTen: 'Thu Trang' },
-    { id: 'NK003', hoTen: 'Trần Đạt' },
-  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -117,32 +110,7 @@ const CreateHoKhauPage = () => {
               />
             </Grid>
 
-            {/* Danh sách mã nhân khẩu (Multi-select) */}
-            <Grid item xs={12}>
-              <FormControl fullWidth variant="outlined">
-                <InputLabel>Danh sách mã nhân khẩu</InputLabel>
-                <Select
-                  multiple
-                  name="danhSachNhanKhau"
-                  value={formData.danhSachNhanKhau}
-                  onChange={handleChange}
-                  input={<OutlinedInput label="Danh sách mã nhân khẩu" />}
-                  renderValue={(selected) => (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selected.map((value) => (
-                        <Chip key={value} label={value} size="small" color="primary" />
-                      ))}
-                    </Box>
-                  )}
-                >
-                  {nhanKhauAvailable.map((nk) => (
-                    <MenuItem key={nk.id} value={nk.id}>
-                      {nk.id} - {nk.hoTen}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+            
 
             {/* Nút lưu */}
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
