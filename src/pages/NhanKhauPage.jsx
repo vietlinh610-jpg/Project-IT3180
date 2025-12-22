@@ -4,8 +4,10 @@ import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { Box, Typography, Button, Stack, IconButton, Chip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useNavigate } from 'react-router-dom';
 
 const NhanKhauPage = () => {
+  const navigate = useNavigate();
   // 1. Định nghĩa các cột cho Danh sách nhân khẩu
   const columns = [
     { field: 'hoTen', headerName: 'Họ tên', flex: 1.2, minWidth: 180 },
@@ -71,6 +73,7 @@ const NhanKhauPage = () => {
       {/* Nút Thêm nhân khẩu */}
       <Button 
         variant="contained" 
+        onClick={() => navigate('/quan-ly-nhan-dan/nhan-khau/create')}
         sx={{ 
           mb: 3, 
           backgroundColor: '#008ecc', 

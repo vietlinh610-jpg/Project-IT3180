@@ -71,12 +71,6 @@ const KhoanThuPage = () => {
         >
           TẠO KHOẢN THU MỚI
         </Button>
-        <Button 
-          variant="outlined" 
-          sx={{ color: '#008ecc', borderColor: '#008ecc', textTransform: 'none' }}
-        >
-          THỐNG KÊ DOANH THU
-        </Button>
       </Stack>
 
       <Box sx={{ flexGrow: 1, width: '100%', backgroundColor: '#fff' }}>

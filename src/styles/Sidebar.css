@@ -173,6 +173,8 @@
     background-color: #f1f1f1;
 }
 
+.arrow.rotate { transform: rotate(180deg); }
+
 /* Đảm bảo toàn bộ chữ trong sidebar là font không chân sạch sẽ */
 * {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

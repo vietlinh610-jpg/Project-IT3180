@@ -10,16 +10,32 @@ const LoginPage = () => {
 
   const handleSubmit = (e) => {
   e.preventDefault();
+
+  // QUAN TRỌNG: Xóa sạch dữ liệu cũ để tránh xung đột vai trò (Role)
+  localStorage.clear();
   
   // Giả lập kiểm tra tài khoản
   if (username === 'admin' && password === '123') {
-    // QUAN TRỌNG: Lưu token giả vào máy để ProtectedRoute nhận diện
-    localStorage.setItem('userToken', 'fake-token-123'); 
-    
-    alert('Đăng nhập thành công!');
-    navigate('/dashboard'); 
+    localStorage.setItem('userToken', 'token-admin');
+    localStorage.setItem('userRole', 'admin');
+    navigate('/dashboard');
+    // Mẹo: Dùng window.location.reload() nếu muốn chắc chắn 100% ứng dụng reset hoàn toàn
+    window.location.reload();
+  } else if (username === 'ketoan' && password === '123') {
+    localStorage.setItem('userToken', 'token-ketoan');
+    localStorage.setItem('userRole', 'ketoan');
+    navigate('/dashboard');
+    // Mẹo: Dùng window.location.reload() nếu muốn chắc chắn 100% ứng dụng reset hoàn toàn
+    window.location.reload();
+  } else if (username === 'user' && password === '123') {
+    // Tài khoản dành cho người dân
+    localStorage.setItem('userToken', 'token-user');
+    localStorage.setItem('userRole', 'user'); 
+    navigate('/dashboard');
+    // Mẹo: Dùng window.location.reload() nếu muốn chắc chắn 100% ứng dụng reset hoàn toàn
+    window.location.reload();
   } else {
-    alert('Tài khoản không đúng. Vui lòng nhập lại!');
+    alert('Sai tài khoản hoặc mật khẩu!');
   }
 };
 

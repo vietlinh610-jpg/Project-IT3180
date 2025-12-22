@@ -12,6 +12,13 @@ import TamTruPage from './pages/TamTruPage';
 import TamVangPage from './pages/TamVangPage';
 import KhoanThuPage from './pages/KhoanThuPage';
 import TaiKhoanPage from './pages/TaikhoanPage';
+import ThongTinCaNhanPage from './pages/ThongTinCaNhanPage';
+import ThanhVienGiaDinhPage from './pages/ThanhVienGiaDinhPage';
+import KhoanThuUserPage from './pages/KhoanThuUserPage';
+import KiemTraKhoanThuPage from './pages/KiemTraKhoanThuPage';
+import CreateHoKhauPage from './pages/CreateHoKhauPage';
+import CreateCanHoPage from './pages/CreateCanHoPage';
+import CreateNhanKhauPage from './pages/CreateNhanKhauPage';
 
 function App() {
   return (
@@ -19,6 +26,7 @@ function App() {
       {/* 1. Các trang công khai - Ai cũng xem được */}
       
       <Route path="/" element={<LoginPage />} />
+      <Route path="/login" element={<LoginPage />} />
 
       {/* 2. Các trang bảo mật - Phải login mới thấy Sidebar và nội dung */}
       <Route
@@ -40,6 +48,13 @@ function App() {
                   <Route path="/quan-ly-nhan-dan/tam-vang" element={<TamVangPage />} />
                   <Route path="/quan-ly-khoan-thu" element={<KhoanThuPage />} />
                   <Route path="/quan-ly-tai-khoan" element={<TaiKhoanPage />} />
+                  <Route path="/thong-tin-ca-nhan" element={<ThongTinCaNhanPage />} />
+                  <Route path="/thanh-vien-gia-dinh" element={<ThanhVienGiaDinhPage />} />
+                  <Route path="/khoan-thu" element={<KhoanThuUserPage />} />
+                  <Route path="/kiem-tra-khoan-thu" element={<KiemTraKhoanThuPage />} />
+                  <Route path="/ho-gia-dinh/ho-khau/create" element={<CreateHoKhauPage />} />
+                  <Route path="/ho-gia-dinh/can-ho/create" element={<CreateCanHoPage />} />
+                  <Route path="/quan-ly-nhan-dan/nhan-khau/create" element={<CreateNhanKhauPage />} />
                   
                   
                   {/* Nếu gõ đường dẫn lạ bên trong khu vực này, tự về dashboard */}

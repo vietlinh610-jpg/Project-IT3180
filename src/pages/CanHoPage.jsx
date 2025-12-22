@@ -4,8 +4,10 @@ import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { Box, Typography, Button, Stack, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useNavigate } from 'react-router-dom';
 
 const CanHoPage = () => {
+  const navigate = useNavigate();
   // 1. Định nghĩa các cột cho Danh sách căn hộ
   const columns = [
     { field: 'maCanHo', headerName: 'Mã căn hộ', flex: 1, minWidth: 100 },
@@ -60,6 +62,7 @@ const CanHoPage = () => {
       {/* Nút Thêm căn hộ */}
       <Button 
         variant="contained" 
+        onClick={() => navigate('/ho-gia-dinh/can-ho/create')}
         sx={{ 
           mb: 3, 
           backgroundColor: '#008ecc', 

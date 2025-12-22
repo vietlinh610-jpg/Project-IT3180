@@ -6,8 +6,11 @@ import { Box, Typography, Button, Stack, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import { useNavigate } from 'react-router-dom';
+
 
 const HoKhauPage = () => {
+  const navigate = useNavigate();
   // 1. Định nghĩa các cột của bảng
   const columns = [
     { field: 'maHoKhau', headerName: 'Mã hộ khẩu', flex: 1, minWidth: 150 },
@@ -74,7 +77,11 @@ const HoKhauPage = () => {
         Danh sách hộ khẩu
       </Typography>
 
-      <Button variant="contained" sx={{ mb: 3, width: 'fit-content', backgroundColor: '#008ecc' }}>
+      <Button 
+        variant="contained" 
+        onClick={() => navigate('/ho-gia-dinh/ho-khau/create')}
+        sx={{ mb: 3, width: 'fit-content', backgroundColor: '#008ecc' }}
+      >
         ĐĂNG KÝ HỘ KHẨU
       </Button>
 
