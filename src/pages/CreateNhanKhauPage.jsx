@@ -64,6 +64,19 @@ const CreateNhanKhauPage = () => {
               />
             </Grid>
 
+            {/* Dòng : Giới tính*/}
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Giới tính *"
+                name="gioiTinh"
+                variant="filled"
+                value={formData.gioiTinh}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+
             {/* Dòng 2: CCCD và Dân tộc */}
             <Grid item xs={12} md={8}>
               <TextField
@@ -124,19 +137,6 @@ const CreateNhanKhauPage = () => {
             </Grid>
 
             {/* Dòng 5: Trạng thái và Quan hệ */}
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth variant="filled">
-                <InputLabel>Trạng thái</InputLabel>
-                <Select
-                  name="trangThai"
-                  value={formData.trangThai}
-                  onChange={handleChange}
-                >
-                  <MenuItem value="Còn sống">Còn sống</MenuItem>
-                  <MenuItem value="Đã mất">Đã mất</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth

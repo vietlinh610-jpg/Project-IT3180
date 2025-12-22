@@ -1,4 +1,3 @@
-// src/pages/BillingPage.jsx
 import React, { useState } from 'react';
 import { 
   Box, Typography, Paper, Table, TableBody, TableCell, 
@@ -6,8 +5,12 @@ import {
 } from '@mui/material';
 import PaymentIcon from '@mui/icons-material/Payment';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+// QUAN TRỌNG: Cần import thêm HistoryIcon
+import HistoryIcon from '@mui/icons-material/History'; 
+import { useNavigate } from 'react-router-dom';
 
 const KhoanThuUserPage = () => {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false); // Trạng thái mở Modal QR
 
   // Dữ liệu mẫu các khoản thu của cư dân
@@ -26,23 +29,35 @@ const KhoanThuUserPage = () => {
   };
 
   return (
-    <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100vh', width: '100%', boxSizing: 'border-box' }}>
+    <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%', boxSizing: 'border-box', backgroundColor: '#f8f9fa' }}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
         <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#2c3e50' }}>
           Danh sách khoản thu
         </Typography>
-        <Button 
-          variant="contained" 
-          startIcon={<PaymentIcon />}
-          onClick={() => setOpen(true)}
-          sx={{ bgcolor: '#308ed6ff', '&:hover': { bgcolor: '#b2bec3' } }}
-        >
-          Thanh toán nhanh QR
-        </Button>
+
+        <Stack direction="row" spacing={2}>
+          <Button 
+            variant="outlined" 
+            startIcon={<HistoryIcon />}
+            onClick={() => navigate('/khoan-thu/lich-su')}
+            sx={{ textTransform: 'none', borderRadius: '8px', color: '#2c3e50', borderColor: '#dcdde1' }}
+          >
+            Lịch sử nộp tiền
+          </Button>
+
+          <Button 
+            variant="contained" 
+            startIcon={<PaymentIcon />}
+            onClick={() => setOpen(true)}
+            sx={{ bgcolor: '#008ecc', '&:hover': { bgcolor: '#007bb5' }, textTransform: 'none', borderRadius: '8px' }}
+          >
+            Thanh toán
+          </Button>
+        </Stack>
       </Stack>
 
       <Paper elevation={1} sx={{ borderRadius: '15px', overflow: 'hidden' }}>
-        <Box sx={{ p: 2, bgcolor: '#f8f9fa', display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ p: 2, bgcolor: '#ffffff', display: 'flex', alignItems: 'center', gap: 1, borderBottom: '1px solid #f1f2f6' }}>
           <ReceiptLongIcon color="primary" />
           <Typography sx={{ fontWeight: 'bold' }}>Chi tiết hóa đơn căn hộ P.805</Typography>
         </Box>
@@ -59,7 +74,7 @@ const KhoanThuUserPage = () => {
                 <TableCell sx={{ fontWeight: 'bold' }}>Thao tác</TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
+            <TableBody sx={{ backgroundColor: '#fff' }}>
               {bills.map((bill) => (
                 <TableRow key={bill.id} hover>
                   <TableCell sx={{ fontWeight: '500' }}>{bill.ten}</TableCell>
@@ -69,9 +84,9 @@ const KhoanThuUserPage = () => {
                   <TableCell>{getStatusChip(bill.trangThai)}</TableCell>
                   <TableCell>
                     {bill.trangThai === "Chưa nộp" ? (
-                      <Button size="small" variant="text" onClick={() => setOpen(true)}>Chi tiết</Button>
+                      <Button size="small" variant="text" onClick={() => setOpen(true)} sx={{ textTransform: 'none' }}>Thanh toán</Button>
                     ) : (
-                      <Typography variant="caption" color="text.disabled">N/A</Typography>
+                      <Typography variant="caption" color="text.disabled">Đã hoàn tất</Typography>
                     )}
                   </TableCell>
                 </TableRow>
@@ -85,18 +100,21 @@ const KhoanThuUserPage = () => {
       <Modal open={open} onClose={() => setOpen(false)}>
         <Box sx={{
           position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-          width: 350, bgcolor: 'background.paper', borderRadius: '15px', p: 4, textAlign: 'center'
+          width: 350, bgcolor: 'background.paper', borderRadius: '20px', p: 4, textAlign: 'center',
+          boxShadow: 24
         }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>Quét mã VietQR</Typography>
-          <img 
-            src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=ThanhToanPhiChungCu" 
-            alt="QR Code" 
-            style={{ width: '100%', maxWidth: '200px' }}
-          />
+          <Box sx={{ p: 2, bgcolor: '#f1f2f6', borderRadius: '15px', mb: 2 }}>
+            <img 
+              src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=ThanhToanPhiChungCuP805" 
+              alt="QR Code" 
+              style={{ width: '100%', maxWidth: '200px', display: 'block', margin: '0 auto' }}
+            />
+          </Box>
           <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
             Nội dung: <strong>THANH TOAN P805</strong>
           </Typography>
-          <Button fullWidth variant="outlined" sx={{ mt: 3 }} onClick={() => setOpen(false)}>Đóng</Button>
+          <Button fullWidth variant="contained" sx={{ mt: 3, bgcolor: '#008ecc', textTransform: 'none' }} onClick={() => setOpen(false)}>Đóng</Button>
         </Box>
       </Modal>
     </Box>

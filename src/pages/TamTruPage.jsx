@@ -5,8 +5,10 @@ import { Box, Typography, Button, Stack, IconButton, Chip } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PrintIcon from '@mui/icons-material/Print';
+import { useNavigate } from 'react-router-dom';
 
 const TamTruPage = () => {
+  const navigate = useNavigate();
   // 1. Định nghĩa các cột cho Danh sách Tạm trú
   const columns = [
     { field: 'hoTen', headerName: 'Họ tên', flex: 1.2, minWidth: 180 },
@@ -62,6 +64,7 @@ const TamTruPage = () => {
 
       <Button 
         variant="contained" 
+        onClick={() => navigate('/quan-ly-nhan-dan/tam-tru/create')}
         sx={{ mb: 3, backgroundColor: '#008ecc', textTransform: 'none', fontWeight: 'bold', width: 'fit-content' }}
       >
         ĐĂNG KÝ TẠM TRÚ MỚI

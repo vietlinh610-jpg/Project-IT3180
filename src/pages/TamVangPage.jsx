@@ -5,8 +5,10 @@ import { Box, Typography, Button, Stack, IconButton, Chip } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InfoIcon from '@mui/icons-material/Info';
+import { useNavigate } from 'react-router-dom';
 
 const TamVangPage = () => {
+  const navigate = useNavigate();
   // 1. Định nghĩa các cột cho Danh sách Tạm vắng
   const columns = [
     { field: 'hoTen', headerName: 'Họ tên', flex: 1.2, minWidth: 180 },
@@ -76,6 +78,7 @@ const TamVangPage = () => {
 
       <Button 
         variant="contained" 
+        onClick={() => navigate('/quan-ly-nhan-dan/tam-vang/create')}
         sx={{ 
           mb: 3, 
           backgroundColor: '#008ecc', 

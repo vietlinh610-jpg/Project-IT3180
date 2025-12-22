@@ -74,7 +74,7 @@ const DashboardPage = () => {
       title: "Khoản thu",
       description: "Xem các hóa đơn và đóng phí hàng tháng",
       imageUrl: "/images/khoan_thu.png",
-      linkTo: "/khoan-khu",
+      linkTo: "/khoan-thu",
       roles: ['user'],
     },
     {

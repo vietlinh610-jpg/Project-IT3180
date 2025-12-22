@@ -19,6 +19,10 @@ import KiemTraKhoanThuPage from './pages/KiemTraKhoanThuPage';
 import CreateHoKhauPage from './pages/CreateHoKhauPage';
 import CreateCanHoPage from './pages/CreateCanHoPage';
 import CreateNhanKhauPage from './pages/CreateNhanKhauPage';
+import LichSuThanhToanPage from './pages/LichSuThanhToanPage';
+import CreateKhoanThuPage from './pages/CreateKhoanThuPage';
+import CreateTamTruPage from './pages/CreateTamTruPage';
+import CreateTamVangPage from './pages/CreateTamVangPage';
 
 function App() {
   return (
@@ -55,6 +59,10 @@ function App() {
                   <Route path="/ho-gia-dinh/ho-khau/create" element={<CreateHoKhauPage />} />
                   <Route path="/ho-gia-dinh/can-ho/create" element={<CreateCanHoPage />} />
                   <Route path="/quan-ly-nhan-dan/nhan-khau/create" element={<CreateNhanKhauPage />} />
+                  <Route path="/khoan-thu/lich-su" element={<LichSuThanhToanPage />} />
+                  <Route path="/quan-ly-khoan-thu/create" element={<CreateKhoanThuPage />} />
+                  <Route path="/quan-ly-nhan-dan/tam-tru/create" element={<CreateTamTruPage />} />
+                  <Route path="/quan-ly-nhan-dan/tam-vang/create" element={<CreateTamVangPage />} />
                   
                   
                   {/* Nếu gõ đường dẫn lạ bên trong khu vực này, tự về dashboard */}

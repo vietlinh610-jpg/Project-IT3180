@@ -32,7 +32,14 @@ const CreateCanHoPage = () => {
   };
 
   return (
-    <Box sx={{ p: 4, backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+    <Box sx={{ 
+        p: 4, 
+        width: '100%',        // Chiếm toàn bộ chiều rộng vùng nội dung bên phải
+        height: '100vh',     // Cố định chiều cao bằng màn hình để tránh lỗi dài vô tận
+        display: 'flex', 
+        flexDirection: 'column',
+        boxSizing: 'border-box'  
+      }}>
       <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3 }}>
         Thêm căn hộ mới
       </Typography>
