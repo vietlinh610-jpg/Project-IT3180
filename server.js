@@ -9,14 +9,17 @@ app.use(cors());
 app.use(express.json());
 
 // Import Routes
-const authRoutes = require('./routes/authRoutes');         // <--- Mới
-const residentRoutes = require('./routes/residentRoutes');
-const feeRoutes = require('./routes/feeRoutes');
-
+const hokhauRoutes = require('./routes/hokhauRoutes');
+const canhoRoutes = require('./routes/canhoRoutes');
+const nhankhauRoutes = require('./routes/nhankhauRoutes');
+const tamvangRoutes = require('./routes/tamvangRoutes');
+const tamtruRoutes = require('./routes/tamtruRoutes');
 // Sử dụng Routes
-app.use('/api/auth', authRoutes);           // <--- Mới (Đăng nhập tại /api/auth/login)
-app.use('/api/residents', residentRoutes);
-app.use('/api/fees', feeRoutes);
+app.use('/api/hokhau', hokhauRoutes);
+app.use('/api/canho', canhoRoutes);
+app.use('/api/nhankhau', nhankhauRoutes);
+app.use('/api/tamvang', tamvangRoutes);
+app.use('/api/tamtru', tamtruRoutes);
 
 app.get('/', (req, res) => {
     res.send('API is ready!');
