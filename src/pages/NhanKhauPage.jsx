@@ -257,6 +257,7 @@ const NhanKhauPage = () => {
         </DialogContent>
 
         <DialogActions sx={{ p: 2, gap: 1 }}>
+
           {selectedMaHoKhau && (
              <Button 
                 variant="outlined" color="success" startIcon={<AddIcon />}
