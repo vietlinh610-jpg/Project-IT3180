@@ -1,92 +1,109 @@
 ﻿
--- 1. Bảng Hộ khẩu
+GO
+
+-- ==================================================================================
+-- 1. CLEANUP (XÓA BẢNG CŨ)
+-- ==================================================================================
+-- Xóa theo thứ tự: Bảng con xóa trước -> Bảng cha xóa sau
+IF OBJECT_ID('dbo.tam_tru', 'U') IS NOT NULL DROP TABLE dbo.tam_tru;
+IF OBJECT_ID('dbo.tam_vang', 'U') IS NOT NULL DROP TABLE dbo.tam_vang;
+IF OBJECT_ID('dbo.nhan_khau', 'U') IS NOT NULL DROP TABLE dbo.nhan_khau;
+IF OBJECT_ID('dbo.can_ho', 'U') IS NOT NULL DROP TABLE dbo.can_ho;
+IF OBJECT_ID('dbo.ho_khau', 'U') IS NOT NULL DROP TABLE dbo.ho_khau;
+GO
+
+-- ==================================================================================
+-- 2. TẠO BẢNG HỘ KHẨU
+-- ==================================================================================
 CREATE TABLE ho_khau (
-    MaHo INT PRIMARY KEY IDENTITY(1,1),
-    SoThanhVien INT DEFAULT 0,
-    DiaChi NVARCHAR(200) NOT NULL
+    MaHoKhau VARCHAR(20) PRIMARY KEY, -- Tự nhập: "HK01"
+    DiaChiThuongTru NVARCHAR(200),
+    NoiCap NVARCHAR(100),
+    NgayCap DATE
+    -- Đã bỏ cột MaChuHo theo yêu cầu
 );
+GO
 
--- 2. Bảng Nhân khẩu
+-- ==================================================================================
+-- 3. TẠO BẢNG CĂN HỘ 
+-- ==================================================================================
+CREATE TABLE can_ho (
+    MaCanHo VARCHAR(20) PRIMARY KEY, -- Tự nhập: "P101"
+    TenCanHo NVARCHAR(50),
+    Tang INT,
+    DienTich FLOAT,
+    
+    MaHoKhau VARCHAR(20), 
+    
+    -- Nếu sửa mã HK01 -> HK99 thì ở đây tự cập nhật theo
+    FOREIGN KEY (MaHoKhau) REFERENCES ho_khau(MaHoKhau) 
+        ON DELETE SET NULL 
+        ON UPDATE CASCADE 
+);
+GO
+
+-- ==================================================================================
+-- 4. TẠO BẢNG NHÂN KHẨU 
+-- ==================================================================================
 CREATE TABLE nhan_khau (
-    ID INT PRIMARY KEY IDENTITY(1,1),
-    CMND VARCHAR(20) UNIQUE,
-    Ten NVARCHAR(50) NOT NULL,
-    Tuoi INT,
-    SDT VARCHAR(15),
-    MaHo INT,
-    FOREIGN KEY (MaHo) REFERENCES ho_khau(MaHo) ON DELETE SET NULL
+    MaNhanKhau VARCHAR(20) PRIMARY KEY, -- Tự nhập: "NK001"
+    
+    MaHoKhau VARCHAR(20),
+    
+    HoTen NVARCHAR(100) NOT NULL,
+    GioiTinh NVARCHAR(10), 
+    NgaySinh DATE,
+    DanToc NVARCHAR(50),
+    TonGiao NVARCHAR(50),
+    QuocTich NVARCHAR(50) DEFAULT N'Việt Nam',
+    NgheNghiep NVARCHAR(100),
+    SoCCCD VARCHAR(20),
+    NoiSinh NVARCHAR(200),
+    QuanHeVoiChuHo NVARCHAR(50), 
+    
+    FOREIGN KEY (MaHoKhau) REFERENCES ho_khau(MaHoKhau) 
+        ON DELETE SET NULL 
+        ON UPDATE CASCADE
 );
+GO
 
--- 3. Bảng Quan hệ
-CREATE TABLE quan_he (
-    MaHo INT,
-    IDThanhVien INT,
-    QuanHe NVARCHAR(30),
-    PRIMARY KEY (MaHo, IDThanhVien),
-    FOREIGN KEY (MaHo) REFERENCES ho_khau(MaHo),
-    FOREIGN KEY (IDThanhVien) REFERENCES nhan_khau(ID)
-);
+-- Index CCCD (Vẫn giữ để đảm bảo không trùng số CCCD)
+CREATE UNIQUE NONCLUSTERED INDEX IX_NhanKhau_CCCD ON nhan_khau(SoCCCD) WHERE SoCCCD IS NOT NULL;
+GO
 
--- 4. Bảng Chủ hộ
-CREATE TABLE chu_ho (
-    MaHo INT PRIMARY KEY,
-    IDChuHo INT,
-    Note NVARCHAR(255),
-    FOREIGN KEY (MaHo) REFERENCES ho_khau(MaHo),
-    FOREIGN KEY (IDChuHo) REFERENCES nhan_khau(ID)
-);
-
--- 5. Bảng Khoản thu
-CREATE TABLE khoan_thu (
-    MaKhoanThu INT PRIMARY KEY IDENTITY(1,1),
-    TenKhoanThu NVARCHAR(100) NOT NULL,
-    SoTien FLOAT,    -- Trong SQL Server, DOUBLE tương ứng với FLOAT
-    LoaiKhoanThu INT
-);
-
--- 6. Bảng Nộp tiền
-CREATE TABLE nop_tien (
-    IDNopTien INT PRIMARY KEY IDENTITY(1,1),
-    MaKhoanThu INT,
-    IDThanhVien INT,
-    NgayThu DATE DEFAULT GETDATE(),
-    FOREIGN KEY (MaKhoanThu) REFERENCES khoan_thu(MaKhoanThu),
-    FOREIGN KEY (IDThanhVien) REFERENCES nhan_khau(ID)
-);
-
--- 7. Bảng Người dùng (Admin)
-CREATE TABLE nguoi_dung (
-    ID INT PRIMARY KEY IDENTITY(1,1),
-    Username VARCHAR(30) UNIQUE NOT NULL,
-    Passwd VARCHAR(100) NOT NULL
-);
-
--- 8. BẢNG TẠM VẮNG (Theo dõi cư dân đi vắng)
-
+-- ==================================================================================
+-- 5. TẠO BẢNG TẠM VẮNG (ID TỰ TĂNG)
+-- ==================================================================================
 CREATE TABLE tam_vang (
-    ID INT PRIMARY KEY IDENTITY(1,1),       -- Khóa chính tự tăng
-    HoTen NVARCHAR(50) NOT NULL,            -- Khớp kiểu dữ liệu với bảng nhan_khau
-    SoCCCD VARCHAR(20) NOT NULL,            -- Khớp kiểu dữ liệu với bảng nhan_khau
-    MaHoKhau INT,                           -- Liên kết với hộ khẩu gốc
-    NgayDi DATE NOT NULL,
-    NgayVeDuKien DATE,
+    ID INT PRIMARY KEY IDENTITY(1,1), -- ID tự động (1, 2, 3...)
+    
+    MaNhanKhau VARCHAR(20) NOT NULL, -- Vẫn nối với mã tự nhập của bảng Nhân Khẩu
+    
+    NgayDi DATE,
+    NgayVe DATE,
     LyDo NVARCHAR(255),
-    TrangThai NVARCHAR(50) DEFAULT N'Chờ duyệt', -- Mặc định là Chờ duyệt
-    -- Liên kết MaHoKhau với MaHo trong bảng ho_khau
-    CONSTRAINT FK_TamVang_HoKhau FOREIGN KEY (MaHoKhau) REFERENCES ho_khau(MaHo)
+    
+    -- Nếu mã nhân khẩu sửa NK01 -> NK99, bảng này tự cập nhật
+    FOREIGN KEY (MaNhanKhau) REFERENCES nhan_khau(MaNhanKhau) 
+        ON DELETE CASCADE 
+        ON UPDATE CASCADE 
 );
+GO
 
--- 9. BẢNG TẠM TRÚ (Người mới đến ở)
+-- ==================================================================================
+-- 6. TẠO BẢNG TẠM TRÚ (ID TỰ TĂNG)
+-- ==================================================================================
 CREATE TABLE tam_tru (
-    ID INT PRIMARY KEY IDENTITY(1,1),       -- Khóa chính tự tăng
-    MaGiayTamTru VARCHAR(20),               -- Mã giấy
-    HoTen NVARCHAR(50) NOT NULL,
-    SoCCCD VARCHAR(20) NOT NULL,
-    MaCanHo INT,                            -- Mã căn hộ họ đến ở (Chính là MaHo)
-    NgayBatDau DATE NOT NULL,
-    NgayKetThuc DATE NOT NULL,
-    LyDo NVARCHAR(255),                     -- Thường có lý do (Lao động, Sinh viên...)
-    TrangThai NVARCHAR(50) DEFAULT N'Chờ duyệt',
-    -- Liên kết MaCanHo với MaHo trong bảng ho_khau
-    CONSTRAINT FK_TamTru_HoKhau FOREIGN KEY (MaCanHo) REFERENCES ho_khau(MaHo)
+    ID INT PRIMARY KEY IDENTITY(1,1), -- ID tự động (1, 2, 3...)
+    
+    MaNhanKhau VARCHAR(20) NOT NULL, 
+    
+    TuNgay DATE,
+    DenNgay DATE,
+    LyDo NVARCHAR(255),
+    
+    FOREIGN KEY (MaNhanKhau) REFERENCES nhan_khau(MaNhanKhau) 
+        ON DELETE CASCADE 
+        ON UPDATE CASCADE 
 );
+GO
