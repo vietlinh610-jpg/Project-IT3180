@@ -155,7 +155,7 @@ const NhanKhauPage = () => {
         </DialogContent>
         {/* DialogActions phải nằm TRONG Dialog */}
         <DialogActions sx={{ p: 2, gap: 1 }}>
-          <Button variant="outlined" color="success" onClick={() => navigate('/ho-gia-dinh/ho-khau/create')} sx={{ textTransform: 'none' }}>
+          <Button variant="outlined" color="success" onClick={() => navigate('/quan-ly-nhan-dan/nhan-khau/create')} sx={{ textTransform: 'none' }}>
             Thêm
           </Button>
           <Button 
