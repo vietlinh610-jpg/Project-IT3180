@@ -1,90 +1,235 @@
 // src/pages/TamVangPage.jsx
-import React from 'react';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { Box, Typography, Button, Stack, IconButton, Chip } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { 
+  DataGrid, GridToolbar, GridRowModes, GridActionsCellItem 
+} from '@mui/x-data-grid';
+import { 
+  Box, Typography, Button, Stack, Chip, 
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField 
+} from '@mui/material';
+
+// Icons
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import InfoIcon from '@mui/icons-material/Info';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Close';
+import AddIcon from '@mui/icons-material/Add';
+import InfoIcon from '@mui/icons-material/Info'; // Icon xem chi tiết
+
 import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
+
+// Import API
+import { 
+  getListTamVang, deleteTamVang, updateTamVang 
+} from '../services/tamvangApi'; // Đảm bảo đúng đường dẫn
 
 const TamVangPage = () => {
   const navigate = useNavigate();
-  // 1. Định nghĩa các cột cho Danh sách Tạm vắng
+
+  // --- STATE ---
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [rowModesModel, setRowModesModel] = useState({});
+
+  // State cho Modal xem/sửa lý do
+  const [openDetail, setOpenDetail] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [isEditingReason, setIsEditingReason] = useState(false);
+  const [tempReason, setTempReason] = useState('');
+
+  // --- 1. CALL API ---
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const res = await getListTamVang();
+      
+      const formattedData = res.data.map((item, index) => ({
+        id: item.ID || index,
+        maNhanKhau: item.MaNhanKhau, // Thêm mã NK
+        hoTen: item.HoTen,
+        cccd: item.SoCCCD,
+        maHoKhau: item.MaHoKhau, 
+        lyDo: item.LyDo,
+        // Map NgayDi / NgayVe từ Backend
+        ngayDi: item.NgayDi ? new Date(item.NgayDi) : null,
+        ngayVeDuKien: item.NgayVe ? new Date(item.NgayVe) : null, // Backend là NgayVe
+      }));
+      
+      setRows(formattedData);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchData(); }, []);
+
+  // --- 2. XỬ LÝ MODAL (LÝ DO) ---
+  const handleViewDetail = (row) => {
+    setSelectedRow(row);
+    setTempReason(row.lyDo || '');
+    setIsEditingReason(false);
+    setOpenDetail(true);
+  };
+
+  const handleSaveReasonFromModal = async () => {
+    if (!selectedRow) return;
+    if (!selectedRow.ngayDi || !selectedRow.ngayVeDuKien) {
+        alert("Lỗi: Ngày đi và Ngày về không được để trống!");
+        return;
+    }
+
+    try {
+      const payload = {
+        NgayDi: dayjs(selectedRow.ngayDi).format('YYYY-MM-DD'),
+        NgayVe: dayjs(selectedRow.ngayVeDuKien).format('YYYY-MM-DD'),
+        LyDo: tempReason 
+      };
+
+      await updateTamVang(selectedRow.id, payload);
+      alert("Cập nhật lý do thành công!");
+      setOpenDetail(false);
+      fetchData();
+    } catch (error) {
+      console.error(error);
+      alert("Lỗi: " + (error.response?.data?.message || error.message));
+    }
+  };
+
+  // --- 3. XỬ LÝ GRID (INLINE EDIT & DELETE) ---
+  const handleDeleteClick = (id) => async () => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa hồ sơ này?")) {
+      try {
+        await deleteTamVang(id);
+        setRows(rows.filter((row) => row.id !== id));
+      } catch (e) { alert("Lỗi xóa!"); }
+    }
+  };
+
+  const processRowUpdate = async (newRow) => {
+    if (!newRow.ngayDi || !newRow.ngayVeDuKien) {
+        alert("Không được để trống ngày tháng!");
+        throw new Error("Date required");
+    }
+
+    try {
+      const payload = {
+        NgayDi: dayjs(newRow.ngayDi).format('YYYY-MM-DD'),
+        NgayVe: dayjs(newRow.ngayVeDuKien).format('YYYY-MM-DD'), // Map lại tên đúng với Backend
+        LyDo: newRow.lyDo 
+      };
+
+      await updateTamVang(newRow.id, payload);
+      fetchData();
+      return newRow;
+    } catch (error) {
+      alert("Cập nhật thất bại!");
+      throw error;
+    }
+  };
+
+  // Handlers cho chế độ Edit
+  const handleEditClick = (id) => () => setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+  const handleSaveClick = (id) => () => setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
+  const handleCancelClick = (id) => () => setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View, ignoreModifications: true } });
+
+  // --- 4. CẤU HÌNH CỘT ---
   const columns = [
+    { field: 'maNhanKhau', headerName: 'Mã NK', width: 90, editable: false },
     { field: 'hoTen', headerName: 'Họ tên', flex: 1.2, minWidth: 180 },
     { field: 'cccd', headerName: 'Số CCCD', flex: 1, minWidth: 150 },
     { field: 'maHoKhau', headerName: 'Mã hộ khẩu', flex: 0.8, align: 'center' },
-    { field: 'ngayDi', headerName: 'Ngày đi', flex: 1, minWidth: 120 },
-    { field: 'ngayVeDuKien', headerName: 'Ngày về dự kiến', flex: 1, minWidth: 120 },
-    { field: 'lyDo', headerName: 'Lý do tạm vắng', flex: 1.5, minWidth: 200 },
+    
+    // Cột Ngày đi (Sửa được)
+    { 
+      field: 'ngayDi', headerName: 'Ngày đi', flex: 1, minWidth: 120, 
+      editable: true, type: 'date',
+      valueFormatter: (v) => v ? dayjs(v).format('DD/MM/YYYY') : ''
+    },
+    
+    // Cột Ngày về dự kiến (Sửa được)
+    { 
+      field: 'ngayVeDuKien', headerName: 'Ngày về dự kiến', flex: 1, minWidth: 120, 
+      editable: true, type: 'date',
+      valueFormatter: (v) => v ? dayjs(v).format('DD/MM/YYYY') : ''
+    },
+
+    // ẨN CỘT LÝ DO KHỎI BẢNG (Đưa vào modal)
+
     { 
       field: 'trangThai', 
       headerName: 'Trạng thái', 
       flex: 1, 
       minWidth: 130,
-      renderCell: (params) => (
-        <Chip 
-          label={params.value} 
-          color={params.value === "Đang vắng" ? "warning" : "default"} 
-          size="small" 
-        />
-      )
+      renderCell: (params) => {
+        const today = dayjs();
+        const returnDate = dayjs(params.row.ngayVeDuKien);
+        const startDate = dayjs(params.row.ngayDi);
+        
+        let label = 'Đang vắng';
+        let color = 'warning';
+
+        // Nếu quá ngày về -> Đã về (hoặc hết hạn vắng)
+        if (today.isAfter(returnDate)) {
+            label = 'Đã về';
+            color = 'default';
+        }
+
+        if(today.isBefore(startDate)) {
+          label = 'Chưa đi';
+          color = 'info';
+        }
+
+        return <Chip label={label} color={color} size="small" variant="outlined" />;
+      }
     },
     {
       field: 'actions',
+      type: 'actions',
       headerName: 'Thao tác',
-      flex: 0.8,
-      minWidth: 120,
-      sortable: false,
-      renderCell: (params) => (
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ height: '100%' }}>
-          <IconButton size="small" title="Chi tiết"><InfoIcon fontSize="small" color="info" /></IconButton>
-          <IconButton size="small" title="Sửa"><EditIcon fontSize="small" /></IconButton>
-          <IconButton size="small" title="Xóa"><DeleteIcon fontSize="small" /></IconButton>
-        </Stack>
-      ),
-    },
-  ];
-
-  // 2. Dữ liệu mẫu Tạm vắng
-  const rows = [
-    { 
-      id: 1, 
-      hoTen: 'Lê Minh Triết', 
-      cccd: '038099887766', 
-      maHoKhau: 'HK26960674', 
-      ngayDi: '10/05/2024', 
-      ngayVeDuKien: '10/05/2025', 
-      lyDo: 'Đi học đại học tại TP.HCM',
-      trangThai: 'Đang vắng'
-    },
-    { 
-      id: 2, 
-      hoTen: 'Hoàng Văn Nam', 
-      cccd: '038011223344', 
-      maHoKhau: 'HK53663503', 
-      ngayDi: '01/02/2024', 
-      ngayVeDuKien: '01/02/2026', 
-      lyDo: 'Thực hiện nghĩa vụ quân sự',
-      trangThai: 'Đang vắng'
+      flex: 1,
+      minWidth: 150,
+      getActions: ({ id, row }) => {
+        const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+        if (isInEditMode) {
+          return [
+            <GridActionsCellItem icon={<SaveIcon />} label="Lưu" onClick={handleSaveClick(id)} sx={{ color: 'primary.main' }} />,
+            <GridActionsCellItem icon={<CancelIcon />} label="Hủy" onClick={handleCancelClick(id)} color="inherit" />
+          ];
+        }
+        return [
+          <GridActionsCellItem 
+            icon={<InfoIcon />} label="Chi tiết" 
+            onClick={() => handleViewDetail(row)} color="info" 
+          />,
+          <GridActionsCellItem 
+            icon={<EditIcon />} label="Sửa ngày" 
+            onClick={handleEditClick(id)} color="inherit" 
+          />,
+          <GridActionsCellItem 
+            icon={<DeleteIcon />} label="Xóa" 
+            onClick={handleDeleteClick(id)} color="error" 
+          />
+        ];
+      },
     },
   ];
 
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100vh', width: '100%', boxSizing: 'border-box' }}>
       <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2 }}>
-        Quản lý khai báo tạm vắng
+        Quản lý khai báo tạm vắng 
       </Typography>
 
       <Button 
         variant="contained" 
         onClick={() => navigate('/quan-ly-nhan-dan/tam-vang/create')}
+        startIcon={<AddIcon />}
         sx={{ 
-          mb: 3, 
-          backgroundColor: '#008ecc', 
-          textTransform: 'none', 
-          fontWeight: 'bold', 
-          width: 'fit-content' 
+          mb: 3, backgroundColor: '#008ecc', textTransform: 'none', 
+          fontWeight: 'bold', width: 'fit-content' 
         }}
       >
         KHAI BÁO TẠM VẮNG
@@ -94,20 +239,56 @@ const TamVangPage = () => {
         <DataGrid
           rows={rows}
           columns={columns}
+          loading={loading}
           slots={{ toolbar: GridToolbar }}
+          editMode="row"
+          rowModesModel={rowModesModel}
+          onRowModesModelChange={setRowModesModel}
+          processRowUpdate={processRowUpdate}
+          onProcessRowUpdateError={(err) => console.log(err)}
           initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
           pageSizeOptions={[10, 20, 50]}
           disableRowSelectionOnClick
           sx={{
-            height: '100%', // Bảng sẽ cao bằng đúng Box cha (flexGrow: 1)
-            width: '100%',  // Bảng rộng 100%
-            border: '1px solid #e0e0e0',
-            '& .MuiDataGrid-columnHeaders': {
-              backgroundColor: '#f8f9fa',
-            }
+            height: '100%', width: '100%', border: '1px solid #e0e0e0',
+            '& .MuiDataGrid-columnHeaders': { backgroundColor: '#f8f9fa' }
           }}
         />
       </Box>
+
+      {/* MODAL CHI TIẾT & SỬA LÝ DO */}
+      <Dialog open={openDetail} onClose={() => setOpenDetail(false)} fullWidth maxWidth="sm">
+        <DialogTitle sx={{ fontWeight: 'bold', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {isEditingReason ? "Chỉnh sửa lý do tạm vắng" : "Chi tiết lý do"}
+        </DialogTitle>
+        
+        <DialogContent dividers>
+          {isEditingReason ? (
+            <TextField
+              fullWidth multiline rows={4} variant="outlined" label="Nội dung lý do"
+              value={tempReason} onChange={(e) => setTempReason(e.target.value)} autoFocus
+            />
+          ) : (
+            <DialogContentText sx={{ color: '#333', fontSize: '1rem' }}>
+              {selectedRow?.lyDo || "Không có lý do cụ thể."}
+            </DialogContentText>
+          )}
+        </DialogContent>
+
+        <DialogActions sx={{ p: 2 }}>
+          {isEditingReason ? (
+            <>
+               <Button onClick={() => setIsEditingReason(false)} color="inherit">Hủy</Button>
+               <Button onClick={handleSaveReasonFromModal} variant="contained" color="primary">Lưu thay đổi</Button>
+            </>
+          ) : (
+            <>
+              <Button onClick={() => setOpenDetail(false)} color="inherit">Đóng</Button>
+              <Button onClick={() => setIsEditingReason(true)} variant="contained" startIcon={<EditIcon />}>Sửa lý do</Button>
+            </>
+          )}
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

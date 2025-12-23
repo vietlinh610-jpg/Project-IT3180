@@ -1,24 +1,28 @@
-// src/pages/CreateNhanKhauPage.jsx
 import React, { useState } from 'react';
 import { 
   Box, Typography, TextField, Button, Grid, Paper, 
-  MenuItem, Select, FormControl, InputLabel, IconButton, Stack
+  IconButton, Stack, CircularProgress 
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom'; // Thêm useParams
+import { createNhanKhau } from '../services/nhankhauApi'; // Import API
 
 const CreateNhanKhauPage = () => {
   const navigate = useNavigate();
+  const { maHoKhau } = useParams(); // Lấy mã hộ khẩu từ URL (VD: /nhan-khau/create/HK001)
+  const [loading, setLoading] = useState(false);
   
   const [formData, setFormData] = useState({
+    maNhanKhau: '', // Cần thêm trường này làm khóa chính
     hoTen: '',
     cccd: '',
-    danToc: '',
+    danToc: 'Kinh',
+    tonGiao: 'Không',
+    quocTich: 'Việt Nam',
     ngheNghiep: '',
-    ngaySinh: '2024-01-11',
+    ngaySinh: '',
     noiSinh: '',
-    trangThai: 'Còn sống',
     quanHe: '',
     ghiChu: ''
   });
@@ -28,31 +32,82 @@ const CreateNhanKhauPage = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    console.log("Dữ liệu nhân khẩu mới:", formData);
-    alert("Đăng ký nhân khẩu thành công!");
-    navigate('/quan-ly-nhan-dan/nhan-khau');
+
+    if (!maHoKhau) {
+      alert("Lỗi: Không xác định được Hộ khẩu để thêm người này vào!");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // Map dữ liệu sang chuẩn Backend
+      const payload = {
+        MaNhanKhau: formData.maNhanKhau,
+        MaHoKhau: maHoKhau, // Lấy từ URL
+        HoTen: formData.hoTen,
+        GioiTinh: formData.gioiTinh, // Lưu ý: Bạn cần thêm Select cho Giới tính ở giao diện
+        NgaySinh: formData.ngaySinh || null,
+        DanToc: formData.danToc,
+        TonGiao: formData.tonGiao,
+        QuocTich: formData.quocTich,
+        NgheNghiep: formData.ngheNghiep,
+        SoCCCD: formData.cccd,
+        NoiSinh: formData.noiSinh,
+        QuanHeVoiChuHo: formData.quanHe
+      };
+
+      await createNhanKhau(payload);
+      
+      alert("Đăng ký nhân khẩu thành công!");
+      navigate('/quan-ly-nhan-dan/nhan-khau', { state: { targetMaHoKhau: maHoKhau } });
+
+    } catch (error) {
+      console.error("Lỗi:", error);
+      const msg = error.response?.data?.message || "Có lỗi xảy ra!";
+      alert(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Box sx={{ p: 4, backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
-      {/* Nút quay lại và Tiêu đề */}
+      {/* Header */}
       <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
-        <IconButton onClick={() => navigate('/quan-ly-nhan-dan/nhan-khau')}>
+        <IconButton onClick={() => navigate('/quan-ly-nhan-dan/nhan-khau', { state: { targetMaHoKhau: maHoKhau } })}>
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-          Đăng ký nhân khẩu mới
-        </Typography>
+        <Box>
+            <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+            Thêm thành viên mới
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+            Đang thêm vào Hộ khẩu mã: <b>{maHoKhau}</b>
+            </Typography>
+        </Box>
       </Stack>
 
       <Paper elevation={0} sx={{ p: 4, borderRadius: '12px', border: '1px solid #e0e0e0', maxWidth: '1000px' }}>
         <form onSubmit={handleSave}>
-          <Grid container spacing={3} direction="column">
+          <Grid container spacing={3}>
             
-            {/* Dòng 1: Họ tên */}
-            <Grid item xs={12}>
+            {/* Dòng 1: Mã Nhân Khẩu & Họ Tên */}
+            <Grid size={4}>
+              <TextField
+                fullWidth
+                label="Mã Nhân Khẩu (ID) *"
+                name="maNhanKhau"
+                variant="filled"
+                value={formData.maNhanKhau}
+                onChange={handleChange}
+                required
+                placeholder="VD: NK001"
+              />
+            </Grid>
+            <Grid size={8}>
               <TextField
                 fullWidth
                 label="Họ tên *"
@@ -64,54 +119,26 @@ const CreateNhanKhauPage = () => {
               />
             </Grid>
 
-            {/* Dòng : Giới tính*/}
-            <Grid item xs={12}>
-              <TextField
+            {/* Dòng 2: Giới tính & Ngày sinh */}
+            <Grid size={4}>
+               {/* Thay TextField bằng Select cho Giới tính để chuẩn dữ liệu */}
+               <TextField
+                select
                 fullWidth
                 label="Giới tính *"
                 name="gioiTinh"
                 variant="filled"
-                value={formData.gioiTinh}
+                value={formData.gioiTinh || ''}
                 onChange={handleChange}
+                SelectProps={{ native: true }}
                 required
-              />
+              >
+                <option value=""></option>
+                <option value="Nam">Nam</option>
+                <option value="Nữ">Nữ</option>
+              </TextField>
             </Grid>
-
-            {/* Dòng 2: CCCD và Dân tộc */}
-            <Grid item xs={12} md={8}>
-              <TextField
-                fullWidth
-                label="Căn cước công dân *"
-                name="cccd"
-                variant="filled"
-                value={formData.cccd}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <TextField
-                fullWidth
-                label="Dân tộc"
-                name="danToc"
-                variant="filled"
-                value={formData.danToc}
-                onChange={handleChange}
-              />
-            </Grid>
-
-            {/* Dòng 3: Nghề nghiệp và Ngày sinh */}
-            <Grid item xs={12} md={8}>
-              <TextField
-                fullWidth
-                label="Nghề nghiệp"
-                name="ngheNghiep"
-                variant="filled"
-                value={formData.ngheNghiep}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={8}>
               <TextField
                 fullWidth
                 label="Ngày sinh"
@@ -121,11 +148,56 @@ const CreateNhanKhauPage = () => {
                 value={formData.ngaySinh}
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
+                required
               />
             </Grid>
 
-            {/* Dòng 4: Nơi sinh */}
-            <Grid item xs={12}>
+            {/* Dòng 3: CCCD, Dân tộc, Quan hệ */}
+            <Grid size={4}>
+              <TextField
+                fullWidth
+                label="Số CCCD *"
+                name="cccd"
+                variant="filled"
+                value={formData.cccd}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+            <Grid size={4}>
+              <TextField
+                fullWidth
+                label="Dân tộc"
+                name="danToc"
+                variant="filled"
+                value={formData.danToc}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid size={4}>
+              <TextField
+                fullWidth
+                label="Quan hệ với chủ hộ"
+                name="quanHe"
+                variant="filled"
+                value={formData.quanHe}
+                onChange={handleChange}
+                placeholder="VD: Con, Vợ..."
+              />
+            </Grid>
+
+            {/* Dòng 4: Nghề nghiệp & Nơi sinh */}
+            <Grid size={6}>
+              <TextField
+                fullWidth
+                label="Nghề nghiệp"
+                name="ngheNghiep"
+                variant="filled"
+                value={formData.ngheNghiep}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid size={6}>
               <TextField
                 fullWidth
                 label="Nơi sinh"
@@ -135,38 +207,35 @@ const CreateNhanKhauPage = () => {
                 onChange={handleChange}
               />
             </Grid>
-
-            {/* Dòng 5: Trạng thái và Quan hệ */}
-            <Grid item xs={12} md={6}>
+            
+            {/* Dòng 5: Tôn giáo & Quốc tịch (Thêm cho đủ DB) */}
+            <Grid size={6}>
               <TextField
                 fullWidth
-                label="Quan hệ với chủ hộ"
-                name="quanHe"
+                label="Tôn giáo"
+                name="tonGiao"
                 variant="filled"
-                value={formData.quanHe}
+                value={formData.tonGiao}
                 onChange={handleChange}
               />
             </Grid>
-
-            {/* Dòng 6: Ghi chú */}
-            <Grid item xs={12}>
+            <Grid size={6}>
               <TextField
                 fullWidth
-                label="Ghi chú"
-                name="ghiChu"
+                label="Quốc tịch"
+                name="quocTich"
                 variant="filled"
-                multiline
-                rows={3}
-                value={formData.ghiChu}
+                value={formData.quocTich}
                 onChange={handleChange}
               />
             </Grid>
 
             {/* Nút thao tác */}
-            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
+            <Grid size={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
               <Button 
                 variant="outlined" 
-                onClick={() => navigate('/quan-ly-nhan-dan/nhan-khau')}
+                onClick={() => navigate('/quan-ly-nhan-dan/nhan-khau', { state: { targetMaHoKhau: maHoKhau } })}
+                disabled={loading}
                 sx={{ textTransform: 'none' }}
               >
                 Hủy bỏ
@@ -174,7 +243,8 @@ const CreateNhanKhauPage = () => {
               <Button 
                 type="submit"
                 variant="contained" 
-                startIcon={<SaveIcon />}
+                disabled={loading}
+                startIcon={loading ? <CircularProgress size={20} color="inherit"/> : <SaveIcon />}
                 sx={{ 
                   bgcolor: '#27ae60', 
                   px: 4, 
@@ -183,7 +253,7 @@ const CreateNhanKhauPage = () => {
                   '&:hover': { bgcolor: '#219150' }
                 }}
               >
-                LƯU NHÂN KHẨU
+                {loading ? "ĐANG LƯU..." : "LƯU NHÂN KHẨU"}
               </Button>
             </Grid>
           </Grid>
