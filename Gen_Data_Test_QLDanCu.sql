@@ -173,3 +173,14 @@ VALUES
 PRINT '--> Đã tạo xong dữ liệu Tạm trú.';
 PRINT '===========================================';
 PRINT 'HOÀN TẤT GEN DỮ LIỆU!';
+
+INSERT INTO tai_khoan (HoTen, SoCCCD, MaHoKhau, TenDangNhap, MatKhau, Quyen)
+VALUES (N'Quản trị viên 1', '000000001', NULL, 'admin', '123', N'Admin');
+
+-- 2. Tạo Kế toán 2 (MaHoKhau NULL) -> Thành công (Không bị lỗi trùng NULL)
+INSERT INTO tai_khoan (HoTen, SoCCCD, MaHoKhau, TenDangNhap, MatKhau, Quyen)
+VALUES (N'Kế toán viên', '000000002', NULL, 'ketoan', '123', N'Kế toán');
+
+-- 3. Tạo User A (HK01) -> Thành công
+INSERT INTO tai_khoan (HoTen, SoCCCD, MaHoKhau, TenDangNhap, MatKhau, Quyen)
+VALUES (N'Nguyễn Văn A', '038000001', 'HK001', 'user', '123', N'Người dùng');
