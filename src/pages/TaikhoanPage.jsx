@@ -3,49 +3,44 @@ import React, { useState, useEffect } from 'react';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { 
   Box, Typography, Button, Stack, IconButton, Chip, 
-  Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid 
+  Dialog, DialogTitle, DialogContent, DialogActions, TextField 
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 
+// 1. IMPORT SERVICE (Nhớ chỉnh lại đường dẫn cho đúng với project của bạn)
+import { getTaiKhoan, deleteTaiKhoan, updateTaiKhoan } from '../services/taikhoanApi';
+
 const TaiKhoanPage = () => {
   const navigate = useNavigate();
   
-  // --- 1. STATE QUẢN LÝ DỮ LIỆU ---
+  // State
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // --- 2. STATE QUẢN LÝ MODAL SỬA ---
   const [openEdit, setOpenEdit] = useState(false);
   const [editData, setEditData] = useState({
-    id: '', 
-    hoTen: '', 
-    cccd: '', 
-    tenDangNhap: '', 
-    matKhau: '', 
-    quyenTaiKhoan: ''
+    id: '', hoTen: '', SoCCCD: '', tenDangNhap: '', matKhau: '', quyenTaiKhoan: ''
   });
 
-  // --- 3. GỌI API LẤY DANH SÁCH ---
+  // --- 2. GỌI API LẤY DANH SÁCH (Sử dụng Service) ---
   const fetchTaiKhoan = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3000/api/tai-khoan'); 
-      const data = await response.json();
+      // Gọi qua axios service
+      const response = await getTaiKhoan(); 
+      // Axios trả dữ liệu trong response.data
+      const data = response.data; 
       
-      // Format dữ liệu trước khi đưa vào bảng
       const formattedData = data.map(item => ({
         ...item,
-        // Format ngày sinh (nếu null thì hiện ---)
-        ngaySinh: item.ngaySinh ? new Date(item.ngaySinh).toLocaleDateString('en-GB') : '---',
-        // Format Mã hộ khẩu (Admin không có mã HK thì hiện ---)
         maHoKhau: item.maHoKhau || '---' 
       }));
 
       setRows(formattedData);
     } catch (error) {
       console.error("Lỗi khi tải danh sách:", error);
+      alert("Không thể tải danh sách tài khoản.");
     } finally {
       setLoading(false);
     }
@@ -55,63 +50,59 @@ const TaiKhoanPage = () => {
     fetchTaiKhoan();
   }, []);
 
-  // --- 4. XỬ LÝ XÓA TÀI KHOẢN ---
+  // --- 3. XÓA TÀI KHOẢN (Sử dụng Service) ---
   const handleDelete = async (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa tài khoản này?")) {
       try {
-        await fetch(`http://localhost:3000/api/tai-khoan/${id}`, { method: 'DELETE' });
-        fetchTaiKhoan(); // Load lại bảng sau khi xóa
+        await deleteTaiKhoan(id);
+        alert("Xóa thành công!");
+        fetchTaiKhoan(); // Load lại bảng
       } catch (error) {
         console.error("Lỗi xóa:", error);
+        alert("Xóa thất bại!");
       }
     }
   };
 
-  // --- 5. XỬ LÝ SỬA TÀI KHOẢN ---
-  
-  // Hàm mở Modal và đổ dữ liệu dòng đó vào form
+  // --- 4. SỬA TÀI KHOẢN (Sử dụng Service) ---
   const handleEditClick = (row) => {
     setEditData({
       id: row.id,
       hoTen: row.hoTen,
-      cccd: row.cccd,
+      SoCCCD: row.SoCCCD,
       tenDangNhap: row.tenDangNhap,
-      matKhau: row.matKhau, // Lưu ý: thực tế matKhau thường được hash, ở đây hiển thị demo
+      matKhau: row.matKhau,
       quyenTaiKhoan: row.quyenTaiKhoan
     });
     setOpenEdit(true);
   };
 
-  // Hàm gọi API Lưu thay đổi
   const handleSaveEdit = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/tai-khoan/${editData.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tenDangNhap: editData.tenDangNhap,
-          matKhau: editData.matKhau,
-          hoTen: editData.hoTen,
-          cccd: editData.cccd,
-          quyen: editData.quyenTaiKhoan // Gửi quyền lên để Backend biết đường check logic
-        })
-      });
+      // Chuẩn bị dữ liệu gửi đi
+      const payload = {
+        tenDangNhap: editData.tenDangNhap,
+        matKhau: editData.matKhau,
+        hoTen: editData.hoTen,
+        SoCCCD: editData.SoCCCD,
+        quyen: editData.quyenTaiKhoan
+      };
 
-      if (response.ok) {
-        alert("Cập nhật thành công!");
-        setOpenEdit(false);
-        fetchTaiKhoan(); // Load lại dữ liệu mới nhất
-      } else {
-        const err = await response.json();
-        alert("Lỗi: " + err.message);
-      }
+      // Gọi API update qua service
+      await updateTaiKhoan(editData.id, payload);
+
+      alert("Cập nhật thành công!");
+      setOpenEdit(false);
+      fetchTaiKhoan(); // Load lại dữ liệu
     } catch (error) {
       console.error("Lỗi cập nhật:", error);
-      alert("Đã xảy ra lỗi kết nối server");
+      // Lấy thông báo lỗi từ backend trả về (nếu có)
+      const message = error.response?.data?.message || "Đã xảy ra lỗi kết nối server";
+      alert("Lỗi: " + message);
     }
   };
 
-  // --- 6. CẤU HÌNH CỘT CHO DATAGRID ---
+  // --- CẤU HÌNH CỘT (Giữ nguyên) ---
   const columns = [
     { 
       field: 'maHoKhau', 
@@ -125,10 +116,9 @@ const TaiKhoanPage = () => {
       )
     },
     { field: 'hoTen', headerName: 'Họ tên', flex: 1.2, minWidth: 180 },
-    { field: 'cccd', headerName: 'Số CCCD', flex: 1, minWidth: 150 },
+    { field: 'SoCCCD', headerName: 'Số CCCD', flex: 1, minWidth: 150 },
     { field: 'tenDangNhap', headerName: 'Tên đăng nhập', flex: 1, minWidth: 150 },
     { field: 'matKhau', headerName: 'Mật khẩu', flex: 0.8, minWidth: 100 }, 
-    { field: 'ngaySinh', headerName: 'Ngày sinh', flex: 1, minWidth: 120 },
     { 
       field: 'quyenTaiKhoan', 
       headerName: 'Quyền tài khoản', 
@@ -171,7 +161,6 @@ const TaiKhoanPage = () => {
         Danh sách tài khoản
       </Typography>
 
-      {/* Nút chuyển trang sang Thêm mới */}
       <Button 
         variant="contained" 
         onClick={() => navigate('/quan-ly-tai-khoan/create')}
@@ -186,7 +175,6 @@ const TaiKhoanPage = () => {
         THÊM TÀI KHOẢN
       </Button>
 
-      {/* Bảng dữ liệu */}
       <Box sx={{ flexGrow: 1, width: '100%', backgroundColor: '#fff', minHeight: 0 }}>
         <DataGrid
           rows={rows}
@@ -205,7 +193,7 @@ const TaiKhoanPage = () => {
         />
       </Box>
 
-      {/* --- DIALOG (MODAL) SỬA TÀI KHOẢN --- */}
+      {/* --- DIALOG MODAL SỬA --- */}
       <Dialog open={openEdit} onClose={() => setOpenEdit(false)} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ fontWeight: 'bold', borderBottom: '1px solid #eee' }}>
           Cập nhật tài khoản
@@ -213,7 +201,6 @@ const TaiKhoanPage = () => {
         <DialogContent sx={{ mt: 2 }}>
           <Stack spacing={2} sx={{ paddingTop: 1 }}>
             
-            {/* 1. Tên đăng nhập (Cho phép sửa) */}
             <TextField 
               label="Tên đăng nhập" 
               fullWidth 
@@ -221,7 +208,6 @@ const TaiKhoanPage = () => {
               onChange={(e) => setEditData({...editData, tenDangNhap: e.target.value})}
             />
 
-            {/* 2. Mật khẩu (Cho phép sửa) */}
             <TextField 
               label="Mật khẩu" 
               fullWidth 
@@ -229,12 +215,11 @@ const TaiKhoanPage = () => {
               onChange={(e) => setEditData({...editData, matKhau: e.target.value})}
             />
 
-            {/* 3. Họ tên (Khóa nếu là User, Mở nếu là Admin) */}
             <TextField 
               label="Họ và tên" 
               fullWidth 
               value={editData.hoTen}
-              // Logic khóa:
+              // Logic khóa ô nhập liệu
               disabled={editData.quyenTaiKhoan === 'Người dùng'} 
               helperText={
                 editData.quyenTaiKhoan === 'Người dùng' 
@@ -244,16 +229,14 @@ const TaiKhoanPage = () => {
               onChange={(e) => setEditData({...editData, hoTen: e.target.value})}
             />
 
-            {/* 4. CCCD (Khóa nếu là User, Mở nếu là Admin) */}
             <TextField 
               label="Số CCCD" 
               fullWidth 
-              value={editData.cccd}
+              value={editData.SoCCCD}
               disabled={editData.quyenTaiKhoan === 'Người dùng'}
-              onChange={(e) => setEditData({...editData, cccd: e.target.value})}
+              onChange={(e) => setEditData({...editData, SoCCCD: e.target.value})}
             />
 
-            {/* Hiển thị quyền (Chỉ xem, không sửa quyền ở đây để tránh lỗi logic) */}
             <TextField 
               label="Quyền hiện tại"
               fullWidth

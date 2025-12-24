@@ -1,49 +1,72 @@
 // src/pages/LoginPage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/LoginPage.css'; // Sẽ tạo ở Bước 4
+import { loginUser } from '../services/loginApi'; // Import API
+import '../styles/LoginPage.css';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState(''); // State để hiện lỗi nếu có
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
 
-  // QUAN TRỌNG: Xóa sạch dữ liệu cũ để tránh xung đột vai trò (Role)
-  localStorage.clear();
-  
-  // Giả lập kiểm tra tài khoản
-  if (username === 'admin' && password === '123') {
-    localStorage.setItem('userToken', 'token-admin');
-    localStorage.setItem('userRole', 'admin');
-    navigate('/dashboard');
-    // Mẹo: Dùng window.location.reload() nếu muốn chắc chắn 100% ứng dụng reset hoàn toàn
-    window.location.reload();
-  } else if (username === 'ketoan' && password === '123') {
-    localStorage.setItem('userToken', 'token-ketoan');
-    localStorage.setItem('userRole', 'ketoan');
-    navigate('/dashboard');
-    // Mẹo: Dùng window.location.reload() nếu muốn chắc chắn 100% ứng dụng reset hoàn toàn
-    window.location.reload();
-  } else if (username === 'user' && password === '123') {
-    // Tài khoản dành cho người dân
-    localStorage.setItem('userToken', 'token-user');
-    localStorage.setItem('userRole', 'user'); 
-    navigate('/dashboard');
-    // Mẹo: Dùng window.location.reload() nếu muốn chắc chắn 100% ứng dụng reset hoàn toàn
-    window.location.reload();
-  } else {
-    alert('Sai tài khoản hoặc mật khẩu!');
-  }
-};
+    try {
+      // 1. Chuẩn bị dữ liệu gửi đi (Mapping tên biến cho khớp Backend)
+      const payload = {
+        tenDangNhap: username,
+        matKhau: password
+      };
+
+      // 2. Gọi API thực tế
+      const res = await loginUser(payload);
+      
+      // 3. Lấy dữ liệu từ Backend trả về
+      // Cấu trúc trả về: { message, token, user: { hoTen, quyen, ... } }
+      const { token, user } = res.data;
+
+      // 4. Xóa dữ liệu cũ và Lưu dữ liệu mới vào localStorage
+      localStorage.clear();
+      localStorage.setItem('userToken', token);
+      let safeRole = user.quyen;
+if (user.quyen === 'Admin') safeRole = 'admin';
+if (user.quyen === 'Kế toán') safeRole = 'ketoan';
+if (user.quyen === 'Người dùng') safeRole = 'user';
+      
+      // Lưu quyền (Role) để dùng cho việc phân quyền menu sau này
+      // Backend trả về: 'Admin', 'Kế toán', 'Người dùng'
+      localStorage.setItem('userRole', safeRole);
+      
+      // Lưu thêm thông tin user để hiển thị "Xin chào..."
+      localStorage.setItem('userInfo', JSON.stringify(user));
+
+      alert(`Đăng nhập thành công! Xin chào ${user.hoTen}`);
+
+      // 5. Điều hướng
+      navigate('/dashboard'); 
+      
+      // Reload để App cập nhật lại Menu theo quyền mới
+      window.location.reload();
+
+    } catch (err) {
+      console.error("Lỗi đăng nhập:", err);
+      // Lấy thông báo lỗi từ Backend (ví dụ: "Sai mật khẩu")
+      const msg = err.response?.data?.message || "Đăng nhập thất bại! Vui lòng thử lại.";
+      setError(msg);
+    }
+  };
 
   return (
     <div className="login-wrapper">
       <form className="login-form" onSubmit={handleSubmit}>
         <h2>Đăng Nhập Hệ Thống</h2>
         
+        {/* Hiển thị lỗi nếu có */}
+        {error && <div className="error-message">{error}</div>}
+
         <div className="form-group">
           <label htmlFor="username">Tên đăng nhập</label>
           <input
@@ -52,6 +75,7 @@ const LoginPage = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
+            placeholder="Nhập tên đăng nhập"
           />
         </div>
         
@@ -63,6 +87,7 @@ const LoginPage = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            placeholder="Nhập mật khẩu"
           />
         </div>
         
