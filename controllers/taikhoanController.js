@@ -11,11 +11,10 @@ const getTaiKhoan = async (req, res) => {
                 t.ID as id,
                 t.MaHoKhau as maHoKhau,
                 t.HoTen as hoTen,
-                t.SoCCCD as cccd,
+                t.SoCCCD as SoCCCD,
                 t.TenDangNhap as tenDangNhap,
                 t.MatKhau as matKhau,
-                t.Quyen as quyenTaiKhoan,
-                t.NgayTao,
+                t.Quyen as quyenTaiKhoan
             FROM tai_khoan t
             ORDER BY t.ID DESC
         `);
@@ -27,7 +26,7 @@ const getTaiKhoan = async (req, res) => {
 
 // 2. THÊM TÀI KHOẢN MỚI (LOGIC QUAN TRỌNG)
 const createTaiKhoan = async (req, res) => {
-    const { tenDangNhap, matKhau, quyen, maHoKhau, hoTen, cccd } = req.body;
+    const { tenDangNhap, matKhau, quyen, maHoKhau, hoTen, SoCCCD } = req.body;
 
     try {
         const pool = await connectDB();
@@ -40,7 +39,7 @@ const createTaiKhoan = async (req, res) => {
                 .input('MatKhau', sql.VarChar, matKhau)
                 .input('Quyen', sql.NVarChar, quyen)
                 .input('HoTen', sql.NVarChar, hoTen) // Lấy từ input nhập tay
-                .input('SoCCCD', sql.VarChar, cccd)  // Lấy từ input nhập tay
+                .input('SoCCCD', sql.VarChar, SoCCCD)  // Lấy từ input nhập tay
                 .query(`
                     INSERT INTO tai_khoan (TenDangNhap, MatKhau, Quyen, HoTen, SoCCCD, MaHoKhau)
                     VALUES (@TenDangNhap, @MatKhau, @Quyen, @HoTen, @SoCCCD, NULL)
@@ -107,7 +106,7 @@ const deleteTaiKhoan = async (req, res) => {
 const updateTaiKhoan = async (req, res) => {
     const { id } = req.params;
     // Lấy dữ liệu từ Frontend gửi lên
-    const { tenDangNhap, matKhau, hoTen, cccd, quyen } = req.body;
+    const { tenDangNhap, matKhau, hoTen, SoCCCD, quyen } = req.body;
 
     try {
         const pool = await connectDB();
@@ -143,7 +142,7 @@ const updateTaiKhoan = async (req, res) => {
         } else {
             // Nếu là Admin/Kế toán: Update CẢ Họ tên và CCCD
             request.input('HoTen', sql.NVarChar, hoTen);
-            request.input('SoCCCD', sql.VarChar, cccd);
+            request.input('SoCCCD', sql.VarChar, SoCCCD);
             
             sqlQuery = `
                 UPDATE tai_khoan 
@@ -163,4 +162,5 @@ const updateTaiKhoan = async (req, res) => {
     }
 };
 
-module.exports = { getTaiKhoan, createTaiKhoan, deleteTaiKhoan, updateTaiKhoan };
+// Nhớ export thêm hàm này
+module.exports = { getTaiKhoan, createTaiKhoan, deleteTaiKhoan, updateTaiKhoan};
