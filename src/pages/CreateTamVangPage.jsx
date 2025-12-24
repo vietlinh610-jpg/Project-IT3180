@@ -2,46 +2,116 @@
 import React, { useState } from 'react';
 import { 
   Box, Typography, TextField, Button, Grid, Paper, 
-  Stack, IconButton 
+  Stack, IconButton, InputAdornment, CircularProgress 
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import SearchIcon from '@mui/icons-material/Search'; 
 import { useNavigate } from 'react-router-dom';
+
+// Import API
+import { createTamVang } from '../services/tamvangApi'; // Kiểm tra lại tên file service
+import { findNhanKhau } from '../services/nhankhauApi';
 
 const CreateTamVangPage = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   
   const [formData, setFormData] = useState({
-    maTamVang: '',
+    maNhanKhau: '', 
     hoTen: '',
     soCCCD: '',
-    noiDen: '',
-    ngayDi: '2024-01-11',
-    ngayVeDuKien: '2024-02-11',
+    maHoKhau: '', // Sẽ tự điền
+    ngayDi: new Date().toISOString().split('T')[0], 
+    ngayVeDuKien: '',
     lyDo: ''
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    setFormData(prev => {
+        // Nếu đổi mã nhân khẩu, reset hết thông tin cũ
+        if (name === 'maNhanKhau') {
+            return { ...prev, [name]: value, hoTen: '', soCCCD: '', maHoKhau: '' };
+        }
+        return { ...prev, [name]: value };
+    });
   };
 
-  const handleSave = (e) => {
+  // --- HÀM TÌM NHÂN KHẨU ---
+  const handleFindNhanKhau = async () => {
+    const maCanTim = formData.maNhanKhau.trim();
+    if (!maCanTim) return;
+
+    try {
+      const res = await findNhanKhau(maCanTim);
+      
+      // Lấy MaHoKhau từ API trả về
+      const { HoTen, SoCCCD, MaHoKhau } = res.data;
+
+      // Logic kiểm tra: Người này phải có hộ khẩu mới khai báo tạm vắng được
+      if (!MaHoKhau) {
+          alert("Người này chưa có Hộ khẩu thường trú trong hệ thống nên không thể khai báo Tạm vắng!");
+          setFormData(prev => ({ ...prev, hoTen: '', soCCCD: '', maHoKhau: '' }));
+          return;
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        maNhanKhau: maCanTim,
+        hoTen: HoTen,
+        soCCCD: SoCCCD,
+        maHoKhau: MaHoKhau // Tự động điền
+      }));
+
+    } catch (err) {
+      alert("Không tìm thấy nhân khẩu có mã này! Vui lòng kiểm tra lại.");
+      setFormData(prev => ({ ...prev, hoTen: '', soCCCD: '', maHoKhau: '' }));
+    }
+  };
+
+  // --- HÀM LƯU ---
+  const handleSave = async (e) => {
     e.preventDefault();
-    console.log("Dữ liệu khai báo tạm vắng:", formData);
-    alert("Khai báo tạm vắng thành công!");
-    navigate('/quan-ly-nhan-dan/tam-vang');
+    
+    if (!formData.maNhanKhau || !formData.hoTen) {
+        alert("Vui lòng tìm kiếm Mã nhân khẩu trước!");
+        return;
+    }
+    if (!formData.maHoKhau) {
+        alert("Người này không có hộ khẩu hợp lệ!");
+        return;
+    }
+
+    try {
+      setLoading(true);
+      await createTamVang({
+        MaNhanKhau: formData.maNhanKhau,
+        MaHoKhau: formData.maHoKhau,
+        NgayDi: formData.ngayDi,
+        NgayVe: formData.ngayVeDuKien,
+        LyDo: formData.lyDo
+      });
+      
+      alert("Khai báo tạm vắng thành công!");
+      navigate('/quan-ly-nhan-dan/tam-vang');
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message;
+      alert("Lỗi: " + msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Box sx={{ p: 4, backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
-      {/* Tiêu đề và nút quay lại */}
       <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
         <IconButton onClick={() => navigate('/quan-ly-nhan-dan/tam-vang')}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-          Khai báo tạm vắng
+          Khai báo tạm vắng 
         </Typography>
       </Stack>
 
@@ -49,82 +119,86 @@ const CreateTamVangPage = () => {
         <form onSubmit={handleSave}>
           <Grid container spacing={3} direction="column">
 
-            {/* Dòng 2: Họ tên người tạm vắng */}
+            {/* Dòng 1: Tìm kiếm Mã Nhân Khẩu */}
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Họ và tên người khai báo *"
-                name="hoTen"
+                label="Mã Nhân Khẩu *"
+                name="maNhanKhau"
                 variant="filled"
-                value={formData.hoTen}
+                value={formData.maNhanKhau}
                 onChange={handleChange}
+                onBlur={handleFindNhanKhau} 
+                placeholder="VD: NK001"
                 required
+                helperText={!formData.hoTen && formData.maNhanKhau ? "Bấm kính lúp để hệ thống tự điền thông tin" : ""}
+                error={!formData.hoTen && formData.maNhanKhau !== ''}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={handleFindNhanKhau}>
+                        <SearchIcon color="primary"/>
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </Grid>
 
-            {/* Dòng 3: Số CCCD */}
+            {/* Dòng 2: Họ tên (ReadOnly) */}
             <Grid item xs={12}>
               <TextField
-                fullWidth
-                label="Số CCCD/Định danh cá nhân *"
-                name="soCCCD"
-                variant="filled"
-                value={formData.soCCCD}
-                onChange={handleChange}
-                required
+                fullWidth label="Họ và tên" value={formData.hoTen}
+                InputProps={{ readOnly: true }} sx={{ bgcolor: '#f5f5f5' }} variant="filled"
               />
             </Grid>
 
-            {/* Dòng 4: Mã hộ khẩu */}
+            {/* Dòng 3: Số CCCD (ReadOnly) */}
             <Grid item xs={12}>
               <TextField
-                fullWidth
-                label="Mã hộ khẩu *"
-                name="maHoKhau"
+                fullWidth label="Số CCCD" value={formData.soCCCD}
+                InputProps={{ readOnly: true }} sx={{ bgcolor: '#f5f5f5' }} variant="filled"
+              />
+            </Grid>
+
+            {/* Dòng 4: Mã hộ khẩu (TỰ ĐỘNG ĐIỀN & KHÓA LẠI) */}
+            <Grid item xs={12}>
+              <TextField
+                fullWidth 
+                label="Thuộc Hộ khẩu (Tự động)" 
+                name="maHoKhau" 
                 variant="filled"
                 value={formData.maHoKhau}
-                onChange={handleChange}
-                required
+                // KHÔNG CẦN onChange vì người dùng không được sửa
+                InputProps={{ readOnly: true }} 
+                sx={{ bgcolor: '#f5f5f5' }} // Màu xám để thể hiện là tự động
+                helperText={formData.hoTen && !formData.maHoKhau ? "Lỗi: Người này chưa có mã hộ khẩu" : ""}
               />
             </Grid>
 
-            {/* Dòng 5: Thời gian tạm vắng */}
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Ngày đi"
-                name="ngayDi"
-                type="date"
-                variant="outlined"
-                value={formData.ngayDi}
-                onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Ngày về dự kiến"
-                name="ngayVeDuKien"
-                type="date"
-                variant="outlined"
-                value={formData.ngayVeDuKien}
-                onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-              />
+            {/* Dòng 5: Thời gian */}
+            <Grid container item spacing={3}>
+                <Grid item xs={12} md={6}>
+                <TextField
+                    fullWidth label="Ngày đi *" name="ngayDi" type="date"
+                    value={formData.ngayDi} onChange={handleChange}
+                    InputLabelProps={{ shrink: true }} variant="outlined" required
+                />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                <TextField
+                    fullWidth label="Ngày về dự kiến *" name="ngayVeDuKien" type="date"
+                    value={formData.ngayVeDuKien} onChange={handleChange}
+                    InputLabelProps={{ shrink: true }} variant="outlined" required
+                />
+                </Grid>
             </Grid>
 
-            {/* Dòng 6: Lý do tạm vắng */}
+            {/* Dòng 6: Lý do */}
             <Grid item xs={12}>
               <TextField
-                fullWidth
-                label="Lý do tạm vắng"
-                name="lyDo"
-                variant="filled"
-                multiline
-                rows={3}
-                value={formData.lyDo}
-                onChange={handleChange}
+                fullWidth label="Lý do tạm vắng" name="lyDo" multiline rows={3} variant="filled"
+                value={formData.lyDo} onChange={handleChange}
                 placeholder="Ví dụ: Đi công tác, Về quê, Du lịch..."
               />
             </Grid>
@@ -132,19 +206,12 @@ const CreateTamVangPage = () => {
             {/* Nút lưu */}
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
               <Button 
-                type="submit"
-                variant="contained" 
-                startIcon={<SaveIcon />}
-                sx={{ 
-                  bgcolor: '#008ecc', 
-                  px: 4, 
-                  py: 1.2,
-                  fontWeight: 'bold',
-                  textTransform: 'none',
-                  '&:hover': { bgcolor: '#007bb5' }
-                }}
+                type="submit" variant="contained" 
+                startIcon={loading ? <CircularProgress size={20} color="inherit"/> : <SaveIcon />}
+                disabled={loading}
+                sx={{ bgcolor: '#008ecc', px: 4, py: 1.2, fontWeight: 'bold' }}
               >
-                LƯU KHAI BÁO
+                {loading ? "ĐANG LƯU..." : "LƯU KHAI BÁO"}
               </Button>
             </Grid>
           </Grid>

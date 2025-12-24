@@ -59,7 +59,7 @@ function App() {
                   <Route path="/kiem-tra-khoan-thu" element={<KiemTraKhoanThuPage />} />
                   <Route path="/ho-gia-dinh/ho-khau/create" element={<CreateHoKhauPage />} />
                   <Route path="/ho-gia-dinh/can-ho/create" element={<CreateCanHoPage />} />
-                  <Route path="/quan-ly-nhan-dan/nhan-khau/create" element={<CreateNhanKhauPage />} />
+                  <Route path="/quan-ly-nhan-dan/nhan-khau/create/:maHoKhau" element={<CreateNhanKhauPage />} />
                   <Route path="/khoan-thu/lich-su" element={<LichSuThanhToanPage />} />
                   <Route path="/quan-ly-khoan-thu/create" element={<CreateKhoanThuPage />} />
                   <Route path="/quan-ly-nhan-dan/tam-tru/create" element={<CreateTamTruPage />} />

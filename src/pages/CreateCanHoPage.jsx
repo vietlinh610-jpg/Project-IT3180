@@ -2,23 +2,22 @@
 import React, { useState } from 'react';
 import { 
   Box, Typography, TextField, Button, Grid, Paper,
-  MenuItem, Select, FormControl, InputLabel, OutlinedInput, Chip,
-  Stack, IconButton
+  Stack, IconButton, CircularProgress
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
+import { createCanHo } from '../services/canhoApi';
 
 const CreateCanHoPage = () => {
   const navigate = useNavigate();
-  
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
-    maCanHo: '',
+    maCanHo: '', 
     tenCanHo: '',
     tang: '',
-    dienTich: '',
-    loaiCanHo: 'Chung cư',
-    trangThai: 'Trống'
+    dienTich: ''
   });
 
   const handleChange = (e) => {
@@ -26,22 +25,55 @@ const CreateCanHoPage = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    console.log("Dữ liệu căn hộ mới:", formData);
-    alert("Thêm căn hộ thành công!");
+    
+    // Validate
+    if (!formData.maCanHo || !formData.tenCanHo) {
+      alert("Vui lòng điền mã và tên căn hộ!");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // --- SỬA QUAN TRỌNG TẠI ĐÂY ---
+      const payload = {
+        // Giữ nguyên là chuỗi (String), KHÔNG dùng parseInt nữa
+        MaCanHo: formData.maCanHo.trim(), 
+        
+        TenCanHo: formData.tenCanHo,
+        Tang: parseInt(formData.tang),
+        DienTich: parseFloat(formData.dienTich),
+        MaHoKhau: null
+      };
+
+      await createCanHo(payload);
+      
+      alert("Thêm căn hộ thành công!");
+      navigate('/ho-gia-dinh/can-ho');
+
+    } catch (error) {
+      console.error("Lỗi:", error);
+      // Hiển thị thông báo lỗi chi tiết từ Backend (VD: Trùng mã căn hộ)
+      const message = error.response?.data?.message || "Có lỗi xảy ra!";
+      alert(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Box sx={{ 
         p: 4, 
-        width: '100%',        // Chiếm toàn bộ chiều rộng vùng nội dung bên phải
-        height: '100vh',     // Cố định chiều cao bằng màn hình để tránh lỗi dài vô tận
+        width: '100%',        
+        height: '100vh',     
         display: 'flex', 
         flexDirection: 'column',
         boxSizing: 'border-box'  
       }}>
-      {/* Tiêu đề và nút quay lại */}
+      
+      {/* Header */}
       <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
         <IconButton onClick={() => navigate('/ho-gia-dinh/can-ho')}>
           <ArrowBackIcon />
@@ -51,26 +83,29 @@ const CreateCanHoPage = () => {
         </Typography>
       </Stack>
 
-      <Paper elevation={0} sx={{ p: 4, borderRadius: '12px', border: '1px solid #e0e0e0', maxWidth: '1000px' }}>
+      <Paper elevation={0} sx={{ p: 4, borderRadius: '12px', border: '1px solid #e0e0e0', maxWidth: '800px' }}>
         <form onSubmit={handleSave}>
           <Grid container spacing={3} direction="column">
             
-            {/* DÒNG 1: Mã căn hộ */}
-            <Grid item xs={12}>
+            {/* --- SỬA QUAN TRỌNG: Ô NHẬP MÃ CĂN HỘ --- */}
+            <Grid size={12}>
               <TextField
                 fullWidth
-                label="Mã căn hộ *"
+                label="Mã căn hộ (ID) *"
                 name="maCanHo"
+                // BỎ type="number" để nhập được chữ (VD: P101)
+                type="text" 
                 variant="filled"
                 value={formData.maCanHo}
                 onChange={handleChange}
-                placeholder="Ví dụ: CH101"
+                placeholder="Ví dụ: P101, A205..."
                 required
+                autoFocus 
               />
             </Grid>
 
-            {/* DÒNG 2: Tên căn hộ */}
-            <Grid item xs={12}>
+            {/* Tên căn hộ */}
+            <Grid size={12}>
               <TextField
                 fullWidth
                 label="Tên căn hộ *"
@@ -78,13 +113,13 @@ const CreateCanHoPage = () => {
                 variant="filled"
                 value={formData.tenCanHo}
                 onChange={handleChange}
-                placeholder="Nhập tên căn hộ..."
+                placeholder="Nhập tên hiển thị..."
                 required
               />
             </Grid>
 
-            {/* DÒNG 3: Tầng */}
-            <Grid item xs={12}>
+            {/* Tầng */}
+            <Grid size={12}>
               <TextField
                 fullWidth
                 label="Tầng *"
@@ -97,8 +132,8 @@ const CreateCanHoPage = () => {
               />
             </Grid>
 
-            {/* DÒNG 4: Diện tích */}
-            <Grid item xs={12}>
+            {/* Diện tích */}
+            <Grid size={12}>
               <TextField
                 fullWidth
                 label="Diện tích (m2) *"
@@ -108,15 +143,17 @@ const CreateCanHoPage = () => {
                 value={formData.dienTich}
                 onChange={handleChange}
                 required
+                inputProps={{ step: "0.1" }} // Cho phép nhập số lẻ
               />
             </Grid>
 
-            {/* NÚT LƯU */}
-            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+            {/* Nút Lưu */}
+            <Grid size={12} sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
               <Button 
                 type="submit"
                 variant="contained" 
-                startIcon={<SaveIcon />}
+                disabled={loading} 
+                startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
                 sx={{ 
                   bgcolor: '#008ecc', 
                   px: 4, 
@@ -126,9 +163,10 @@ const CreateCanHoPage = () => {
                   '&:hover': { bgcolor: '#007bb5' }
                 }}
               >
-                LƯU CĂN HỘ
+                {loading ? "ĐANG LƯU..." : "LƯU CĂN HỘ"}
               </Button>
             </Grid>
+
           </Grid>
         </form>
       </Paper>
