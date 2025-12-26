@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 const thuPhiController = require('../controllers/thuPhiController');
 
-router.get("/api/thu-phi/:maKhoanThu/trang-thai", thuPhiController.xemTrangThaiThuPhi);
+// /api/thu-phi/:maKhoanThu/trang-thai
+router.get("/:maKhoanThu/trang-thai", thuPhiController.xemTrangThaiThuPhi);
+
+// /api/thu-phi/kiem-tra
+router.get("/kiem-tra", thuPhiController.kiemTraKhoanThu);
 
 module.exports = router;

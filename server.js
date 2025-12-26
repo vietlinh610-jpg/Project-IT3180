@@ -9,22 +9,32 @@ app.use(cors());
 app.use(express.json());
 
 // Import Routes
-const authRoutes = require('./routes/authRoutes');         // <--- Mới
-//const residentRoutes = require('./routes/residentRoutes');
-const feeRoutes = require('./routes/feeRoutes');
+// * const authRoutes = require('./routes/authRoutes');
+// * const residentRoutes = require('./routes/residentRoutes');
+// * const feeRoutes = require('./routes/feeRoutes');
+
+// ? 
 
 // Thêm mới các route liên quan tới khoản thu
 const khoanThuRoutes = require('./routes/khoanThuRoutes');
 const thuPhiRoutes = require('./routes/thuPhiRoutes');
+const ktKhoanThuRoutes = require('./routes/KTKhoanThuRoutes');
 
 // Sử dụng Routes
-app.use('/api/auth', authRoutes);           // <--- Mới (Đăng nhập tại /api/auth/login)
+// * app.use('/api/auth', authRoutes);
 //app.use('/api/residents', residentRoutes);
-app.use('/api/fees', feeRoutes);
+// * app.use('/api/fees', feeRoutes);
 
-// Thêm mới các route liên quan tới khoản thu
-app.use("/api/fees", khoanThuRoutes);
-app.use("/", thuPhiRoutes);
+// ?
+
+// Module: Khoản thu
+app.use("/api/khoan-thu", khoanThuRoutes);
+
+// Module: Thu phí
+app.use("/api/thu-phi", thuPhiRoutes);
+
+// Module: Kiểm tra khoản thu và xác nhận
+app.use("/api/kt-khoanthu", ktKhoanThuRoutes);
 
 app.get('/', (req, res) => {
     res.send('API is ready!');
