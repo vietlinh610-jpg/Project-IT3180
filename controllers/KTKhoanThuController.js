@@ -9,15 +9,17 @@ const kiemTraThuPhi = async (req, res) =>  {
   try {
     const pool = await connectDB();
 
+    // Mã thu phí cần thiết cho xác nhận khoản thu
     query = `
-    select kt.TenKhoanThu as TenKhoanThu, kt.SoTien as soTien,
+    select tp.maThuPhi as maThuPhi, kt.TenKhoanThu as TenKhoanThu, kt.SoTien as soTien,
       ch.MaCanHo as MaCanHo, nk.HoTen as ChuHo, tp.NgayDong as NgayGioNop
     from thu_phi tp
       join khoan_thu kt on tp.MaKhoanThu = kt.makhoanthu
       join ho_khau hk on tp.MaHoKhau = hk.MaHoKhau
       join nhan_khau nk on hk.MaHoKhau = nk.MaHoKhau and nk.QuanHeVoiChuHo = N'Chủ hộ'
       join can_ho ch on ch.MaHoKhau = hk.MaHoKhau
-    where tp.DaXacNhan = 0;
+    where tp.DaXacNhan = 0
+    order by tp.maThuPhi desc;
     `
     const result = await pool.request().query(query);
     // Truy vấn những khoản thu đang chờ xác nhận và trả về kết quả
@@ -31,6 +33,38 @@ const kiemTraThuPhi = async (req, res) =>  {
   }
 }
 
+// 2. Xác nhận một khoản thu phí
+// Lấy mã khoản thu và đặt trạng thái xác nhận về true
+const xacNhanThuPhi =  async (req, res) => {
+  try {
+    // id của mã khoản thu để xác nhận
+    const { id } = req.params;
+
+    const pool = await connectDB();
+
+    const query = `
+      UPDATE thu_phi
+      SET
+        DaXacNhan = 1
+      WHERE
+        MaThuPhi = @MaThuPhi
+    `;
+
+    await pool.request()
+      .input("MaThuPhi", sql.Int, id)
+      .query(query)
+
+    return res.status(201).json({
+      message: "Xác nhận khoản thu thành công",
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Lỗi khi xác nhận một khoản thu phí",
+    })
+  }
+}
+
 module.exports = {
-  kiemTraThuPhi
+  kiemTraThuPhi,
+  xacNhanThuPhi
 };
