@@ -19,6 +19,8 @@ app.use(express.json());
 const khoanThuRoutes = require('./routes/khoanThuRoutes');
 const thuPhiRoutes = require('./routes/thuPhiRoutes');
 const ktKhoanThuRoutes = require('./routes/KTKhoanThuRoutes');
+const ttcnRoutes = require('./routes/thongTinCaNhanRoutes');
+const dongPhiRoutes = require('./routes/dongPhiRoutes');
 
 // Sử dụng Routes
 // * app.use('/api/auth', authRoutes);
@@ -35,6 +37,14 @@ app.use("/api/thu-phi", thuPhiRoutes);
 
 // Module: Kiểm tra khoản thu và xác nhận
 app.use("/api/kt-khoanthu", ktKhoanThuRoutes);
+
+// Module: Xem thông tin cá nhân và gia đình
+app.use("/api/ttcn", ttcnRoutes);
+
+// Module : Quản lý đóng và nộp phí
+app.use("/api/dongphi", dongPhiRoutes);
+
+// TODO : Triển khai phân trang
 
 app.get('/', (req, res) => {
     res.send('API is ready!');

@@ -1,7 +1,5 @@
 const { connectDB, sql } = require("../config/db");
 
-// TODO : Xác nhận khoản thu, từ chối lỗi, xem minh chứng!
-
 // 1. Lấy các khoản thu từ bảng thu phí
 // Ghi chú : Các khoản chưa nộp thì xem trong quản lý khoản thu tùy theo khoản thu
 // Chỉ hiển thị các khoản thu đang chờ xác nhận nhằm mục đích xác nhận hợp lệ
@@ -18,7 +16,7 @@ const kiemTraThuPhi = async (req, res) =>  {
       join ho_khau hk on tp.MaHoKhau = hk.MaHoKhau
       join nhan_khau nk on hk.MaHoKhau = nk.MaHoKhau and nk.QuanHeVoiChuHo = N'Chủ hộ'
       join can_ho ch on ch.MaHoKhau = hk.MaHoKhau
-    where tp.DaXacNhan = 0
+    where tp.DaXacNhan = 0 and tp.tuChoi = 0
     order by tp.maThuPhi desc;
     `
     const result = await pool.request().query(query);
@@ -64,7 +62,39 @@ const xacNhanThuPhi =  async (req, res) => {
   }
 }
 
+// 3. Từ chối 1 khoản phí
+// Lấy mã khoản thu và đặt trường từ chối về 1
+const tuChoiKhoanThu = async(req, res) => {
+  try {
+    // id của mã khoản thu để từ chối
+    const { id } = req.params;
+
+    const pool = await connectDB();
+
+    const query = `
+      UPDATE thu_phi
+      SET
+        tuChoi = 1
+      WHERE
+        MaThuPhi = @MaThuPhi
+    `;
+
+    await pool.request()
+      .input("MaThuPhi", sql.Int, id)
+      .query(query);
+
+    return res.status(201).json({
+      message: "Từ chối khoản thu thành công",
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Lỗi khi từ chối một khoản thu phí",
+    })
+  }
+}
+
 module.exports = {
   kiemTraThuPhi,
-  xacNhanThuPhi
+  xacNhanThuPhi,
+  tuChoiKhoanThu,
 };
