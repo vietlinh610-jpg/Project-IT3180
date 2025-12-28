@@ -8,12 +8,12 @@ const getListTamVang = async (req, res) => {
             SELECT 
                 TV.ID,
                 TV.MaNhanKhau,
+                TV.NgayDi,
+                TV.NgayVe,
+                TV.LyDo,
                 NK.HoTen,
                 NK.SoCCCD,
-                NK.MaHoKhau,
-                TV.NgayDi,
-                TV.NgayVe, -- Tên cột mới
-                TV.LyDo
+                NK.MaHoKhau
             FROM tam_vang TV
             JOIN nhan_khau NK ON TV.MaNhanKhau = NK.MaNhanKhau
             ORDER BY TV.ID DESC

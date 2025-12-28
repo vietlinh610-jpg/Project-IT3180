@@ -13,7 +13,6 @@ const getListTamTru = async (req, res) => {
                 TT.LyDo,
                 NK.HoTen, 
                 NK.SoCCCD,
-                -- Lấy Mã căn hộ từ các bảng liên kết
                 CH.MaCanHo
             FROM tam_tru TT
             JOIN nhan_khau NK ON TT.MaNhanKhau = NK.MaNhanKhau

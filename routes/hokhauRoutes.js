@@ -13,4 +13,6 @@ router.put('/:id', hokhauController.updateHoKhau);
 
 router.delete('/:id', hokhauController.deleteHoKhau);
 
+router.get('/thongtin-chuho/:maHoKhau', hokhauController.getThongTinChuHo);
+
 module.exports = router;

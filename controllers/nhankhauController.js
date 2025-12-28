@@ -153,8 +153,6 @@ const getNhanKhauByMa = async (req, res) => {
 
         const pool = await connectDB();
         
-        // 1. Dùng LEFT JOIN để tìm người đó kể cả khi chưa có căn hộ
-        // JOIN bảng nhan_khau -> ho_khau (nếu cần) -> can_ho
         const query = `
             SELECT 
                 NK.MaHoKhau,
@@ -162,7 +160,6 @@ const getNhanKhauByMa = async (req, res) => {
                 NK.SoCCCD, 
                 CH.MaCanHo
             FROM nhan_khau NK
-            -- Dùng LEFT JOIN để lấy thông tin nhân khẩu dù chưa có hộ khẩu/căn hộ
             LEFT JOIN can_ho CH ON NK.MaHoKhau = CH.MaHoKhau 
             WHERE NK.MaNhanKhau = @MaNK
         `;
@@ -199,4 +196,34 @@ const getNhanKhauByMa = async (req, res) => {
     }
 };
 
-module.exports = { getCanHoWithCount, getNhanKhauByCanHo, updateNhanKhau, deleteNhanKhau, createNhanKhau, getNhanKhauByMa };
+const getAllNhanKhau = async (req, res) => {
+  try {
+    const pool = await connectDB();
+    
+    // Truy vấn: Lấy tất cả thông tin nhân khẩu KÈM THEO Mã Căn Hộ từ bảng Hộ Khẩu
+    const result = await pool.request().query(`
+      SELECT 
+        NK.MaHoKhau,
+        NK.MaNhanKhau,
+        NK.HoTen,
+        NK.GioiTinh,
+        NK.SoCCCD,
+        NK.NgaySinh,
+        NK.NoiSinh,
+        NK.DanToc,
+        NK.NgheNghiep,
+        CH.MaCanHo 
+      FROM nhan_khau NK
+      LEFT JOIN can_ho CH ON NK.MaHoKhau = CH.MaHoKhau
+    `);
+
+    // Trả về dữ liệu
+    return res.status(200).json(result.recordset);
+
+  } catch (error) {
+    console.error('Lỗi lấy danh sách nhân khẩu:', error);
+    return res.status(500).json({ message: 'Lỗi server', error });
+  }
+};
+
+module.exports = { getCanHoWithCount, getNhanKhauByCanHo, updateNhanKhau, deleteNhanKhau, createNhanKhau, getNhanKhauByMa, getAllNhanKhau };
