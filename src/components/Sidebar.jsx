@@ -1,5 +1,4 @@
-// src/components/Sidebar.jsx
-import React, { useState } from 'react'; // Bỏ useEffect nếu không dùng cho việc khác
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Dialog, 
@@ -12,9 +11,16 @@ import {
 import '../styles/Sidebar.css';
 
 const Sidebar = () => {
-  // FIX ESLint: Khởi tạo role trực tiếp từ localStorage
+  // 1. Lấy ROLE từ localStorage
   const [role, setRole] = useState(() => {
     return localStorage.getItem('userRole') || '';
+  });
+
+  // 2. [THÊM MỚI] Lấy TÊN NGƯỜI DÙNG từ localStorage
+  // Lưu ý: Trong trang Đăng Nhập (Login), bạn phải có lệnh: localStorage.setItem('fullName', 'Tên User');
+  const [fullName, setFullName] = useState(() => {
+    // Nếu không tìm thấy tên thì hiển thị mặc định là "Cư dân" hoặc "Admin"
+    return localStorage.getItem('fullName') || 'Người dùng';
   });
 
   const [openMenus, setOpenMenus] = useState({ hoKhau: false, nhanDan: false });
@@ -32,10 +38,20 @@ const Sidebar = () => {
   const handleCloseLogout = () => setOpenLogoutModal(false);
 
   const handleConfirmLogout = () => {
-    localStorage.clear(); // Xóa sạch bộ nhớ
+    localStorage.clear();
     setOpenLogoutModal(false);
-    navigate('/login'); // Chuyển hướng về trang đăng nhập
-    window.location.reload(); // Reset hoàn toàn trạng thái ứng dụng
+    navigate('/login');
+    window.location.reload();
+  };
+
+  // 3. [THÊM MỚI] Hàm hiển thị tên chức vụ cho đẹp (thay vì viết ternary operator dài dòng)
+  const getRoleDisplayName = (currentRole) => {
+    switch(currentRole) {
+        case 'admin': return 'Ban quản trị';
+        case 'ketoan': return 'Phòng Kế toán';
+        case 'user': return 'Cư dân';
+        default: return 'Khách';
+    }
   };
 
   return (
@@ -46,14 +62,20 @@ const Sidebar = () => {
           <img src="/images/logo.png" alt="Logo" className="bluemoon-logo" />
         </div>
         <hr className="sidebar-divider" />
+        
+        {/* PHẦN SỬA ĐỔI: HIỂN THỊ THÔNG TIN ĐỘNG */}
         <div className="user-info">
           <span className="user-name">
-            {role === 'admin' ? 'Lê Công Dũng' : role === 'ketoan' ? 'Trần Viết Linh' : role === 'user' ? 'Đại Đào' : 'Khách'}
+            {/* Hiển thị tên lấy từ localStorage */}
+            {fullName}
           </span>
           <p className="user-role">
-            {role === 'admin' ? 'Ban quản trị' : role === 'ketoan' ? 'Phòng Kế toán' : role === 'user' ? 'Người dùng' : 'Chưa xác định'}
+            {/* Hiển thị chức vụ dựa trên role */}
+            {getRoleDisplayName(role)}
           </p>
         </div>
+        {/* KẾT THÚC PHẦN SỬA ĐỔI */}
+
         <hr className="sidebar-divider" />
       </div>
 
@@ -65,7 +87,7 @@ const Sidebar = () => {
             </Link>
           </li>
 
-          {/* Phân quyền Menu giữ nguyên logic cũ của bạn */}
+          {/* --- CÁC MENU KHÁC GIỮ NGUYÊN --- */}
           {role === 'admin' && (
             <>
               <li className={`has-submenu ${openMenus.hoKhau ? 'open' : ''}`}>
@@ -141,7 +163,6 @@ const Sidebar = () => {
         </DialogContent>
         <DialogActions sx={{ padding: '16px' }}>
           <Button onClick={handleCloseLogout} variant="outlined">Hủy bỏ</Button>
-          {/* SỬA TẠI ĐÂY: Xóa Link, chỉ dùng onClick */}
           <Button onClick={handleConfirmLogout} variant="contained" color="error" autoFocus>
             Đồng ý
           </Button>

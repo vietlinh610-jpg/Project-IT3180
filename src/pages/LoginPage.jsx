@@ -23,7 +23,7 @@ const LoginPage = () => {
 
       // 2. Gọi API thực tế
       const res = await loginUser(payload);
-      
+
       // 3. Lấy dữ liệu từ Backend trả về
       // Cấu trúc trả về: { message, token, user: { hoTen, quyen, ... } }
       const { token, user } = res.data;
@@ -32,22 +32,19 @@ const LoginPage = () => {
       localStorage.clear();
       localStorage.setItem('userToken', token);
       let safeRole = user.quyen;
-if (user.quyen === 'Admin') safeRole = 'admin';
-if (user.quyen === 'Kế toán') safeRole = 'ketoan';
-if (user.quyen === 'Người dùng') safeRole = 'user';
-      
-      // Lưu quyền (Role) để dùng cho việc phân quyền menu sau này
-      // Backend trả về: 'Admin', 'Kế toán', 'Người dùng'
-      localStorage.setItem('userRole', safeRole);
-      
-      // Lưu thêm thông tin user để hiển thị "Xin chào..."
-      localStorage.setItem('userInfo', JSON.stringify(user));
+      if (user.quyen === 'Admin') safeRole = 'admin';
+      if (user.quyen === 'Kế toán') safeRole = 'ketoan';
+      if (user.quyen === 'Người dùng') safeRole = 'user';
 
+
+      localStorage.setItem('userRole', safeRole);
+      localStorage.setItem('userInfo', JSON.stringify(user));
+      localStorage.setItem('fullName', user.hoTen);
       alert(`Đăng nhập thành công! Xin chào ${user.hoTen}`);
 
       // 5. Điều hướng
-      navigate('/dashboard'); 
-      
+      navigate('/dashboard');
+
       // Reload để App cập nhật lại Menu theo quyền mới
       window.location.reload();
 
@@ -63,7 +60,7 @@ if (user.quyen === 'Người dùng') safeRole = 'user';
     <div className="login-wrapper">
       <form className="login-form" onSubmit={handleSubmit}>
         <h2>Đăng Nhập Hệ Thống</h2>
-        
+
         {/* Hiển thị lỗi nếu có */}
         {error && <div className="error-message">{error}</div>}
 
@@ -78,7 +75,7 @@ if (user.quyen === 'Người dùng') safeRole = 'user';
             placeholder="Nhập tên đăng nhập"
           />
         </div>
-        
+
         <div className="form-group">
           <label htmlFor="password">Mật khẩu</label>
           <input
@@ -90,7 +87,7 @@ if (user.quyen === 'Người dùng') safeRole = 'user';
             placeholder="Nhập mật khẩu"
           />
         </div>
-        
+
         <button type="submit" className="submit-button">
           Đăng Nhập
         </button>
