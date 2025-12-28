@@ -1,4 +1,4 @@
-const { connectDB, sql } = require('../Backend/config/db');
+const { connectDB, sql } = require('../config/db');
 
 // 1. API CHO TRANG CHỦ: Lấy danh sách Căn hộ + Số thành viên
 const getCanHoWithCount = async (req, res) => {

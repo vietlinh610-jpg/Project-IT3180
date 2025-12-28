@@ -15,6 +15,8 @@ const nhankhauRoutes = require('./routes/nhankhauRoutes');
 const tamvangRoutes = require('./routes/tamvangRoutes');
 const tamtruRoutes = require('./routes/tamtruRoutes');
 const taikhoanRoutes = require('./routes/taikhoanRoutes');
+const loginRoutes = require('./routes/loginRoutes');
+
 // Sử dụng Routes
 app.use('/api/hokhau', hokhauRoutes);
 app.use('/api/canho', canhoRoutes);
@@ -22,6 +24,7 @@ app.use('/api/nhankhau', nhankhauRoutes);
 app.use('/api/tamvang', tamvangRoutes);
 app.use('/api/tamtru', tamtruRoutes);
 app.use('/api/taikhoan', taikhoanRoutes);
+app.use('/api/login', loginRoutes);
 
 app.get('/', (req, res) => {
     res.send('API is ready!');

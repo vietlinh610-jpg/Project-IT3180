@@ -1,4 +1,4 @@
-const { connectDB, sql } = require('../Backend/config/db');
+const { connectDB, sql } = require('../config/db');
 
 // 1. LẤY DANH SÁCH CĂN HỘ
 const getListCanHo = async (req, res) => {
