@@ -14,6 +14,7 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit'; 
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
+import PieChartIcon from '@mui/icons-material/PieChart';
 
 // Import API
 import { getCanHoCount, getNhanKhauByCanHo, deleteNhanKhau, updateNhanKhau } from '../services/nhankhauApi';
@@ -210,6 +211,26 @@ const NhanKhauPage = () => {
       <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3 }}>
         Quản lý nhân khẩu 
       </Typography>
+
+      <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
+        <Button
+          variant="contained"
+          startIcon={<GroupsIcon />}
+          onClick={() => navigate('/quan-ly-nhan-dan/nhan-khau/tat-ca')}
+          sx={{ bgcolor: '#2b98c0ff', '&:hover': { bgcolor: '#3fa8c3ff' }, textTransform: 'none', fontWeight: 'bold' }}
+        >
+          XEM TẤT CẢ NHÂN KHẨU
+        </Button>
+
+        <Button 
+          variant="contained" 
+          startIcon={<PieChartIcon />}
+          onClick={() => navigate('/ho-gia-dinh/ho-khau/thong-ke')}
+          sx={{ backgroundColor: '#8e44ad', textTransform: 'none', fontWeight: 'bold', '&:hover': { backgroundColor: '#7d3c98' } }}
+        >
+          THỐNG KÊ NHÂN KHẨU
+        </Button>
+      </Stack>
 
       <Paper elevation={0} sx={{ flexGrow: 1, border: '1px solid #e0e0e0', borderRadius: '8px' }}>
         <DataGrid

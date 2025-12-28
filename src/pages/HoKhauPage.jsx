@@ -6,14 +6,15 @@ import {
   GridRowModes, 
   GridActionsCellItem 
 } from '@mui/x-data-grid';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, TextField, InputAdornment } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
+import SearchIcon from '@mui/icons-material/Search'; // Thêm icon tìm kiếm
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { getHoKhauList, deleteHoKhau, updateHoKhau } from '../services/hokhauApi'; // Đảm bảo đã tạo file này
+import { getHoKhauList, deleteHoKhau, updateHoKhau } from '../services/hokhauApi';
 
 const HoKhauPage = () => {
   const navigate = useNavigate();
@@ -21,6 +22,9 @@ const HoKhauPage = () => {
   // State lưu dữ liệu
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // --- THÊM STATE TÌM KIẾM ---
+  const [searchText, setSearchText] = useState('');
   
   // State quản lý chế độ sửa (Edit Mode)
   const [rowModesModel, setRowModesModel] = useState({});
@@ -31,11 +35,10 @@ const HoKhauPage = () => {
       setLoading(true);
       const response = await getHoKhauList();
       
-      // Map dữ liệu từ Backend (PascalCase) sang Frontend (camelCase)
       const formattedData = response.data.map((item) => ({
-        id: item.MaHoKhau, // DataGrid bắt buộc phải có trường 'id'
+        id: item.MaHoKhau,
         maHoKhau: item.MaHoKhau,
-        soThanhVien: item.SoThanhVien, // Cột số lượng thành viên (Backend đã count)
+        soThanhVien: item.SoThanhVien,
         diaChi: item.DiaChiThuongTru,
         noiCap: item.NoiCap,
         ngayCap: item.NgayCap
@@ -53,6 +56,16 @@ const HoKhauPage = () => {
   useEffect(() => {
     fetchHoKhau();
   }, []);
+
+  // --- LOGIC LỌC DỮ LIỆU TÌM KIẾM ---
+  const filteredRows = rows.filter((row) => {
+    const searchLower = searchText.toLowerCase();
+    return (
+      row.maHoKhau?.toLowerCase().includes(searchLower) ||
+      row.diaChi?.toLowerCase().includes(searchLower) ||
+      row.noiCap?.toLowerCase().includes(searchLower)
+    );
+  });
 
   // --- 2. XỬ LÝ SỰ KIỆN CLICK (Edit/Save/Cancel/Delete) ---
   const handleEditClick = (id) => () => {
@@ -74,11 +87,9 @@ const HoKhauPage = () => {
     if (window.confirm(`Bạn có chắc chắn muốn xóa Hộ khẩu mã: ${id}?`)) {
       try {
         await deleteHoKhau(id);
-        // Xóa thành công thì update lại state để giao diện tự mất dòng đó
         setRows(rows.filter((row) => row.id !== id));
         alert("Xóa thành công!");
       } catch (error) {
-        // Hiển thị thông báo lỗi từ Backend (VD: Đang có nhân khẩu)
         const message = error.response?.data?.message || "Xóa thất bại!";
         alert(message);
       }
@@ -88,15 +99,13 @@ const HoKhauPage = () => {
   // --- 3. XỬ LÝ UPDATE KHI BẤM LƯU ---
   const processRowUpdate = async (newRow) => {
     try {
-      // Chuẩn bị dữ liệu gửi về Backend
       const updatedData = {
         DiaChiThuongTru: newRow.diaChi,
         NoiCap: newRow.noiCap,
-        NgayCap: newRow.ngayCap // DataGrid sẽ trả về dạng Date Object hoặc String
+        NgayCap: newRow.ngayCap
       };
-
       await updateHoKhau(newRow.id, updatedData);
-      return newRow; // Trả về row mới để Grid hiển thị
+      return newRow;
     } catch (error) {
       console.error("Lỗi cập nhật:", error);
       alert("Cập nhật thất bại!");
@@ -107,8 +116,6 @@ const HoKhauPage = () => {
   // --- 4. CẤU HÌNH CỘT ---
   const columns = [
     { field: 'maHoKhau', headerName: 'Mã hộ khẩu', flex: 1, minWidth: 150, editable: false },
-    
-    // Cột Số thành viên (Lấy từ Backend, không cho sửa)
     { 
       field: 'soThanhVien', 
       headerName: 'Số thành viên', 
@@ -118,11 +125,8 @@ const HoKhauPage = () => {
       type: 'number',
       editable: false 
     },
-
     { field: 'diaChi', headerName: 'Địa chỉ thường trú', flex: 1.5, minWidth: 200, editable: true },
     { field: 'noiCap', headerName: 'Nơi cấp', flex: 1, minWidth: 120, editable: true },
-    
-    // Cột Ngày cấp (Kiểu Date)
     { 
       field: 'ngayCap', 
       headerName: 'Ngày cấp', 
@@ -130,15 +134,11 @@ const HoKhauPage = () => {
       minWidth: 120,
       type: 'date',
       editable: true,
-      // Chuyển đổi chuỗi ISO từ DB thành Date Object để DataGrid hiểu
       valueGetter: (value) => value && new Date(value),
       valueFormatter: (value) => {
-      // Nếu có giá trị thì format, không thì để rỗng
-      return value ? dayjs(value).format('DD/MM/YYYY') : '';
+        return value ? dayjs(value).format('DD/MM/YYYY') : '';
       },
     },
-    
-    // Cột Thao tác (Dùng type: 'actions' để hỗ trợ Inline Edit tốt nhất)
     {
       field: 'actions',
       type: 'actions',
@@ -158,7 +158,6 @@ const HoKhauPage = () => {
             <GridActionsCellItem
               icon={<CancelIcon />}
               label="Cancel"
-              className="textPrimary"
               onClick={handleCancelClick(id)}
               color="inherit"
             />,
@@ -169,7 +168,6 @@ const HoKhauPage = () => {
           <GridActionsCellItem
             icon={<EditIcon />}
             label="Edit"
-            className="textPrimary"
             onClick={handleEditClick(id)}
             color="inherit"
           />,
@@ -197,13 +195,36 @@ const HoKhauPage = () => {
         Danh sách hộ khẩu
       </Typography>
 
-      <Button 
-        variant="contained" 
-        onClick={() => navigate('/ho-gia-dinh/ho-khau/create')}
-        sx={{ mb: 3, width: 'fit-content', backgroundColor: '#008ecc' }}
-      >
-        ĐĂNG KÝ HỘ KHẨU
-      </Button>
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        mb: 3 
+      }}>
+        <Button 
+          variant="contained" 
+          onClick={() => navigate('/ho-gia-dinh/ho-khau/create')}
+          sx={{ width: 'fit-content', backgroundColor: '#008ecc' }}
+        >
+          ĐĂNG KÝ HỘ KHẨU
+        </Button>
+
+        {/* --- Ô TÌM KIẾM TÙY CHỈNH --- */}
+        <TextField
+          size="small"
+          placeholder="Tìm theo mã HK, địa chỉ..."
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          sx={{ width: 300, backgroundColor: '#fff' }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Box>
 
       <Box sx={{ 
         width: '100%', 
@@ -212,23 +233,17 @@ const HoKhauPage = () => {
         backgroundColor: '#fff' 
       }}>
         <DataGrid
-          rows={rows}
+          rows={filteredRows} // TRUYỀN DỮ LIỆU ĐÃ LỌC VÀO ĐÂY
           columns={columns}
           loading={loading}
           slots={{ toolbar: GridToolbar }}
-          
-          // Cấu hình Edit Mode
           editMode="row"
           rowModesModel={rowModesModel}
           onRowModesModelChange={setRowModesModel}
           processRowUpdate={processRowUpdate}
           onProcessRowUpdateError={(error) => console.log(error)}
-          
-          // Chặn click đúp để tránh vô tình sửa
           onCellDoubleClick={(params, event) => event.stopPropagation()}
-
           pageSizeOptions={[5, 10, 25, 50]}
-
           initialState={{
             pagination: {
               paginationModel: { pageSize: 10 },

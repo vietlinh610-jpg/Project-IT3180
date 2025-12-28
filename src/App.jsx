@@ -24,6 +24,9 @@ import CreateKhoanThuPage from './pages/CreateKhoanThuPage';
 import CreateTamTruPage from './pages/CreateTamTruPage';
 import CreateTamVangPage from './pages/CreateTamVangPage';
 import CreateTaiKhoanPage from './pages/CreateTaiKhoanPage';
+import NhanKhauAllPage from './pages/NhanKhauAllPage';
+import ThongKeKhoanThuPage from './pages/ThongKeKhoanThuPage';
+import ThongKeNhanKhauPage from './pages/ThongKeNhanKhauPage';
 
 function App() {
   return (
@@ -65,6 +68,9 @@ function App() {
                   <Route path="/quan-ly-nhan-dan/tam-tru/create" element={<CreateTamTruPage />} />
                   <Route path="/quan-ly-nhan-dan/tam-vang/create" element={<CreateTamVangPage />} />
                   <Route path="/quan-ly-tai-khoan/create" element={<CreateTaiKhoanPage />} />
+                  <Route path="/quan-ly-nhan-dan/nhan-khau/tat-ca" element={<NhanKhauAllPage />} />
+                  <Route path="/quan-ly-khoan-thu/thong-ke" element={<ThongKeKhoanThuPage />} />
+                  <Route path="/ho-gia-dinh/ho-khau/thong-ke" element={<ThongKeNhanKhauPage />} />
                   
                   
                   {/* Nếu gõ đường dẫn lạ bên trong khu vực này, tự về dashboard */}
