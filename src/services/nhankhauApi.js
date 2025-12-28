@@ -7,7 +7,4 @@ export const createNhanKhau = (data) => axios.post(`${API_URL}`, data);
 export const updateNhanKhau = (id, data) => axios.put(`${API_URL}/${id}`, data);
 export const deleteNhanKhau = (id) => axios.delete(`${API_URL}/${id}`);
 export const findNhanKhau = (maNhanKhau) => axios.get(`${API_URL}/find/${maNhanKhau}`);
-export const getAllNhanKhau = async () => {
-    // Thay đổi URL theo API thực tế của bạn
-    return await axios.get('/api/nhankhau/all'); 
-};
+export const getAllNhanKhau = () => axios.get(`${API_URL}`);

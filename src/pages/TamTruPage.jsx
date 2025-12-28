@@ -1,11 +1,11 @@
 // src/pages/TamTruPage.jsx
 import React, { useState, useEffect } from 'react';
-import { 
-  DataGrid, GridToolbar, GridRowModes, GridActionsCellItem 
+import {
+  DataGrid, GridToolbar, GridRowModes, GridActionsCellItem
 } from '@mui/x-data-grid';
-import { 
-  Box, Typography, Button, Chip, 
-  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField 
+import {
+  Box, Typography, Button, Chip,
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField
 } from '@mui/material';
 
 // Icons
@@ -21,8 +21,8 @@ import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 
 // Import API
-import { 
-  getListTamTru, deleteTamTru, updateTamTru 
+import {
+  getListTamTru, deleteTamTru, updateTamTru
 } from '../services/tamtruApi'; // Kiểm tra lại đường dẫn import đúng file service của bạn
 
 const TamTruPage = () => {
@@ -35,29 +35,29 @@ const TamTruPage = () => {
 
   // State cho Modal xem/sửa lý do
   const [openDetail, setOpenDetail] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null); 
-  const [isEditingReason, setIsEditingReason] = useState(false); 
-  const [tempReason, setTempReason] = useState(''); 
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [isEditingReason, setIsEditingReason] = useState(false);
+  const [tempReason, setTempReason] = useState('');
 
   // --- 1. CALL API ---
   const fetchData = async () => {
     try {
       setLoading(true);
       const res = await getListTamTru();
-      
+
       const formattedData = res.data.map((item, index) => ({
         id: item.ID || index,
         // --- THÊM DÒNG NÀY ---
-        maNhanKhau: item.MaNhanKhau, 
+        maNhanKhau: item.MaNhanKhau,
         // --------------------
         hoTen: item.HoTen,
-        cccd: item.SoCCCD,
+        SoCCCD: item.SoCCCD,
         maCanHo: item.MaCanHo || 'Chưa có',
         lyDo: item.LyDo,
         ngayBatDau: item.TuNgay ? new Date(item.TuNgay) : null,
         ngayKetThuc: item.DenNgay ? new Date(item.DenNgay) : null,
       }));
-      
+
       setRows(formattedData);
     } catch (error) {
       console.error(error);
@@ -73,7 +73,7 @@ const TamTruPage = () => {
   const handleViewDetail = (row) => {
     setSelectedRow(row);
     setTempReason(row.lyDo || '');
-    setIsEditingReason(false); 
+    setIsEditingReason(false);
     setOpenDetail(true);
   };
 
@@ -81,22 +81,30 @@ const TamTruPage = () => {
     if (!selectedRow) return;
 
     if (!selectedRow.ngayBatDau || !selectedRow.ngayKetThuc) {
-        alert("Lỗi: Ngày bắt đầu và Ngày kết thúc không được để trống!");
-        return; 
+      alert("Lỗi: Ngày bắt đầu và Ngày kết thúc không được để trống!");
+      return;
+    }
+
+    const dateDi = dayjs(newRow.ngayBatDau);
+    const dateVe = dayjs(newRow.ngayKetThuc);
+
+    if (dateVe.isBefore(dateDi)) {
+      alert("Lỗi vô lý: Ngày kết thúc không được phép trước Ngày bắt đầu!");
+      return oldRow; // Hủy thay đổi, quay về giá trị cũ
     }
 
     try {
       const payload = {
         TuNgay: dayjs(selectedRow.ngayBatDau).format('YYYY-MM-DD'),
         DenNgay: dayjs(selectedRow.ngayKetThuc).format('YYYY-MM-DD'),
-        LyDo: tempReason 
+        LyDo: tempReason
       };
 
       await updateTamTru(selectedRow.id, payload);
-      
+
       alert("Cập nhật lý do thành công!");
       setOpenDetail(false);
-      fetchData(); 
+      fetchData();
     } catch (error) {
       console.error(error);
       alert("Lỗi khi cập nhật: " + (error.response?.data?.message || error.message));
@@ -115,15 +123,15 @@ const TamTruPage = () => {
 
   const processRowUpdate = async (newRow) => {
     if (!newRow.ngayBatDau || !newRow.ngayKetThuc) {
-        alert("Không được để trống ngày tháng!");
-        throw new Error("Date cannot be null"); 
+      alert("Không được để trống ngày tháng!");
+      throw new Error("Date cannot be null");
     }
 
     try {
       const payload = {
         TuNgay: dayjs(newRow.ngayBatDau).format('YYYY-MM-DD'),
         DenNgay: dayjs(newRow.ngayKetThuc).format('YYYY-MM-DD'),
-        LyDo: newRow.lyDo 
+        LyDo: newRow.lyDo
       };
 
       await updateTamTru(newRow.id, payload);
@@ -151,32 +159,32 @@ const TamTruPage = () => {
   // --- 4. CẤU HÌNH CỘT ---
   const columns = [
     // --- CỘT MÃ NK MỚI THÊM ---
-    { 
-        field: 'maNhanKhau', 
-        headerName: 'Mã NK', 
-        width: 90, 
-        editable: false // Không cho sửa mã NK
+    {
+      field: 'maNhanKhau',
+      headerName: 'Mã NK',
+      width: 90,
+      editable: false // Không cho sửa mã NK
     },
     // --------------------------
     { field: 'hoTen', headerName: 'Họ tên', flex: 1.2, minWidth: 160 },
-    { field: 'cccd', headerName: 'Số CCCD', flex: 1, minWidth: 140 },
+    { field: 'SoCCCD', headerName: 'Số CCCD', flex: 1, minWidth: 140 },
     { field: 'maCanHo', headerName: 'Mã căn hộ', flex: 0.8, align: 'center', editable: false },
-    
-    { 
-      field: 'ngayBatDau', headerName: 'Ngày bắt đầu', flex: 1, minWidth: 120, 
+
+    {
+      field: 'ngayBatDau', headerName: 'Ngày bắt đầu', flex: 1, minWidth: 120,
       editable: true, type: 'date',
       valueFormatter: (v) => v ? dayjs(v).format('DD/MM/YYYY') : ''
     },
-    { 
-      field: 'ngayKetThuc', headerName: 'Ngày kết thúc', flex: 1, minWidth: 120, 
+    {
+      field: 'ngayKetThuc', headerName: 'Ngày kết thúc', flex: 1, minWidth: 120,
       editable: true, type: 'date',
       valueFormatter: (v) => v ? dayjs(v).format('DD/MM/YYYY') : ''
     },
 
-    { 
-      field: 'trangThai', 
-      headerName: 'Trạng thái', 
-      flex: 1, 
+    {
+      field: 'trangThai',
+      headerName: 'Trạng thái',
+      flex: 1,
       minWidth: 130,
       renderCell: (params) => {
         const today = dayjs();
@@ -206,23 +214,23 @@ const TamTruPage = () => {
         }
 
         return [
-          <GridActionsCellItem 
-            icon={<InfoIcon />} 
-            label="Chi tiết" 
-            onClick={() => handleViewDetail(row)} 
-            color="info" 
+          <GridActionsCellItem
+            icon={<InfoIcon />}
+            label="Chi tiết"
+            onClick={() => handleViewDetail(row)}
+            color="info"
           />,
-          <GridActionsCellItem 
-            icon={<EditIcon />} 
-            label="Sửa ngày" 
-            onClick={handleEditClick(id)} 
-            color="inherit" 
+          <GridActionsCellItem
+            icon={<EditIcon />}
+            label="Sửa ngày"
+            onClick={handleEditClick(id)}
+            color="inherit"
           />,
-          <GridActionsCellItem 
-            icon={<DeleteIcon />} 
-            label="Xóa" 
-            onClick={handleDeleteClick(id)} 
-            color="error" 
+          <GridActionsCellItem
+            icon={<DeleteIcon />}
+            label="Xóa"
+            onClick={handleDeleteClick(id)}
+            color="error"
           />,
         ];
       },
@@ -235,8 +243,8 @@ const TamTruPage = () => {
         Quản lý đăng ký tạm trú
       </Typography>
 
-      <Button 
-        variant="contained" 
+      <Button
+        variant="contained"
         startIcon={<AddIcon />}
         onClick={() => navigate('/quan-ly-nhan-dan/tam-tru/create')}
         sx={{ mb: 3, backgroundColor: '#008ecc', textTransform: 'none', fontWeight: 'bold', width: 'fit-content' }}
@@ -270,7 +278,7 @@ const TamTruPage = () => {
         <DialogTitle sx={{ fontWeight: 'bold', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           {isEditingReason ? "Chỉnh sửa lý do" : "Chi tiết lý do tạm trú"}
         </DialogTitle>
-        
+
         <DialogContent dividers>
           {isEditingReason ? (
             <TextField
@@ -293,12 +301,12 @@ const TamTruPage = () => {
         <DialogActions sx={{ p: 2 }}>
           {isEditingReason ? (
             <>
-               <Button onClick={() => setIsEditingReason(false)} color="inherit">
-                 Hủy
-               </Button>
-               <Button onClick={handleSaveReasonFromModal} variant="contained" color="primary">
-                 Lưu thay đổi
-               </Button>
+              <Button onClick={() => setIsEditingReason(false)} color="inherit">
+                Hủy
+              </Button>
+              <Button onClick={handleSaveReasonFromModal} variant="contained" color="primary">
+                Lưu thay đổi
+              </Button>
             </>
           ) : (
             <>

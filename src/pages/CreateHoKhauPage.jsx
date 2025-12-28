@@ -30,8 +30,8 @@ const CreateHoKhauPage = () => {
     e.preventDefault();
 
     // 1. Validate cơ bản
-    if (!formData.maHoKhau || !formData.diaChiThuongTru) {
-      alert("Vui lòng nhập Mã hộ khẩu và Địa chỉ!");
+    if (!formData.maHoKhau) {
+      alert("Vui lòng nhập Mã hộ khẩu!");
       return;
     }
 
@@ -105,13 +105,12 @@ const CreateHoKhauPage = () => {
             <Grid size={12}>
               <TextField
                 fullWidth
-                label="Địa chỉ thường trú *"
+                label="Địa chỉ thường trú "
                 name="diaChiThuongTru"
                 variant="filled"
                 value={formData.diaChiThuongTru}
                 onChange={handleChange}
                 placeholder="Số nhà, đường, phường, quận..."
-                required
                 multiline
                 rows={2} // Cho phép nhập nhiều dòng địa chỉ
               />
@@ -141,7 +140,6 @@ const CreateHoKhauPage = () => {
                 value={formData.ngayCap}
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
-                required // Thường ngày cấp là bắt buộc
               />
             </Grid>
 

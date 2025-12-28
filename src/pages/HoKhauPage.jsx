@@ -97,22 +97,43 @@ const HoKhauPage = () => {
   };
 
   // --- 3. XỬ LÝ UPDATE KHI BẤM LƯU ---
-  const processRowUpdate = async (newRow) => {
+  const processRowUpdate = async (newRow, oldRow) => { // <-- 1. Thêm oldRow vào đây
+    // --- 2. VALIDATION (Kiểm tra dữ liệu rỗng) ---
+    
+    // Kiểm tra Địa chỉ thường trú
+    if (!newRow.diaChi || newRow.diaChi.toString().trim() === '') {
+      alert("Lỗi: Địa chỉ thường trú không được để trống!");
+      return oldRow; // Trả về dữ liệu cũ (Hủy thay đổi)
+    }
+
+    // Kiểm tra Nơi cấp
+    if (!newRow.noiCap || newRow.noiCap.toString().trim() === '') {
+      alert("Lỗi: Nơi cấp không được để trống!");
+      return oldRow;
+    }
+
+    // Kiểm tra Ngày cấp
+    if (!newRow.ngayCap) {
+      alert("Lỗi: Ngày cấp không được để trống!");
+      return oldRow;
+    }
+
+    // --- 3. GỌI API (Nếu dữ liệu hợp lệ) ---
     try {
       const updatedData = {
         DiaChiThuongTru: newRow.diaChi,
         NoiCap: newRow.noiCap,
-        NgayCap: newRow.ngayCap
+        NgayCap: newRow.ngayCap // Lưu ý: Cần format date nếu backend yêu cầu YYYY-MM-DD
       };
+
       await updateHoKhau(newRow.id, updatedData);
-      return newRow;
+      return newRow; // Cập nhật thành công
     } catch (error) {
       console.error("Lỗi cập nhật:", error);
-      alert("Cập nhật thất bại!");
-      throw error;
+      alert("Cập nhật thất bại: " + (error.response?.data?.message || error.message));
+      return oldRow; // API lỗi thì quay về dữ liệu cũ
     }
   };
-
   // --- 4. CẤU HÌNH CỘT ---
   const columns = [
     { field: 'maHoKhau', headerName: 'Mã hộ khẩu', flex: 1, minWidth: 150, editable: false },

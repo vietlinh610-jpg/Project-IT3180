@@ -6,7 +6,7 @@ import {
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router-dom'; // Thêm useParams
-import { createNhanKhau } from '../services/nhankhauApi'; // Import API
+import { createNhanKhau, getCanHoCount, getNhanKhauByCanHo } from '../services/nhankhauApi'; // Import API
 
 const CreateNhanKhauPage = () => {
   const navigate = useNavigate();
@@ -42,6 +42,26 @@ const CreateNhanKhauPage = () => {
 
     try {
       setLoading(true);
+      if (formData.quanHe.trim().toLowerCase() === 'chủ hộ') {
+       
+        const resApartments = await getCanHoCount();
+        const targetApartment = resApartments.data.find(apt => String(apt.MaHoKhau) === String(maHoKhau));
+
+        if (targetApartment) {
+           
+            const resMembers = await getNhanKhauByCanHo(targetApartment.MaCanHo);
+            const members = (resMembers.data && resMembers.data.data) ? resMembers.data.data : [];
+
+            
+            const existingHost = members.find(m => m.QuanHeVoiChuHo && m.QuanHeVoiChuHo.trim().toLowerCase() === 'chủ hộ');
+            
+            if (existingHost) {
+                alert(`Lỗi: Hộ này đã có chủ hộ là "${existingHost.HoTen}".\nKhông thể thêm chủ hộ thứ hai.`);
+                setLoading(false);
+                return; // Dừng lại ngay, không tạo mới nữa
+            }
+        }
+      }
 
       // Map dữ liệu sang chuẩn Backend
       const payload = {
@@ -131,7 +151,7 @@ const CreateNhanKhauPage = () => {
                 value={formData.gioiTinh || ''}
                 onChange={handleChange}
                 SelectProps={{ native: true }}
-                required
+                
               >
                 <option value=""></option>
                 <option value="Nam">Nam</option>
@@ -148,7 +168,7 @@ const CreateNhanKhauPage = () => {
                 value={formData.ngaySinh}
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
-                required
+                
               />
             </Grid>
 
@@ -156,12 +176,12 @@ const CreateNhanKhauPage = () => {
             <Grid size={4}>
               <TextField
                 fullWidth
-                label="Số CCCD *"
+                label="Số CCCD "
                 name="cccd"
                 variant="filled"
                 value={formData.cccd}
                 onChange={handleChange}
-                required
+                
               />
             </Grid>
             <Grid size={4}>

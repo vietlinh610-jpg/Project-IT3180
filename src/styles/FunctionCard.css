@@ -18,7 +18,8 @@
 }
 
 .card-image-wrapper {
-    height: 150px; /* Chiều cao cố định cho ảnh */
+    height: 200px; /* Chiều cao cố định cho ảnh */
+    width: 350px;
     overflow: hidden;
     display: flex;
     align-items: center;

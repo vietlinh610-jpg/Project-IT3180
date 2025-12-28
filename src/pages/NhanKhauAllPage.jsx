@@ -25,11 +25,13 @@ const NhanKhauAllPage = () => {
       const res = await getAllNhanKhau(); 
       const formatted = res.data.map((nk) => ({
         id: nk.MaNhanKhau,
+        maHoKhau: nk.MaHoKhau,
         maNhanKhau: nk.MaNhanKhau,
         hoTen: nk.HoTen,
         gioiTinh: nk.GioiTinh,
         cccd: nk.SoCCCD,
         ngaySinh: nk.NgaySinh ? new Date(nk.NgaySinh) : null,
+        noiSinh: nk.NoiSinh,
         danToc: nk.DanToc,
         ngheNghiep: nk.NgheNghiep,
         maCanHo: nk.MaCanHo // Để biết họ ở căn hộ nào
@@ -49,6 +51,7 @@ const NhanKhauAllPage = () => {
     const searchLower = searchText.toLowerCase();
     return (
       row.hoTen?.toLowerCase().includes(searchLower) ||
+      row.maHoKhau?.toLowerCase().includes(searchLower) ||
       row.maNhanKhau?.toLowerCase().includes(searchLower) ||
       row.cccd?.toLowerCase().includes(searchLower) ||
       row.maCanHo?.toLowerCase().includes(searchLower)
@@ -56,17 +59,19 @@ const NhanKhauAllPage = () => {
   });
 
   const columns = [
+    { field: 'maHoKhau', headerName: 'Mã HK', width: 100 },
     { field: 'maNhanKhau', headerName: 'Mã NK', width: 100 },
-    { field: 'hoTen', headerName: 'Họ và tên', flex: 1.5, minWidth: 150 },
+    { field: 'hoTen', headerName: 'Họ và tên', flex: 1, minWidth: 150 },
     { field: 'maCanHo', headerName: 'Căn hộ', width: 100 },
-    { field: 'gioiTinh', headerName: 'Giới tính', width: 90 },
+    { field: 'gioiTinh', headerName: 'Giới tính', width: 80 },
     { 
-      field: 'ngaySinh', headerName: 'Ngày sinh', width: 120,
-      valueFormatter: (params) => params.value ? dayjs(params.value).format('DD/MM/YYYY') : ''
+      field: 'ngaySinh', headerName: 'Ngày sinh', width: 100, type: 'date',
+      valueFormatter: (value) => value ? dayjs(value).format('DD/MM/YYYY') : ''
     },
-    { field: 'cccd', headerName: 'Số CCCD', width: 150 },
+    { field: 'noiSinh', headerName: 'Nơi Sinh', width : 130 },
+    { field: 'cccd', headerName: 'Số CCCD', width: 120 },
     { field: 'danToc', headerName: 'Dân tộc', width: 100 },
-    { field: 'ngheNghiep', headerName: 'Nghề nghiệp', width: 150 },
+    { field: 'ngheNghiep', headerName: 'Nghề nghiệp', flex: 1.5, width: 150 },
   ];
 
   return (

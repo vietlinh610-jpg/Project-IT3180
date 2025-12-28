@@ -1,11 +1,11 @@
 // src/pages/TamVangPage.jsx
 import React, { useState, useEffect } from 'react';
-import { 
-  DataGrid, GridToolbar, GridRowModes, GridActionsCellItem 
+import {
+  DataGrid, GridToolbar, GridRowModes, GridActionsCellItem
 } from '@mui/x-data-grid';
-import { 
-  Box, Typography, Button, Stack, Chip, 
-  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField 
+import {
+  Box, Typography, Button, Stack, Chip,
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField
 } from '@mui/material';
 
 // Icons
@@ -20,8 +20,8 @@ import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 
 // Import API
-import { 
-  getListTamVang, deleteTamVang, updateTamVang 
+import {
+  getListTamVang, deleteTamVang, updateTamVang
 } from '../services/tamvangApi'; // Đảm bảo đúng đường dẫn
 
 const TamVangPage = () => {
@@ -43,19 +43,18 @@ const TamVangPage = () => {
     try {
       setLoading(true);
       const res = await getListTamVang();
-      
+
       const formattedData = res.data.map((item, index) => ({
         id: item.ID || index,
-        maNhanKhau: item.MaNhanKhau, // Thêm mã NK
+        maNhanKhau: item.MaNhanKhau,
         hoTen: item.HoTen,
-        cccd: item.SoCCCD,
-        maHoKhau: item.MaHoKhau, 
+        SoCCCD: item.SoCCCD || '',
+        maHoKhau: item.MaHoKhau,
         lyDo: item.LyDo,
-        // Map NgayDi / NgayVe từ Backend
         ngayDi: item.NgayDi ? new Date(item.NgayDi) : null,
-        ngayVeDuKien: item.NgayVe ? new Date(item.NgayVe) : null, // Backend là NgayVe
+        ngayVeDuKien: item.NgayVe ? new Date(item.NgayVe) : null,
       }));
-      
+
       setRows(formattedData);
     } catch (error) {
       console.error(error);
@@ -77,15 +76,15 @@ const TamVangPage = () => {
   const handleSaveReasonFromModal = async () => {
     if (!selectedRow) return;
     if (!selectedRow.ngayDi || !selectedRow.ngayVeDuKien) {
-        alert("Lỗi: Ngày đi và Ngày về không được để trống!");
-        return;
+      alert("Lỗi: Ngày đi và Ngày về không được để trống!");
+      return;
     }
 
     try {
       const payload = {
         NgayDi: dayjs(selectedRow.ngayDi).format('YYYY-MM-DD'),
         NgayVe: dayjs(selectedRow.ngayVeDuKien).format('YYYY-MM-DD'),
-        LyDo: tempReason 
+        LyDo: tempReason
       };
 
       await updateTamVang(selectedRow.id, payload);
@@ -110,15 +109,23 @@ const TamVangPage = () => {
 
   const processRowUpdate = async (newRow) => {
     if (!newRow.ngayDi || !newRow.ngayVeDuKien) {
-        alert("Không được để trống ngày tháng!");
-        throw new Error("Date required");
+      alert("Không được để trống ngày tháng!");
+      throw new Error("Date required");
+    }
+
+    const dateDi = dayjs(newRow.ngayDi);
+    const dateVe = dayjs(newRow.ngayVeDuKien);
+
+    if (dateVe.isBefore(dateDi)) {
+      alert("Lỗi vô lý: Ngày về dự kiến không được phép trước Ngày đi!");
+      return oldRow; // Hủy thay đổi, quay về giá trị cũ
     }
 
     try {
       const payload = {
         NgayDi: dayjs(newRow.ngayDi).format('YYYY-MM-DD'),
         NgayVe: dayjs(newRow.ngayVeDuKien).format('YYYY-MM-DD'), // Map lại tên đúng với Backend
-        LyDo: newRow.lyDo 
+        LyDo: newRow.lyDo
       };
 
       await updateTamVang(newRow.id, payload);
@@ -138,46 +145,46 @@ const TamVangPage = () => {
   // --- 4. CẤU HÌNH CỘT ---
   const columns = [
     { field: 'maNhanKhau', headerName: 'Mã NK', width: 90, editable: false },
-    { field: 'hoTen', headerName: 'Họ tên', flex: 1.2, minWidth: 180 },
-    { field: 'cccd', headerName: 'Số CCCD', flex: 1, minWidth: 150 },
-    { field: 'maHoKhau', headerName: 'Mã hộ khẩu', flex: 0.8, align: 'center' },
-    
+    { field: 'hoTen', headerName: 'Họ tên', flex: 1.2, minWidth: 180, editable: false },
+    { field: 'SoCCCD', headerName: 'Số CCCD', flex: 1, minWidth: 150, editable: false },
+    { field: 'maHoKhau', headerName: 'Mã hộ khẩu', flex: 0.8, align: 'center', editable: false },
+
     // Cột Ngày đi (Sửa được)
-    { 
-      field: 'ngayDi', headerName: 'Ngày đi', flex: 1, minWidth: 120, 
+    {
+      field: 'ngayDi', headerName: 'Ngày đi', flex: 1, minWidth: 120,
       editable: true, type: 'date',
       valueFormatter: (v) => v ? dayjs(v).format('DD/MM/YYYY') : ''
     },
-    
+
     // Cột Ngày về dự kiến (Sửa được)
-    { 
-      field: 'ngayVeDuKien', headerName: 'Ngày về dự kiến', flex: 1, minWidth: 120, 
+    {
+      field: 'ngayVeDuKien', headerName: 'Ngày về dự kiến', flex: 1, minWidth: 120,
       editable: true, type: 'date',
       valueFormatter: (v) => v ? dayjs(v).format('DD/MM/YYYY') : ''
     },
 
     // ẨN CỘT LÝ DO KHỎI BẢNG (Đưa vào modal)
 
-    { 
-      field: 'trangThai', 
-      headerName: 'Trạng thái', 
-      flex: 1, 
+    {
+      field: 'trangThai',
+      headerName: 'Trạng thái',
+      flex: 1,
       minWidth: 130,
       renderCell: (params) => {
         const today = dayjs();
         const returnDate = dayjs(params.row.ngayVeDuKien);
         const startDate = dayjs(params.row.ngayDi);
-        
+
         let label = 'Đang vắng';
         let color = 'warning';
 
         // Nếu quá ngày về -> Đã về (hoặc hết hạn vắng)
         if (today.isAfter(returnDate)) {
-            label = 'Đã về';
-            color = 'default';
+          label = 'Đã về';
+          color = 'default';
         }
 
-        if(today.isBefore(startDate)) {
+        if (today.isBefore(startDate)) {
           label = 'Chưa đi';
           color = 'info';
         }
@@ -200,17 +207,17 @@ const TamVangPage = () => {
           ];
         }
         return [
-          <GridActionsCellItem 
-            icon={<InfoIcon />} label="Chi tiết" 
-            onClick={() => handleViewDetail(row)} color="info" 
+          <GridActionsCellItem
+            icon={<InfoIcon />} label="Chi tiết"
+            onClick={() => handleViewDetail(row)} color="info"
           />,
-          <GridActionsCellItem 
-            icon={<EditIcon />} label="Sửa ngày" 
-            onClick={handleEditClick(id)} color="inherit" 
+          <GridActionsCellItem
+            icon={<EditIcon />} label="Sửa ngày"
+            onClick={handleEditClick(id)} color="inherit"
           />,
-          <GridActionsCellItem 
-            icon={<DeleteIcon />} label="Xóa" 
-            onClick={handleDeleteClick(id)} color="error" 
+          <GridActionsCellItem
+            icon={<DeleteIcon />} label="Xóa"
+            onClick={handleDeleteClick(id)} color="error"
           />
         ];
       },
@@ -220,16 +227,16 @@ const TamVangPage = () => {
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100vh', width: '100%', boxSizing: 'border-box' }}>
       <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2 }}>
-        Quản lý khai báo tạm vắng 
+        Quản lý khai báo tạm vắng
       </Typography>
 
-      <Button 
-        variant="contained" 
+      <Button
+        variant="contained"
         onClick={() => navigate('/quan-ly-nhan-dan/tam-vang/create')}
         startIcon={<AddIcon />}
-        sx={{ 
-          mb: 3, backgroundColor: '#008ecc', textTransform: 'none', 
-          fontWeight: 'bold', width: 'fit-content' 
+        sx={{
+          mb: 3, backgroundColor: '#008ecc', textTransform: 'none',
+          fontWeight: 'bold', width: 'fit-content'
         }}
       >
         KHAI BÁO TẠM VẮNG
@@ -261,7 +268,7 @@ const TamVangPage = () => {
         <DialogTitle sx={{ fontWeight: 'bold', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           {isEditingReason ? "Chỉnh sửa lý do tạm vắng" : "Chi tiết lý do"}
         </DialogTitle>
-        
+
         <DialogContent dividers>
           {isEditingReason ? (
             <TextField
@@ -278,8 +285,8 @@ const TamVangPage = () => {
         <DialogActions sx={{ p: 2 }}>
           {isEditingReason ? (
             <>
-               <Button onClick={() => setIsEditingReason(false)} color="inherit">Hủy</Button>
-               <Button onClick={handleSaveReasonFromModal} variant="contained" color="primary">Lưu thay đổi</Button>
+              <Button onClick={() => setIsEditingReason(false)} color="inherit">Hủy</Button>
+              <Button onClick={handleSaveReasonFromModal} variant="contained" color="primary">Lưu thay đổi</Button>
             </>
           ) : (
             <>

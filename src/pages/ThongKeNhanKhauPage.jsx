@@ -24,7 +24,7 @@ const ThongKeNhanKhauPage = () => {
     <Box sx={{ p: 4, backgroundColor: '#f8f9fa', minHeight: '100vh', width: '100%', boxSizing: 'border-box' }}>
       {/* Header - Đảm bảo thanh tiêu đề dàn trải đều */}
       <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 5 }}>
-        <IconButton onClick={() => navigate('/ho-gia-dinh/ho-khau')}>
+        <IconButton onClick={() => navigate('/quan-ly-nhan-dan/nhan-khau')}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#2c3e50' }}>

@@ -78,13 +78,40 @@ const TaiKhoanPage = () => {
   };
 
   const handleSaveEdit = async () => {
+    // --- 1. VALIDATION (Kiểm tra dữ liệu rỗng) ---
+    // Kiểm tra Tên đăng nhập
+    if (!editData.tenDangNhap || editData.tenDangNhap.toString().trim() === '') {
+      alert("Lỗi: Tên đăng nhập không được để trống!");
+      return; // Dừng hàm ngay lập tức
+    }
+
+    // Kiểm tra Mật khẩu 
+    // (Lưu ý: Nếu logic của bạn là "để trống nghĩa là không đổi pass" thì bỏ đoạn if này đi)
+    if (!editData.matKhau || editData.matKhau.toString().trim() === '') {
+      alert("Lỗi: Mật khẩu không được để trống!");
+      return;
+    }
+
+    // Kiểm tra Họ tên
+    if (!editData.hoTen || editData.hoTen.toString().trim() === '') {
+      alert("Lỗi: Họ tên không được để trống!");
+      return;
+    }
+
+    // Kiểm tra Số CCCD
+    if (!editData.SoCCCD || editData.SoCCCD.toString().trim() === '') {
+      alert("Lỗi: Số CCCD không được để trống!");
+      return;
+    }
+
+    // --- 2. GỬI DỮ LIỆU ---
     try {
       // Chuẩn bị dữ liệu gửi đi
       const payload = {
-        tenDangNhap: editData.tenDangNhap,
+        tenDangNhap: editData.tenDangNhap.trim(), // Nên trim() để xóa khoảng thừa đầu đuôi
         matKhau: editData.matKhau,
-        hoTen: editData.hoTen,
-        SoCCCD: editData.SoCCCD,
+        hoTen: editData.hoTen.trim(),
+        SoCCCD: editData.SoCCCD.toString().trim(),
         quyen: editData.quyenTaiKhoan
       };
 
@@ -108,12 +135,7 @@ const TaiKhoanPage = () => {
       field: 'maHoKhau', 
       headerName: 'Mã HK', 
       flex: 0.8, 
-      minWidth: 100,
-      renderCell: (params) => (
-        <Typography sx={{ fontWeight: 'bold', color: params.value === '---' ? '#999' : '#000' }}>
-            {params.value}
-        </Typography>
-      )
+      minWidth: 100
     },
     { field: 'hoTen', headerName: 'Họ tên', flex: 1.2, minWidth: 180 },
     { field: 'SoCCCD', headerName: 'Số CCCD', flex: 1, minWidth: 150 },

@@ -23,7 +23,7 @@ const CreateTamTruPage = () => {
   const [formData, setFormData] = useState({
     maNhanKhau: '', 
     hoTen: '',
-    soCCCD: '',
+    SoCCCD: '',
     canHo: '',
     ngayBatDau: new Date().toISOString().split('T')[0], 
     ngayKetThuc: '',
@@ -37,7 +37,7 @@ const CreateTamTruPage = () => {
         // Nếu đổi mã nhân khẩu, reset lại toàn bộ thông tin xác thực cũ
         if (name === 'maNhanKhau') {
             setFoundApartments([]); 
-            return { ...prev, [name]: value, hoTen: '', soCCCD: '', canHo: '' };
+            return { ...prev, [name]: value, hoTen: '', SoCCCD: '', canHo: '' };
         }
         return { ...prev, [name]: value };
     });
@@ -60,7 +60,7 @@ const CreateTamTruPage = () => {
               ...prev, 
               maNhanKhau: maCanTim, // Giữ lại mã để họ biết đang tìm mã nào
               hoTen: '',            // Xóa tên để hiển thị lỗi field đỏ
-              soCCCD: '', 
+              SoCCCD: '', 
               canHo: '' 
           }));
           setFoundApartments([]);
@@ -75,14 +75,14 @@ const CreateTamTruPage = () => {
         ...prev,
         maNhanKhau: maCanTim,
         hoTen: HoTen,
-        soCCCD: SoCCCD,
+        SoCCCD: SoCCCD,
         // Nếu chỉ có 1 căn thì chọn luôn, nhiều căn thì để user chọn
         canHo: DanhSachCanHo.length === 1 ? DanhSachCanHo[0] : ''
       }));
 
     } catch (err) {
       alert("Không tìm thấy nhân khẩu này trong hệ thống!");
-      setFormData(prev => ({ ...prev, hoTen: '', soCCCD: '', canHo: '' }));
+      setFormData(prev => ({ ...prev, hoTen: '', SoCCCD: '', canHo: '' }));
       setFoundApartments([]);
     }
   };
@@ -97,6 +97,16 @@ const CreateTamTruPage = () => {
     if (!formData.canHo) {
         alert("Vui lòng chọn căn hộ!");
         return;
+    }
+
+    if (formData.ngayBatDau && formData.ngayKetThuc) {
+        const startDate = new Date(formData.ngayBatDau);
+        const endDate = new Date(formData.ngayKetThuc);
+
+        if (endDate <= startDate) {
+            alert("Lỗi: Ngày kết thúc tạm trú phải sau Ngày bắt đầu!");
+            return;
+        }
     }
 
     try {
@@ -161,7 +171,7 @@ const CreateTamTruPage = () => {
             </Grid>
             <Grid item xs={12}>
               <TextField
-                fullWidth label="Số CCCD" value={formData.soCCCD}
+                fullWidth label="Số CCCD" value={formData.SoCCCD}
                 InputProps={{ readOnly: true }} sx={{ bgcolor: '#f5f5f5' }} variant="filled"
               />
             </Grid>

@@ -1,17 +1,17 @@
 // src/pages/NhanKhauPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { 
-  Box, Typography, Paper, Button, Dialog, 
-  DialogTitle, DialogContent, DialogActions, Chip, IconButton, CircularProgress,
-  Stack 
+import {
+  Box, Typography, Paper, Button, Dialog,
+  DialogTitle, DialogContent, DialogActions, Chip, IconButton,
+  Stack, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel // <--- 1. Import thêm
 } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import GroupsIcon from '@mui/icons-material/Groups';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit'; 
+import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import PieChartIcon from '@mui/icons-material/PieChart';
@@ -29,12 +29,18 @@ const NhanKhauPage = () => {
 
   const [openModal, setOpenModal] = useState(false);
   const [selectedApartment, setSelectedApartment] = useState(null);
+  const [selectedHoKhau, setSelectedHoKhau] = useState(null);
   const [currentMembers, setCurrentMembers] = useState([]);
   const [selectedMaHoKhau, setSelectedMaHoKhau] = useState(null);
   const [loadingMembers, setLoadingMembers] = useState(false);
-  
-  // State quản lý chế độ sửa (True = Cho phép nhập liệu)
   const [isEditing, setIsEditing] = useState(false);
+
+  // --- STATE MỚI: CHO POPUP CHUYỂN CHỦ HỘ ---
+  const [openChangeHostModal, setOpenChangeHostModal] = useState(false);
+  const [candidates, setCandidates] = useState([]); // Danh sách ứng viên
+  const [newHostId, setNewHostId] = useState('');   // MaNhanKhau người được chọn
+  const [deletingMemberId, setDeletingMemberId] = useState(null); // ID người cần xóa
+  // -------------------------------------------
 
   // --- 1. LOAD DANH SÁCH CĂN HỘ ---
   const fetchApartments = async () => {
@@ -42,7 +48,7 @@ const NhanKhauPage = () => {
       setLoadingApartments(true);
       const res = await getCanHoCount();
       const filteredData = res.data.filter(item => item.MaHoKhau !== null);
-      
+
       const formatted = filteredData.map((item) => ({
         id: item.MaCanHo,
         maCanHo: item.MaCanHo,
@@ -61,7 +67,7 @@ const NhanKhauPage = () => {
   useEffect(() => { fetchApartments(); }, []);
 
   useEffect(() => {
-   if (apartmentRows.length > 0 && location.state?.targetMaHoKhau) {
+    if (apartmentRows.length > 0 && location.state?.targetMaHoKhau) {
       const targetRow = apartmentRows.find(row => row.maHoKhau === location.state.targetMaHoKhau);
       if (targetRow) {
         handleOpenMembers(targetRow);
@@ -73,21 +79,20 @@ const NhanKhauPage = () => {
   // --- 2. XỬ LÝ MỞ MODAL ---
   const handleOpenMembers = async (apartmentRow) => {
     setSelectedApartment(apartmentRow);
-    setCurrentMembers([]); 
+    setCurrentMembers([]);
+    setSelectedHoKhau({ maHoKhau: apartmentRow.maHoKhau });
     setOpenModal(true);
-    setIsEditing(false); 
+    setIsEditing(false);
     setLoadingMembers(true);
 
     try {
       const res = await getNhanKhauByCanHo(apartmentRow.maCanHo);
       const rawData = (res.data && res.data.data) ? res.data.data : [];
-      setSelectedMaHoKhau(res.data?.maHoKhau || null);
+      setSelectedMaHoKhau(res.data?.maHoKhau || apartmentRow.maHoKhau);
 
       const formattedMembers = rawData.map((nk, index) => ({
         id: nk.MaNhanKhau || index,
-        // --- THÊM DÒNG NÀY ĐỂ HIỂN THỊ CỘT MÃ NK ---
-        maNhanKhau: nk.MaNhanKhau, 
-        // -------------------------------------------
+        maNhanKhau: nk.MaNhanKhau,
         hoTen: nk.HoTen,
         gioiTinh: nk.GioiTinh,
         danToc: nk.DanToc,
@@ -112,7 +117,38 @@ const NhanKhauPage = () => {
   };
 
   // --- 3. XỬ LÝ LƯU KHI SỬA TRỰC TIẾP ---
-  const processRowUpdate = async (newRow) => {
+  const processRowUpdate = async (newRow, oldRow) => {
+    const errorMessages = {
+      hoTen: "Họ và tên",
+      gioiTinh: "Giới tính",
+      danToc: "Dân tộc",
+      ngheNghiep: "Nghề nghiệp",
+      cccd: "Số CCCD",
+      noiSinh: "Nơi sinh",
+      quanHe: "Quan hệ",
+      ngaySinh: "Ngày sinh"
+    };
+
+    for (const field in errorMessages) {
+      if (!newRow[field] || newRow[field].toString().trim() === '') {
+        alert(`Lỗi: ${errorMessages[field]} không được để trống!`);
+        return oldRow;
+      }
+    }
+
+    const newRelation = newRow.quanHe.trim().toLowerCase();
+
+    if (newRelation === 'chủ hộ') {
+        const existingHost = currentMembers.find(
+            m => m.quanHe.trim().toLowerCase() === 'chủ hộ' && m.id !== newRow.id
+        );
+
+        if (existingHost) {
+            alert(`Thất bại: Hộ này đã có chủ hộ là "${existingHost.hoTen}".\n\nMột hộ khẩu chỉ được phép có 1 chủ hộ. Vui lòng đổi quan hệ của chủ hộ cũ trước.`);
+            return oldRow; // Trả về dữ liệu cũ, hủy bỏ thao tác
+        }
+    }
+
     try {
       const payload = {
         HoTen: newRow.hoTen,
@@ -126,59 +162,125 @@ const NhanKhauPage = () => {
       };
 
       await updateNhanKhau(newRow.id, payload);
+      setCurrentMembers((prevMembers) => 
+        prevMembers.map((member) => (member.id === newRow.id ? newRow : member))
+      );
       return newRow;
     } catch (error) {
       alert("Cập nhật thất bại: " + (error.response?.data?.message || error.message));
-      throw error;
+      return oldRow;
     }
   };
 
-  // --- 4. XỬ LÝ XÓA THÀNH VIÊN ---
-  const handleDeleteMember = async (memberId) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa người này?")) {
-      try {
-        await deleteNhanKhau(memberId);
-        setCurrentMembers((prev) => prev.filter(m => m.id !== memberId));
-        fetchApartments(); 
-        alert("Xóa thành công!");
-      } catch (error) {
-        alert("Lỗi khi xóa!");
+  // --- 4. XỬ LÝ XÓA THÀNH VIÊN (LOGIC MỚI) ---
+  const handleDeleteMember = async (memberRow) => {
+    // Nếu KHÔNG PHẢI chủ hộ -> Xóa bình thường
+    const curRole = memberRow.quanHe.trim().toLowerCase();
+    if (curRole !== 'chủ hộ') {
+      if (window.confirm(`Bạn có chắc muốn xóa ${memberRow.hoTen}?`)) {
+        await executeDelete(memberRow.id);
       }
+      return;
+    }
+
+    // Nếu LÀ CHỦ HỘ
+    const otherMembers = currentMembers.filter(m => m.id !== memberRow.id);
+
+    // Trường hợp: Nhà chỉ còn 1 mình ông này
+    if (otherMembers.length === 0) {
+      if (window.confirm("Đây là thành viên cuối cùng. Xóa người này sẽ xóa luôn hộ khẩu?")) {
+        await executeDelete(memberRow.id);
+      }
+      return;
+    }
+
+    // Trường hợp: Còn người khác -> Bắt buộc chọn chủ hộ mới
+    setCandidates(otherMembers);
+    setDeletingMemberId(memberRow.id);
+    setNewHostId('');
+    setOpenChangeHostModal(true);
+  };
+
+  // Hàm thực hiện xóa (dùng chung)
+  const executeDelete = async (id) => {
+    try {
+      await deleteNhanKhau(id);
+      setCurrentMembers((prev) => prev.filter(m => m.id !== id));
+      fetchApartments(); // Refresh bảng bên ngoài
+      alert("Xóa thành công!");
+    } catch (error) {
+      alert("Lỗi khi xóa: " + (error.response?.data?.message || error.message));
+    }
+  };
+
+  // --- 5. XÁC NHẬN ĐỔI CHỦ HỘ VÀ XÓA ---
+  const confirmChangeHostAndDelete = async () => {
+    if (!newHostId) {
+      alert("Vui lòng chọn người làm chủ hộ mới!");
+      return;
+    }
+
+    try {
+      // 1. Tìm thông tin người kế nhiệm
+      const newHost = candidates.find(c => c.maNhanKhau === newHostId);
+      if (!newHost) return;
+
+      // 2. Chuẩn bị payload (Giữ nguyên thông tin cũ, chỉ đổi Quan hệ thành Chủ hộ)
+      const payload = {
+        HoTen: newHost.hoTen,
+        GioiTinh: newHost.gioiTinh,
+        DanToc: newHost.danToc,
+        NgheNghiep: newHost.ngheNghiep,
+        SoCCCD: newHost.cccd,
+        NoiSinh: newHost.noiSinh,
+        NgaySinh: newHost.ngaySinh ? dayjs(newHost.ngaySinh).format('YYYY-MM-DD') : null,
+        QuanHeVoiChuHo: 'Chủ hộ' // <--- QUAN TRỌNG
+      };
+
+      // 3. Update người kế nhiệm
+      await updateNhanKhau(newHost.id, payload);
+
+      // 4. Xóa chủ hộ cũ
+      await deleteNhanKhau(deletingMemberId);
+
+      // 5. Thành công
+      alert(`Đã chuyển quyền Chủ hộ cho ${newHost.hoTen} và xóa thành viên cũ!`);
+      setOpenChangeHostModal(false);
+      fetchApartments();
+      handleCloseModal(); // Đóng modal chi tiết để refresh lại dữ liệu
+
+    } catch (error) {
+      console.error(error);
+      alert("Có lỗi xảy ra: " + (error.response?.data?.message || error.message));
     }
   };
 
   // --- CẤU HÌNH CỘT THÀNH VIÊN ---
   const memberColumns = [
-    // --- CỘT MÃ NHÂN KHẨU (Mới thêm) ---
-    { 
-      field: 'maNhanKhau', 
-      headerName: 'Mã NK', 
-      width: 90, 
-      editable: false, // Mã NK thường không cho sửa trực tiếp để tránh lỗi hệ thống
-      headerAlign: 'center',
-      align: 'center'
+    {
+      field: 'maNhanKhau', headerName: 'Mã NK', width: 90, editable: false,
+      headerAlign: 'center', align: 'center'
     },
-    // -----------------------------------
     { field: 'hoTen', headerName: 'Họ và tên', flex: 1.5, minWidth: 150, editable: isEditing },
-    { 
+    {
       field: 'gioiTinh', headerName: 'Giới tính', width: 80, editable: isEditing,
-      type: 'singleSelect', valueOptions: ['Nam', 'Nữ'] 
+      type: 'singleSelect', valueOptions: ['Nam', 'Nữ']
     },
     { field: 'quanHe', headerName: 'Quan hệ', flex: 1, editable: isEditing },
-    { 
+    {
       field: 'ngaySinh', headerName: 'Ngày sinh', width: 110, editable: isEditing, type: 'date',
       valueFormatter: (value) => value ? dayjs(value).format('DD/MM/YYYY') : ''
     },
+    { field: 'noiSinh', headerName: 'Nơi Sinh', width: 130, editable: isEditing },
     { field: 'cccd', headerName: 'Số CCCD', width: 130, editable: isEditing },
     { field: 'danToc', headerName: 'Dân tộc', width: 90, editable: isEditing },
     { field: 'ngheNghiep', headerName: 'Nghề nghiệp', width: 120, editable: isEditing },
-    // { field: 'noiSinh', headerName: 'Nơi sinh', width: 120, editable: isEditing },
-    
+
     {
       field: 'actions', headerName: 'Xóa', width: 60, sortable: false,
       renderCell: (params) => (
-        <IconButton color="error" size="small" onClick={() => handleDeleteMember(params.id)}>
-           <DeleteIcon fontSize="small" />
+        <IconButton color="error" size="small" onClick={() => handleDeleteMember(params.row)}>
+          <DeleteIcon fontSize="small" />
         </IconButton>
       )
     }
@@ -188,7 +290,7 @@ const NhanKhauPage = () => {
   const apartmentColumns = [
     { field: 'maCanHo', headerName: 'Mã căn hộ', flex: 1, minWidth: 120 },
     { field: 'tenCanHo', headerName: 'Tên căn hộ', flex: 1.5, minWidth: 200 },
-    { 
+    {
       field: 'soThanhVien', headerName: 'Số thành viên', flex: 1, align: 'center', headerAlign: 'center',
       renderCell: (params) => <Chip label={params.value} color="primary" variant="outlined" size="small" />
     },
@@ -209,7 +311,7 @@ const NhanKhauPage = () => {
   return (
     <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100vh', width: '100%', boxSizing: 'border-box' }}>
       <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3 }}>
-        Quản lý nhân khẩu 
+        Quản lý nhân khẩu
       </Typography>
 
       <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
@@ -222,8 +324,8 @@ const NhanKhauPage = () => {
           XEM TẤT CẢ NHÂN KHẨU
         </Button>
 
-        <Button 
-          variant="contained" 
+        <Button
+          variant="contained"
           startIcon={<PieChartIcon />}
           onClick={() => navigate('/ho-gia-dinh/ho-khau/thong-ke')}
           sx={{ backgroundColor: '#8e44ad', textTransform: 'none', fontWeight: 'bold', '&:hover': { backgroundColor: '#7d3c98' } }}
@@ -246,15 +348,15 @@ const NhanKhauPage = () => {
       {/* --- MODAL CHI TIẾT --- */}
       <Dialog open={openModal} onClose={handleCloseModal} maxWidth="xl" fullWidth>
         <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 'bold', bgcolor: '#f8f9fa' }}>
-          Thành viên - {selectedApartment?.tenCanHo}
+          Thành viên - {selectedApartment?.tenCanHo} - {selectedHoKhau?.maHoKhau}
           <IconButton onClick={handleCloseModal}><CloseIcon /></IconButton>
         </DialogTitle>
-        
+
         <DialogContent dividers>
           <Box sx={{ height: 500, width: '100%' }}>
             <DataGrid
               rows={currentMembers}
-              columns={memberColumns} 
+              columns={memberColumns}
               loading={loadingMembers}
               disableRowSelectionOnClick
               hideFooterSelectedRowCount
@@ -262,15 +364,15 @@ const NhanKhauPage = () => {
               onProcessRowUpdateError={(err) => console.log(err)}
               onCellClick={(params, event) => {
                 if (isEditing && params.colDef.editable) {
-                  event.defaultMuiPrevented = true; 
+                  event.defaultMuiPrevented = true;
                   params.api.startCellEditMode({ id: params.id, field: params.field });
                 }
               }}
               slots={{
                 noRowsOverlay: () => (
-                    <Stack height="100%" alignItems="center" justifyContent="center">
-                        {loadingMembers ? "Đang tải..." : "Chưa có thành viên nào"}
-                    </Stack>
+                  <Stack height="100%" alignItems="center" justifyContent="center">
+                    {loadingMembers ? "Đang tải..." : "Chưa có thành viên nào"}
+                  </Stack>
                 )
               }}
             />
@@ -278,23 +380,22 @@ const NhanKhauPage = () => {
         </DialogContent>
 
         <DialogActions sx={{ p: 2, gap: 1 }}>
-
           {selectedMaHoKhau && (
-             <Button 
-                variant="outlined" color="success" startIcon={<AddIcon />}
-                onClick={() => navigate(`/quan-ly-nhan-dan/nhan-khau/create/${selectedMaHoKhau}`)}
-                sx={{ textTransform: 'none' }}
-             >
-                Thêm thành viên
-             </Button>
+            <Button
+              variant="outlined" color="success" startIcon={<AddIcon />}
+              onClick={() => navigate(`/quan-ly-nhan-dan/nhan-khau/create/${selectedMaHoKhau}`)}
+              sx={{ textTransform: 'none' }}
+            >
+              Thêm thành viên
+            </Button>
           )}
 
-          <Button 
-            variant="contained" 
-            color={isEditing ? "primary" : "warning"} 
+          <Button
+            variant="contained"
+            color={isEditing ? "primary" : "warning"}
             startIcon={isEditing ? <GroupsIcon /> : <EditIcon />}
             onClick={() => setIsEditing(!isEditing)}
-            disabled={currentMembers.length === 0} 
+            disabled={currentMembers.length === 0}
             sx={{ textTransform: 'none', fontWeight: 'bold' }}
           >
             {isEditing ? "HOÀN TẤT" : "CHỈNH SỬA"}
@@ -305,6 +406,42 @@ const NhanKhauPage = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* --- MODAL CHỌN CHỦ HỘ MỚI (MỚI THÊM) --- */}
+      <Dialog open={openChangeHostModal} onClose={() => setOpenChangeHostModal(false)}>
+        <DialogTitle sx={{ bgcolor: '#fff3cd', color: '#856404' }}>
+          ⚠️ Yêu cầu chọn Chủ hộ mới
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2, minWidth: 300 }}>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Bạn đang xóa <b>Chủ hộ</b>. Vui lòng chọn một thành viên khác để thay thế vị trí này trước khi xóa.
+          </Typography>
+
+          <FormControl>
+            <FormLabel>Chọn người kế nhiệm:</FormLabel>
+            <RadioGroup
+              value={newHostId}
+              onChange={(e) => setNewHostId(e.target.value)}
+            >
+              {candidates.map((mem) => (
+                <FormControlLabel
+                  key={mem.id}
+                  value={mem.maNhanKhau} // Dùng mã NK để tìm kiếm
+                  control={<Radio />}
+                  label={`${mem.hoTen} (${mem.quanHe})`}
+                />
+              ))}
+            </RadioGroup>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenChangeHostModal(false)} color="inherit">Hủy bỏ</Button>
+          <Button onClick={confirmChangeHostAndDelete} variant="contained" color="primary">
+            Lưu & Xóa
+          </Button>
+        </DialogActions>
+      </Dialog>
+
     </Box>
   );
 };

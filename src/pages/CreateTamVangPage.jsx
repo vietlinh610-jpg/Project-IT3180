@@ -20,7 +20,7 @@ const CreateTamVangPage = () => {
   const [formData, setFormData] = useState({
     maNhanKhau: '', 
     hoTen: '',
-    soCCCD: '',
+    SoCCCD: '',
     maHoKhau: '', // Sẽ tự điền
     ngayDi: new Date().toISOString().split('T')[0], 
     ngayVeDuKien: '',
@@ -33,7 +33,7 @@ const CreateTamVangPage = () => {
     setFormData(prev => {
         // Nếu đổi mã nhân khẩu, reset hết thông tin cũ
         if (name === 'maNhanKhau') {
-            return { ...prev, [name]: value, hoTen: '', soCCCD: '', maHoKhau: '' };
+            return { ...prev, [name]: value, hoTen: '', SoCCCD: '', maHoKhau: '' };
         }
         return { ...prev, [name]: value };
     });
@@ -53,7 +53,7 @@ const CreateTamVangPage = () => {
       // Logic kiểm tra: Người này phải có hộ khẩu mới khai báo tạm vắng được
       if (!MaHoKhau) {
           alert("Người này chưa có Hộ khẩu thường trú trong hệ thống nên không thể khai báo Tạm vắng!");
-          setFormData(prev => ({ ...prev, hoTen: '', soCCCD: '', maHoKhau: '' }));
+          setFormData(prev => ({ ...prev, hoTen: '', SoCCCD: '', maHoKhau: '' }));
           return;
       }
 
@@ -61,13 +61,13 @@ const CreateTamVangPage = () => {
         ...prev,
         maNhanKhau: maCanTim,
         hoTen: HoTen,
-        soCCCD: SoCCCD,
+        SoCCCD: SoCCCD,
         maHoKhau: MaHoKhau // Tự động điền
       }));
 
     } catch (err) {
       alert("Không tìm thấy nhân khẩu có mã này! Vui lòng kiểm tra lại.");
-      setFormData(prev => ({ ...prev, hoTen: '', soCCCD: '', maHoKhau: '' }));
+      setFormData(prev => ({ ...prev, hoTen: '', SoCCCD: '', maHoKhau: '' }));
     }
   };
 
@@ -84,13 +84,23 @@ const CreateTamVangPage = () => {
         return;
     }
 
+    if (formData.ngayDi && formData.ngayVeDuKien) {
+        const startDate = new Date(formData.ngayDi);
+        const endDate = new Date(formData.ngayVeDuKien);
+
+        if (endDate <= startDate) {
+            alert("Lỗi: Ngày kết thúc tạm vắng phải sau Ngày bắt đầu!");
+            return;
+        }
+    }
+
     try {
       setLoading(true);
       await createTamVang({
         MaNhanKhau: formData.maNhanKhau,
         MaHoKhau: formData.maHoKhau,
-        NgayDi: formData.ngayDi,
-        NgayVe: formData.ngayVeDuKien,
+        NgayDi: formData.ngayDi ? new Date(formData.ngayDi) : null,
+        NgayVe: formData.ngayVeDuKien ? new Date(formData.ngayVeDuKien) : null,
         LyDo: formData.lyDo
       });
       
@@ -156,7 +166,7 @@ const CreateTamVangPage = () => {
             {/* Dòng 3: Số CCCD (ReadOnly) */}
             <Grid item xs={12}>
               <TextField
-                fullWidth label="Số CCCD" value={formData.soCCCD}
+                fullWidth label="Số CCCD" value={formData.SoCCCD}
                 InputProps={{ readOnly: true }} sx={{ bgcolor: '#f5f5f5' }} variant="filled"
               />
             </Grid>
@@ -180,16 +190,16 @@ const CreateTamVangPage = () => {
             <Grid container item spacing={3}>
                 <Grid item xs={12} md={6}>
                 <TextField
-                    fullWidth label="Ngày đi *" name="ngayDi" type="date"
+                    fullWidth label="Ngày đi" name="ngayDi" type="date"
                     value={formData.ngayDi} onChange={handleChange}
-                    InputLabelProps={{ shrink: true }} variant="outlined" required
+                    InputLabelProps={{ shrink: true }} variant="outlined" 
                 />
                 </Grid>
                 <Grid item xs={12} md={6}>
                 <TextField
-                    fullWidth label="Ngày về dự kiến *" name="ngayVeDuKien" type="date"
+                    fullWidth label="Ngày về dự kiến" name="ngayVeDuKien" type="date"
                     value={formData.ngayVeDuKien} onChange={handleChange}
-                    InputLabelProps={{ shrink: true }} variant="outlined" required
+                    InputLabelProps={{ shrink: true }} variant="outlined" 
                 />
                 </Grid>
             </Grid>
