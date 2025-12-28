@@ -6,26 +6,41 @@ import {
   GridRowModes, 
   GridActionsCellItem 
 } from '@mui/x-data-grid';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, TextField, InputAdornment } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
+import SearchIcon from '@mui/icons-material/Search'; // Thêm icon tìm kiếm
 import { useNavigate } from 'react-router-dom';
 import { getCanHoList, deleteCanHo, updateCanHo } from '../services/canhoApi'; 
 
 const CanHoPage = () => {
   const navigate = useNavigate();
   
-  // State dữ liệu
+  // State dữ liệu gốc từ API
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // --- THÊM STATE TÌM KIẾM ---
+  const [searchText, setSearchText] = useState('');
   
   // State quản lý chế độ sửa
   const [rowModesModel, setRowModesModel] = useState({});
 
-  // --- CÁC HÀM XỬ LÝ SỰ KIỆN CLICK ---
+  // --- LOGIC LỌC DỮ LIỆU TÌM KIẾM ---
+  // Lọc dựa trên mã căn hộ, tên căn hộ hoặc mã hộ khẩu
+  const filteredRows = rows.filter((row) => {
+    const searchLower = searchText.toLowerCase();
+    return (
+      row.maCanHo?.toLowerCase().includes(searchLower) ||
+      row.tenCanHo?.toLowerCase().includes(searchLower) ||
+      row.maHoKhau?.toLowerCase().includes(searchLower) ||
+      row.tang?.toString().includes(searchLower)
+    );
+  });
 
+  // --- CÁC HÀM XỬ LÝ SỰ KIỆN CLICK ---
   const handleEditClick = (id) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   };
@@ -49,35 +64,24 @@ const CanHoPage = () => {
         alert("Xóa thành công!");
       } catch (error) {
         console.error("Lỗi khi xóa:", error);
-        // Hiển thị lỗi chi tiết từ Backend (VD: Đang có người ở)
         const message = error.response?.data?.message || "Xóa thất bại! Có lỗi xảy ra.";
         alert(message);
       }
     }
   };
 
-  // --- HÀM UPDATE ĐÃ ĐƯỢC TỐI ƯU ---
   const processRowUpdate = async (newRow) => {
     try {
-      // 1. Chỉ lấy MaHoKhau để gửi lên (Backend chỉ cần cái này)
       const updatedData = {
-        MaHoKhau: newRow.maHoKhau || null // Nếu rỗng thì gửi null
+        MaHoKhau: newRow.maHoKhau || null 
       };
-
-      // 2. Gọi API Update (newRow.id bây giờ là String "P101", đúng ý đồ)
       await updateCanHo(newRow.id, updatedData);
-
-      // 3. Trả về row đã update để lưới hiển thị
       return newRow;
-
     } catch (error) {
       console.error("Lỗi cập nhật:", error);
-      
-      // 4. Hiển thị thông báo lỗi cụ thể từ Backend (VD: Mã hộ khẩu không tồn tại)
       const message = error.response?.data?.message || "Cập nhật thất bại! Vui lòng thử lại.";
       alert(message);
-      
-      throw error; // Ném lỗi để DataGrid giữ nguyên chế độ Edit (không thoát ra)
+      throw error; 
     }
   };
 
@@ -91,8 +95,6 @@ const CanHoPage = () => {
     { field: 'tenCanHo', headerName: 'Tên căn hộ', flex: 1, minWidth: 120, editable: false },
     { field: 'tang', headerName: 'Tầng', flex: 0.8, align: 'center', headerAlign: 'center', type: 'number', editable: false },
     { field: 'dienTich', headerName: 'Diện tích (m2)', flex: 1, align: 'center', headerAlign: 'center', type: 'number', editable: false },
-    
-    // Chỉ cột này được sửa
     { 
       field: 'maHoKhau', 
       headerName: 'Mã hộ khẩu', 
@@ -100,7 +102,6 @@ const CanHoPage = () => {
       minWidth: 150, 
       editable: true 
     },
-    
     {
       field: 'actions',
       type: 'actions',
@@ -109,7 +110,6 @@ const CanHoPage = () => {
       cellClassName: 'actions',
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-
         if (isInEditMode) {
           return [
             <GridActionsCellItem
@@ -121,18 +121,15 @@ const CanHoPage = () => {
             <GridActionsCellItem
               icon={<CancelIcon />}
               label="Cancel"
-              className="textPrimary"
               onClick={handleCancelClick(id)}
               color="inherit"
             />,
           ];
         }
-
         return [
           <GridActionsCellItem
             icon={<EditIcon />}
             label="Edit"
-            className="textPrimary"
             onClick={handleEditClick(id)}
             color="inherit"
           />,
@@ -151,10 +148,8 @@ const CanHoPage = () => {
     try {
       setLoading(true);
       const response = await getCanHoList();
-      
-      // Map dữ liệu: Backend trả về MaCanHo, ta gán nó vào id cho DataGrid dùng
       const formattedData = response.data.map((item) => ({
-        id: item.MaCanHo, // Quan trọng: id của DataGrid chính là chuỗi "P101"
+        id: item.MaCanHo, 
         maCanHo: item.MaCanHo,
         tenCanHo: item.TenCanHo,
         tang: item.Tang,
@@ -175,53 +170,57 @@ const CanHoPage = () => {
   }, []);
 
   return (
-    <Box sx={{ 
-        p: 3, 
-        display: 'flex', 
-        flexDirection: 'column', 
-        height: '100vh', 
-        width: '100%',
-        boxSizing: 'border-box'
-      }}>
+    <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100vh', width: '100%', boxSizing: 'border-box' }}>
       <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2 }}>
         Danh sách căn hộ
       </Typography>
 
-      <Button 
-        variant="contained" 
-        onClick={() => navigate('/ho-gia-dinh/can-ho/create')}
-        sx={{ 
-          mb: 3, 
-          backgroundColor: '#008ecc', 
-          textTransform: 'none', 
-          fontWeight: 'bold',
-          width: 'fit-content'
-        }}
-      >
-        THÊM CĂN HỘ
-      </Button>
+      {/* --- CẬP NHẬT GIAO DIỆN HÀNG NÚT VÀ TÌM KIẾM --- */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Button 
+          variant="contained" 
+          onClick={() => navigate('/ho-gia-dinh/can-ho/create')}
+          sx={{ 
+            backgroundColor: '#008ecc', 
+            textTransform: 'none', 
+            fontWeight: 'bold',
+            width: 'fit-content'
+          }}
+        >
+          THÊM CĂN HỘ
+        </Button>
+
+        <TextField
+          size="small"
+          placeholder="Tìm mã căn, tên căn, hộ khẩu..."
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          sx={{ width: 350, backgroundColor: '#fff' }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Box>
 
       <Box sx={{ flexGrow: 1, width: '100%', backgroundColor: '#fff' }}>
         <DataGrid
-          rows={rows}
+          rows={filteredRows} // Dùng dữ liệu đã lọc
           columns={columns}
           loading={loading}
           slots={{ toolbar: GridToolbar }}
-          
           editMode="row"
           rowModesModel={rowModesModel}
           onRowModesModelChange={handleRowModesModelChange}
           processRowUpdate={processRowUpdate}
           onProcessRowUpdateError={(error) => console.log(error)}
-          
-          // --- SỬA QUAN TRỌNG: CHẶN CLICK ĐÚP ---
           onCellDoubleClick={(params, event) => {
             event.stopPropagation();
           }}
-          // --------------------------------------
-
           pageSizeOptions={[5, 10, 25, 50]}
-
           initialState={{
             pagination: {
               paginationModel: { pageSize: 10 },

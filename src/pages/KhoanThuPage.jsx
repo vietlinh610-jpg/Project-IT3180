@@ -9,6 +9,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import ListAltIcon from '@mui/icons-material/ListAlt'; // Icon cho Danh sách hộ
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
+import BarChartIcon from '@mui/icons-material/BarChart';
 
 const KhoanThuPage = () => {
   const navigate = useNavigate();
@@ -105,11 +106,21 @@ const KhoanThuPage = () => {
 
       <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
         <Button 
-            variant="contained" 
-            onClick={() => navigate('/quan-ly-khoan-thu/create')} // Sửa lại đường dẫn chuyển hướng
-            sx={{ backgroundColor: '#008ecc', textTransform: 'none', fontWeight: 'bold' }}
-          >
-            TẠO KHOẢN THU MỚI
+          variant="contained" 
+          onClick={() => navigate('/quan-ly-khoan-thu/create')} 
+          sx={{ backgroundColor: '#008ecc', textTransform: 'none', fontWeight: 'bold' }}
+        >
+          TẠO KHOẢN THU MỚI
+        </Button>
+
+        {/* NÚT THỐNG KÊ MỚI */}
+        <Button 
+          variant="contained" 
+          startIcon={<BarChartIcon />}
+          onClick={() => navigate('/quan-ly-khoan-thu/thong-ke')} 
+          sx={{ backgroundColor: '#3fa8c3ff', textTransform: 'none', fontWeight: 'bold', '&:hover': { backgroundColor: '#27ae60' } }}
+        >
+          THỐNG KÊ DOANH THU
         </Button>
       </Stack>
 

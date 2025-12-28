@@ -10,18 +10,31 @@ const LoginPage = () => {
   const [error, setError] = useState(''); // State để hiện lỗi nếu có
   const navigate = useNavigate();
 
+  const DEFAULT_ACCOUNT = {
+  username: 'admin',
+  password: '123456',
+  user: {
+    hoTen: 'Quản trị hệ thống',
+    quyen: 'Admin'
+  },
+  token: 'FAKE_TOKEN_123'
+};
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    try {
-      // 1. Chuẩn bị dữ liệu gửi đi (Mapping tên biến cho khớp Backend)
-      const payload = {
-        tenDangNhap: username,
-        matKhau: password
-      };
+    // KIỂM TRA TÀI KHOẢN MẶC ĐỊNH TRƯỚC
+    if (username === DEFAULT_ACCOUNT.username && password === DEFAULT_ACCOUNT.password) {
+      const { token, user } = DEFAULT_ACCOUNT;
+      handleSuccessLogin(token, user); // Tách hàm để dùng chung
+      return;
+    }
 
-      // 2. Gọi API thực tế
+    // NẾU KHÔNG PHẢI ADMIN MẶC ĐỊNH -> GỌI API THẬT
+    try {
+      const payload = { tenDangNhap: username, matKhau: password };
       const res = await loginUser(payload);
 
       // 3. Lấy dữ liệu từ Backend trả về
@@ -36,7 +49,6 @@ const LoginPage = () => {
       if (user.quyen === 'Kế toán') safeRole = 'ketoan';
       if (user.quyen === 'Người dùng') safeRole = 'user';
 
-
       localStorage.setItem('userRole', safeRole);
       localStorage.setItem('userInfo', JSON.stringify(user));
       localStorage.setItem('fullName', user.hoTen);
@@ -48,14 +60,30 @@ const LoginPage = () => {
       // Reload để App cập nhật lại Menu theo quyền mới
       window.location.reload();
 
+
     } catch (err) {
       console.error("Lỗi đăng nhập:", err);
-      // Lấy thông báo lỗi từ Backend (ví dụ: "Sai mật khẩu")
-      const msg = err.response?.data?.message || "Đăng nhập thất bại! Vui lòng thử lại.";
+      const msg = err.response?.data?.message || "Đăng nhập thất bại!";
       setError(msg);
     }
   };
 
+  // Hàm bổ trợ để tránh lặp code (DRY - Don't Repeat Yourself)
+  const handleSuccessLogin = (token, user) => {
+    localStorage.clear();
+    localStorage.setItem('userToken', token);
+    
+    // Logic map quyền của bạn
+    const roleMap = { 'Admin': 'admin', 'Kế toán': 'ketoan', 'Người dùng': 'user' };
+    const safeRole = roleMap[user.quyen] || 'user';
+
+    localStorage.setItem('userRole', safeRole);
+    localStorage.setItem('userInfo', JSON.stringify(user));
+
+    alert(`Đăng nhập thành công! Xin chào ${user.hoTen}`);
+    navigate('/dashboard');
+    window.location.reload(); 
+  };
   return (
     <div className="login-wrapper">
       <form className="login-form" onSubmit={handleSubmit}>
