@@ -1,4 +1,4 @@
-const { connectDB, sql } = require('../config/db');
+const { connectDB, sql } = require('../Backend/config/db');
 
 // 1. LẤY DANH SÁCH
 const getListTamTru = async (req, res) => {

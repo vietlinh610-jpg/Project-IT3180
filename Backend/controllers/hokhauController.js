@@ -1,4 +1,4 @@
-const { connectDB, sql } = require('../config/db');
+const { connectDB, sql } = require('../Backend/config/db');
 
 // 1. LẤY DANH SÁCH HỘ KHẨU
 const getListHoKhau = async (req, res) => {
