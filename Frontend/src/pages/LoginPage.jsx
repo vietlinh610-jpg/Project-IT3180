@@ -1,32 +1,34 @@
 // src/pages/LoginPage.jsx
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../services/loginApi'; // Import API
-import '../styles/LoginPage.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../services/loginApi"; // Import API
+import "../styles/LoginPage.css";
 
 const LoginPage = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(''); // State để hiện lỗi nếu có
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(""); // State để hiện lỗi nếu có
   const navigate = useNavigate();
 
   const DEFAULT_ACCOUNT = {
-  username: 'admin',
-  password: '123456',
-  user: {
-    hoTen: 'Quản trị hệ thống',
-    quyen: 'Admin'
-  },
-  token: 'FAKE_TOKEN_123'
-};
-
+    username: "admin",
+    password: "123456",
+    user: {
+      hoTen: "Quản trị hệ thống",
+      quyen: "Admin",
+    },
+    token: "FAKE_TOKEN_123",
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     // KIỂM TRA TÀI KHOẢN MẶC ĐỊNH TRƯỚC
-    if (username === DEFAULT_ACCOUNT.username && password === DEFAULT_ACCOUNT.password) {
+    if (
+      username === DEFAULT_ACCOUNT.username &&
+      password === DEFAULT_ACCOUNT.password
+    ) {
       const { token, user } = DEFAULT_ACCOUNT;
       handleSuccessLogin(token, user); // Tách hàm để dùng chung
       return;
@@ -43,24 +45,24 @@ const LoginPage = () => {
 
       // 4. Xóa dữ liệu cũ và Lưu dữ liệu mới vào localStorage
       localStorage.clear();
-      localStorage.setItem('userToken', token);
+      localStorage.setItem("userToken", token);
       let safeRole = user.quyen;
-      if (user.quyen === 'Admin') safeRole = 'admin';
-      if (user.quyen === 'Kế toán') safeRole = 'ketoan';
-      if (user.quyen === 'Người dùng') safeRole = 'user';
+      if (user.quyen === "Admin") safeRole = "admin";
+      if (user.quyen === "Kế toán") safeRole = "ketoan";
+      if (user.quyen === "Người dùng") safeRole = "user";
 
-      localStorage.setItem('userRole', safeRole);
-      localStorage.setItem('userInfo', JSON.stringify(user));
-      localStorage.setItem('fullName', user.hoTen);
+      localStorage.setItem("userRole", safeRole);
+      localStorage.setItem("userInfo", JSON.stringify(user));
+      localStorage.setItem("fullName", user.hoTen);
+      // Thêm userID để tích hợp với tài khoản người dùng
+      localStorage.setItem("userID", user.id); 
       alert(`Đăng nhập thành công! Xin chào ${user.hoTen}`);
 
       // 5. Điều hướng
-      navigate('/dashboard');
+      navigate("/dashboard");
 
       // Reload để App cập nhật lại Menu theo quyền mới
       window.location.reload();
-
-
     } catch (err) {
       console.error("Lỗi đăng nhập:", err);
       const msg = err.response?.data?.message || "Đăng nhập thất bại!";
@@ -71,18 +73,24 @@ const LoginPage = () => {
   // Hàm bổ trợ để tránh lặp code (DRY - Don't Repeat Yourself)
   const handleSuccessLogin = (token, user) => {
     localStorage.clear();
-    localStorage.setItem('userToken', token);
-    
-    // Logic map quyền của bạn
-    const roleMap = { 'Admin': 'admin', 'Kế toán': 'ketoan', 'Người dùng': 'user' };
-    const safeRole = roleMap[user.quyen] || 'user';
+    localStorage.setItem("userToken", token);
 
-    localStorage.setItem('userRole', safeRole);
-    localStorage.setItem('userInfo', JSON.stringify(user));
+    // Logic map quyền của bạn
+    const roleMap = {
+      Admin: "admin",
+      "Kế toán": "ketoan",
+      "Người dùng": "user",
+    };
+    const safeRole = roleMap[user.quyen] || "user";
+
+    localStorage.setItem("userRole", safeRole);
+    localStorage.setItem("userInfo", JSON.stringify(user));
+    // Thêm id của nhân khẩu để tích hợp tài khoản người dùng với BE
+    localStorage.setItem("userID", user.id);
 
     alert(`Đăng nhập thành công! Xin chào ${user.hoTen}`);
-    navigate('/dashboard');
-    window.location.reload(); 
+    navigate("/dashboard");
+    window.location.reload();
   };
   return (
     <div className="login-wrapper">

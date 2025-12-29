@@ -1,94 +1,170 @@
-import React, { useState } from 'react';
-import { 
-  Box, Typography, Paper, Table, TableBody, TableCell, 
+import React, { useEffect, useState } from 'react';
+import {
+  Box, Typography, Paper, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Chip, Button, Stack, Modal
 } from '@mui/material';
 import PaymentIcon from '@mui/icons-material/Payment';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
-// QUAN TRỌNG: Cần import thêm HistoryIcon
-import HistoryIcon from '@mui/icons-material/History'; 
+import HistoryIcon from '@mui/icons-material/History';
 import { useNavigate } from 'react-router-dom';
+
+// API
+import { layDSKT, nopKt } from "../services/dongPhiAPi";
 
 const KhoanThuUserPage = () => {
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false); // Trạng thái mở Modal QR
 
-  // Dữ liệu mẫu các khoản thu của cư dân
-  const bills = [
-    { id: 1, ten: "Phí quản lý tháng 12", loai: "Bắt buộc", soTien: "500,000", hanNop: "31/12/2023", trangThai: "Chưa nộp" },
-    { id: 2, ten: "Tiền điện tháng 11", loai: "Biến đổi", soTien: "1,250,000", hanNop: "15/12/2023", trangThai: "Đã nộp" },
-    { id: 3, ten: "Tiền nước tháng 11", loai: "Biến đổi", soTien: "180,000", hanNop: "15/12/2023", trangThai: "Đã nộp" },
-    { id: 4, ten: "Phí gửi xe máy", loai: "Bắt buộc", soTien: "100,000", hanNop: "31/12/2023", trangThai: "Chưa nộp" },
-    { id: 5, ten: "Quỹ cư dân 2023", loai: "Tự nguyện", soTien: "200,000", hanNop: "31/12/2023", trangThai: "Chưa nộp" },
-  ];
+  const [open, setOpen] = useState(false);
+  const [bills, setBills] = useState([]);
+  const [selectedBill, setSelectedBill] = useState(null);
 
-  // Hàm định dạng màu sắc cho trạng thái
+  const userId = localStorage.getItem("userID");
+
+  /* ================== LOAD DS KHOẢN THU ================== */
+  const fetchDSKT = async () => {
+    try {
+      const res = await layDSKT(userId);
+
+      const data = res.data.data.map((item, index) => ({
+        id: index + 1,
+        id_kt: item.MaKhoanThu,
+        ten: item.TenKhoanThu,
+        loai: item.Loai,
+        soTien: item.SoTien.toLocaleString("vi-VN"),
+        soTienRaw: item.SoTien,
+        hanNop: item.HanNop
+          ? new Date(item.HanNop).toLocaleDateString("vi-VN")
+          : "",
+        trangThai: item.TrangThai,
+      }));
+
+      setBills(data);
+    } catch (err) {
+      console.error("Lỗi lấy danh sách khoản thu:", err);
+    }
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchDSKT();
+  }, []);
+
+  /* ================== CHIP TRẠNG THÁI ================== */
   const getStatusChip = (status) => {
-    if (status === "Đã nộp") return <Chip label={status} color="success" size="small" />;
-    return <Chip label={status} color="error" size="small" variant="outlined" />;
+    switch (status) {
+      case "Đã nộp":
+        return <Chip label={status} color="success" size="small" />;
+      case "Chờ xác nhận":
+        return <Chip label={status} color="info" size="small" />;
+      case "Từ chối":
+        return <Chip label={status} color="warning" size="small" />;
+      default:
+        return <Chip label={status} color="error" size="small" variant="outlined" />;
+    }
+  };
+
+  /* ================== ACTION ================== */
+  const renderAction = (bill) => {
+    if (bill.trangThai === "Chưa nộp" || bill.trangThai === "Từ chối") {
+      return (
+        <Button
+          size="small"
+          sx={{ textTransform: 'none' }}
+          onClick={() => {
+            setSelectedBill(bill);
+            setOpen(true);
+          }}
+        >
+          {bill.trangThai === "Từ chối" ? "Thanh toán lại" : "Thanh toán"}
+        </Button>
+      );
+    }
+
+    return (
+      <Typography variant="caption" color="text.disabled">
+        —
+      </Typography>
+    );
+  };
+
+  /* ================== GỬI YÊU CẦU ĐÓNG PHÍ ================== */
+  const handleSubmitPayment = async () => {
+    try {
+      await nopKt({
+        id_nk: userId,                 // ✅ đúng controller
+        id_kt: selectedBill.id_kt,
+        soTien: selectedBill.soTienRaw,
+      });
+
+      alert("Đã gửi yêu cầu đóng phí, chờ kế toán xác nhận");
+
+      setOpen(false);
+      setSelectedBill(null);
+
+      fetchDSKT();
+    } catch (err) {
+      console.error(err);
+      alert("Lỗi khi gửi yêu cầu đóng phí");
+    }
   };
 
   return (
-    <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%', boxSizing: 'border-box', backgroundColor: '#f8f9fa' }}>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-        <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#2c3e50' }}>
+    <Box sx={{ p: 3, minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
+      <Stack direction="row" justifyContent="space-between" sx={{ mb: 3 }}>
+        <Typography variant="h5" fontWeight="bold">
           Danh sách khoản thu
         </Typography>
 
         <Stack direction="row" spacing={2}>
-          <Button 
-            variant="outlined" 
+          <Button
+            variant="outlined"
             startIcon={<HistoryIcon />}
             onClick={() => navigate('/khoan-thu/lich-su')}
-            sx={{ textTransform: 'none', borderRadius: '8px', color: '#2c3e50', borderColor: '#dcdde1' }}
+            sx={{ textTransform: 'none' }}
           >
             Lịch sử nộp tiền
           </Button>
 
-          <Button 
-            variant="contained" 
+          <Button
+            variant="contained"
             startIcon={<PaymentIcon />}
-            onClick={() => setOpen(true)}
-            sx={{ bgcolor: '#008ecc', '&:hover': { bgcolor: '#007bb5' }, textTransform: 'none', borderRadius: '8px' }}
+            sx={{ bgcolor: '#008ecc', textTransform: 'none' }}
           >
             Thanh toán
           </Button>
         </Stack>
       </Stack>
 
-      <Paper elevation={1} sx={{ borderRadius: '15px', overflow: 'hidden' }}>
-        <Box sx={{ p: 2, bgcolor: '#ffffff', display: 'flex', alignItems: 'center', gap: 1, borderBottom: '1px solid #f1f2f6' }}>
+      <Paper elevation={1} sx={{ borderRadius: 3 }}>
+        <Box sx={{ p: 2, borderBottom: '1px solid #eee', display: 'flex', gap: 1 }}>
           <ReceiptLongIcon color="primary" />
-          <Typography sx={{ fontWeight: 'bold' }}>Chi tiết hóa đơn căn hộ P.805</Typography>
+          <Typography fontWeight="bold">Chi tiết khoản thu</Typography>
         </Box>
 
         <TableContainer>
-          <Table sx={{ minWidth: 700 }}>
-            <TableHead sx={{ backgroundColor: '#fafafa' }}>
+          <Table>
+            <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 'bold' }}>Tên khoản thu</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Loại phí</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Số tiền (VNĐ)</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Hạn nộp</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Trạng thái</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Thao tác</TableCell>
+                <TableCell>Tên khoản thu</TableCell>
+                <TableCell>Loại</TableCell>
+                <TableCell>Số tiền</TableCell>
+                <TableCell>Hạn nộp</TableCell>
+                <TableCell>Trạng thái</TableCell>
+                <TableCell>Thao tác</TableCell>
               </TableRow>
             </TableHead>
-            <TableBody sx={{ backgroundColor: '#fff' }}>
+
+            <TableBody>
               {bills.map((bill) => (
                 <TableRow key={bill.id} hover>
-                  <TableCell sx={{ fontWeight: '500' }}>{bill.ten}</TableCell>
+                  <TableCell>{bill.ten}</TableCell>
                   <TableCell>{bill.loai}</TableCell>
-                  <TableCell sx={{ color: '#d32f2f', fontWeight: 'bold' }}>{bill.soTien}</TableCell>
+                  <TableCell sx={{ color: '#d32f2f', fontWeight: 'bold' }}>
+                    {bill.soTien}
+                  </TableCell>
                   <TableCell>{bill.hanNop}</TableCell>
                   <TableCell>{getStatusChip(bill.trangThai)}</TableCell>
-                  <TableCell>
-                    {bill.trangThai === "Chưa nộp" ? (
-                      <Button size="small" variant="text" onClick={() => setOpen(true)} sx={{ textTransform: 'none' }}>Thanh toán</Button>
-                    ) : (
-                      <Typography variant="caption" color="text.disabled">Đã hoàn tất</Typography>
-                    )}
-                  </TableCell>
+                  <TableCell>{renderAction(bill)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -96,25 +172,51 @@ const KhoanThuUserPage = () => {
         </TableContainer>
       </Paper>
 
-      {/* Modal hiện mã QR giả lập */}
+      {/* ===== MODAL QR ===== */}
       <Modal open={open} onClose={() => setOpen(false)}>
         <Box sx={{
-          position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-          width: 350, bgcolor: 'background.paper', borderRadius: '20px', p: 4, textAlign: 'center',
-          boxShadow: 24
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 350,
+          bgcolor: 'background.paper',
+          borderRadius: 3,
+          p: 4,
+          textAlign: 'center'
         }}>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>Quét mã VietQR</Typography>
-          <Box sx={{ p: 2, bgcolor: '#f1f2f6', borderRadius: '15px', mb: 2 }}>
-            <img 
-              src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=ThanhToanPhiChungCuP805" 
-              alt="QR Code" 
-              style={{ width: '100%', maxWidth: '200px', display: 'block', margin: '0 auto' }}
-            />
-          </Box>
-          <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
-            Nội dung: <strong>THANH TOAN P805</strong>
+          <Typography fontWeight="bold">Quét mã VietQR</Typography>
+
+          <Typography sx={{ mt: 1 }}>
+            Khoản thu: <b>{selectedBill?.ten}</b>
           </Typography>
-          <Button fullWidth variant="contained" sx={{ mt: 3, bgcolor: '#008ecc', textTransform: 'none' }} onClick={() => setOpen(false)}>Đóng</Button>
+
+          <Typography sx={{ mb: 2 }}>
+            Số tiền: <b>{selectedBill?.soTien}</b>
+          </Typography>
+
+          <img
+            src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=THANHTOAN"
+            alt="QR"
+            style={{ width: 200, margin: '16px auto' }}
+          />
+
+          <Button
+            fullWidth
+            variant="contained"
+            sx={{ mb: 1 }}
+            onClick={handleSubmitPayment}
+          >
+            Gửi yêu cầu xác nhận
+          </Button>
+
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={() => setOpen(false)}
+          >
+            Hủy
+          </Button>
         </Box>
       </Modal>
     </Box>

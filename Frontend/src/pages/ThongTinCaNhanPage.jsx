@@ -1,127 +1,190 @@
-// src/pages/UserProfilePage.jsx
-import React, { useState } from 'react';
-import { Box, Typography, Paper, Grid, TextField, Button, Avatar, Stack } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import SaveIcon from '@mui/icons-material/Save';
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Typography,
+  Paper,
+  Grid,
+  TextField,
+  Button,
+  Avatar,
+  Stack,
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
+
+import { chinhSuaTTCN, layTTCN } from "../services/ttcnApi";
 
 const ThongTinCaNhanPage = () => {
+  // Lấy userID từ localStorage để map đúng đối tượng
+  const userId = localStorage.getItem("userID");
+
   const [isEditing, setIsEditing] = useState(false);
   const [userInfo, setUserInfo] = useState({
-    hoTen: 'Đài Đạo',
-    cccd: '038012345678',
-    gioiTinh: 'Nam',
-    ngaySinh: '1990-01-01',
-    soDienThoai: '0901234567',
-    queQuan: 'Hà Nội',
-    danToc: 'Kinh',
-    tonGiao: 'Không',
-    ngheNghiep: 'Kỹ sư'
+    hoTen: "",
+    cccd: "",
+    gioiTinh: "",
+    ngaySinh: "",
+    soDienThoai: "0900000000", // Fake do db lưu thiếu sđt :v
+    danToc: "",
+    tonGiao: "",
+    ngheNghiep: "",
+    noiSinh: "",
   });
 
-  const handleSave = () => {
-    setIsEditing(false);
-    alert("Đã lưu thông tin mới!");
-  };
+  // Load thông tin cá nhân khi vừa mới tải lại trang
+  useEffect(() => {
+    const fetchTTCN = async () => {
+      try {
+        const res = await layTTCN(userId);
+        const data = res.data.data;
 
+        setUserInfo({
+          hoTen: data.HoTen,
+          cccd: data.SoCCCD,
+          gioiTinh: data.GioiTinh,
+          ngaySinh: data.NgaySinh?.slice(0, 10),
+          soDienThoai: "0900000000", // ! 
+          danToc: data.DanToc,
+          tonGiao: data.TonGiao,
+          ngheNghiep: data.NgheNghiep,
+          noiSinh: data.NoiSinh,
+        });
+      } catch (err) {
+        console.error("Lỗi load TTCN:", err);
+        alert("Không thể tải thông tin cá nhân");
+      }
+    };
+
+    fetchTTCN();
+  }, [userId]);
+
+  // Xử lý thay đổi khi nhập
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUserInfo(prev => ({ ...prev, [name]: value }));
+    setUserInfo((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Xử lý lưu thông tin cá nhân thay đổi
+  const handleSave = async () => {
+    try {
+      const payload = {
+        CCCD: userInfo.cccd,
+        SDT: userInfo.soDienThoai,
+        TonGiao: userInfo.tonGiao,
+        NgheNghiep: userInfo.ngheNghiep,
+      };
+
+      await chinhSuaTTCN(userId, payload);
+
+      setIsEditing(false);
+      alert("Cập nhật thông tin cá nhân thành công!");
+    } catch (err) {
+      console.error(err);
+      alert("Lỗi khi cập nhật thông tin cá nhân");
+    }
   };
 
   return (
-    <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100vh', width: '100%', boxSizing: 'border-box' }}>
-      <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3, color: '#2c3e50' }}>
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h5" sx={{ fontWeight: "bold", mb: 3 }}>
         Thông tin cá nhân
       </Typography>
 
-      <Paper elevation={2} sx={{ p: 5, borderRadius: '20px', maxWidth: '900px', margin: '0 auto' }}>
-        
-        {/* Phần Header: Tên hiện chữ nổi bật */}
+      <Paper elevation={2} sx={{ p: 5, borderRadius: "20px" }}>
         <Stack direction="row" spacing={3} alignItems="center" sx={{ mb: 5 }}>
-          <Avatar 
-            sx={{ 
-              width: 100, 
-              height: 100, 
-              bgcolor: '#008ecc', 
-              fontSize: '2.5rem',
-              boxShadow: '0 4px 10px rgba(0,0,142,0.3)' 
-            }}
-          >
-            {userInfo.hoTen.charAt(0)}
+          <Avatar sx={{ width: 100, height: 100 }}>
+            {userInfo.hoTen?.charAt(0)}
           </Avatar>
-          <Box>
-            {/* Tên hiển thị nổi bật */}
-            <Typography variant="h4" sx={{ fontWeight: '800', color: '#1a1a1a', letterSpacing: '-0.5px' }}>
-              {userInfo.hoTen}
-            </Typography>
-            <Typography variant="body1" sx={{ color: '#636e72', fontWeight: '500' }}>
-              Cư dân Chung cư BlueMoon
-            </Typography>
-          </Box>
+          <Typography variant="h4">{userInfo.hoTen}</Typography>
         </Stack>
 
-        {/* Lưới thông tin chi tiết */}
-        <Grid container spacing={4}>
+        <Grid container spacing={3}>
+          {/* Không cho sửa 1 số trường */}
           <Grid item xs={12} sm={4}>
-            <TextField fullWidth label="Họ và tên" name="hoTen" value={userInfo.hoTen} disabled={!isEditing} onChange={handleChange} variant="outlined" />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField fullWidth label="Số CCCD" name="cccd" value={userInfo.cccd} disabled={!isEditing} onChange={handleChange} />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField fullWidth label="Giới tính" name="gioiTinh" value={userInfo.gioiTinh} disabled={!isEditing} onChange={handleChange} />
-          </Grid>
-          
-          <Grid item xs={12} sm={4}>
-            <TextField fullWidth label="Ngày sinh" type="date" name="ngaySinh" value={userInfo.ngaySinh} disabled={!isEditing} onChange={handleChange} InputLabelProps={{ shrink: true }} />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField fullWidth label="Số điện thoại" name="soDienThoai" value={userInfo.soDienThoai} disabled={!isEditing} onChange={handleChange} />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField fullWidth label="Quê quán" name="queQuan" value={userInfo.queQuan} disabled={!isEditing} onChange={handleChange} />
+            <TextField fullWidth label="Họ và tên" value={userInfo.hoTen} disabled />
           </Grid>
 
-          {/* Các trường mới bổ sung */}
           <Grid item xs={12} sm={4}>
-            <TextField fullWidth label="Dân tộc" name="danToc" value={userInfo.danToc} disabled={!isEditing} onChange={handleChange} />
+            <TextField fullWidth label="Giới tính" value={userInfo.gioiTinh} disabled />
           </Grid>
+
           <Grid item xs={12} sm={4}>
-            <TextField fullWidth label="Tôn giáo" name="tonGiao" value={userInfo.tonGiao} disabled={!isEditing} onChange={handleChange} />
+            <TextField
+              fullWidth
+              label="Ngày sinh"
+              type="date"
+              value={userInfo.ngaySinh}
+              disabled
+              InputLabelProps={{ shrink: true }}
+            />
           </Grid>
+
           <Grid item xs={12} sm={4}>
-            <TextField fullWidth label="Nghề nghiệp" name="ngheNghiep" value={userInfo.ngheNghiep} disabled={!isEditing} onChange={handleChange} />
+            <TextField
+              fullWidth
+              label="Số CCCD"
+              name="cccd"
+              value={userInfo.cccd}
+              disabled={!isEditing}
+              onChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <TextField
+              fullWidth
+              label="Số điện thoại"
+              name="soDienThoai"
+              value={userInfo.soDienThoai}
+              disabled={!isEditing}
+              onChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <TextField
+              fullWidth
+              label="Tôn giáo"
+              name="tonGiao"
+              value={userInfo.tonGiao}
+              disabled={!isEditing}
+              onChange={handleChange}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <TextField
+              fullWidth
+              label="Nghề nghiệp"
+              name="ngheNghiep"
+              value={userInfo.ngheNghiep}
+              disabled={!isEditing}
+              onChange={handleChange}
+            />
           </Grid>
         </Grid>
 
-        {/* Nút tác vụ */}
-        <Box sx={{ mt: 5, display: 'flex', justifyContent: 'flex-end' }}>
+        <Box sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}>
           {isEditing ? (
             <Stack direction="row" spacing={2}>
-              <Button variant="outlined" color="error" onClick={() => setIsEditing(false)} sx={{ borderRadius: '8px', textTransform: 'none' }}>
-                Hủy bỏ
+              <Button color="error" onClick={() => setIsEditing(false)}>
+                Hủy
               </Button>
-              <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSave} sx={{ bgcolor: '#2ecc71', borderRadius: '8px', textTransform: 'none', '&:hover': { bgcolor: '#27ae60' } }}>
+              <Button
+                variant="contained"
+                startIcon={<SaveIcon />}
+                onClick={handleSave}
+              >
                 Lưu thay đổi
               </Button>
             </Stack>
           ) : (
-            <Button 
-              variant="contained" 
-              startIcon={<EditIcon />} 
-              onClick={() => setIsEditing(true)} 
-              sx={{ 
-                bgcolor: '#008ecc', 
-                borderRadius: '8px', 
-                px: 4,
-                py: 1.5,
-                textTransform: 'none',
-                fontWeight: 'bold',
-                boxShadow: '0 4px 12px rgba(0,142,204,0.3)',
-                '&:hover': { bgcolor: '#007bb5' }
-              }}
+            <Button
+              variant="contained"
+              startIcon={<EditIcon />}
+              onClick={() => setIsEditing(true)}
             >
-              CHỈNH SỬA THÔNG TIN
+              Chỉnh sửa thông tin
             </Button>
           )}
         </Box>

@@ -17,6 +17,14 @@ const tamtruRoutes = require('./routes/tamtruRoutes');
 const taikhoanRoutes = require('./routes/taikhoanRoutes');
 const loginRoutes = require('./routes/loginRoutes');
 
+// Phần thu phí + người dùng
+const khoanThuRoutes = require('./routes/khoanThuRoutes');
+const thuPhiRoutes = require('./routes/thuPhiRoutes');
+const ktKhoanThuRoutes = require('./routes/KTKhoanThuRoutes');
+const ttcnRoutes = require('./routes/thongTinCaNhanRoutes');
+const dongPhiRoutes = require('./routes/dongPhiRoutes');
+const guiXeRoutes = require('./routes/guiXeRoutes');
+
 // Sử dụng Routes
 app.use('/api/hokhau', hokhauRoutes);
 app.use('/api/canho', canhoRoutes);
@@ -25,6 +33,14 @@ app.use('/api/tamvang', tamvangRoutes);
 app.use('/api/tamtru', tamtruRoutes);
 app.use('/api/taikhoan', taikhoanRoutes);
 app.use('/api/login', loginRoutes);
+
+// Phần thu phí + người dùng
+app.use("/api/khoan-thu", khoanThuRoutes);
+app.use("/api/thu-phi", thuPhiRoutes);
+app.use("/api/kt-khoanthu", ktKhoanThuRoutes);
+app.use("/api/ttcn", ttcnRoutes);
+app.use("/api/dongphi", dongPhiRoutes);
+app.use("/api/guixe", guiXeRoutes);
 
 app.get('/', (req, res) => {
     res.send('API is ready!');

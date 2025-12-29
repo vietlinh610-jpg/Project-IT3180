@@ -66,6 +66,7 @@ const CreateTamVangPage = () => {
       }));
 
     } catch (err) {
+      console.log(err);
       alert("Không tìm thấy nhân khẩu có mã này! Vui lòng kiểm tra lại.");
       setFormData(prev => ({ ...prev, hoTen: '', SoCCCD: '', maHoKhau: '' }));
     }

@@ -9,6 +9,7 @@ const DashboardPage = () => {
     // Lấy role từ localStorage khi vào trang
     const savedRole = localStorage.getItem('userRole');
     console.log("Vai trò hiện tại:", savedRole); // Dùng để kiểm tra lỗi ở Console
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setRole(savedRole || 'user');
   }, []);
 
@@ -84,6 +85,13 @@ const DashboardPage = () => {
       linkTo: "/kiem-tra-khoan-thu",
       roles: ['ketoan'],
     },
+    {
+      title: "Quản lý gửi xe",
+      description: "Quản lý gửi ô tô, xe máy của các hộ",
+      imageUrl: "images/guiXe.jpg",
+      linkTo: "/quan-ly-gui-xe",
+      roles: ['admin'], // chỉ admin mới có quyền quản lý gửi xe
+    }
   ];
 
   // 2. Lọc danh sách card dựa trên vai trò của người dùng hiện tại

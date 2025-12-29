@@ -1,69 +1,163 @@
-// src/pages/CheckBillingPage.jsx
-import React, { useState } from 'react';
-import { 
-  Box, Typography, Paper, Chip, Button, Stack, IconButton, Tooltip 
-} from '@mui/material';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import DoDisturbIcon from '@mui/icons-material/DoDisturb';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+// Hoàn thiện page khoản thu
+
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Typography,
+  Chip,
+  IconButton,
+  Tooltip,
+  Stack,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+} from "@mui/material";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import DoDisturbIcon from "@mui/icons-material/DoDisturb";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+
+// Minh họa minh chứng chuyển khoản
+// Chú ý : Đây chỉ là minh họa, thực tế không nên lưu ảnh trên cơ sở dữ liệu
+import minhChungImg from "../assets/minhChung.png";
+
+import {
+  KiemTraKhoanThu,
+  xacNhanKhoanThu,
+  tuChoiKhoanThu,
+} from "../services/KTKhoanThuApi";
 
 const KiemTraKhoanThuPage = () => {
-  // Dữ liệu mẫu (Thực tế sẽ lấy từ API/Database)
-  const [rows, setRows] = useState([
-    { id: 1, tenKhoanThu: "Phí quản lý T12", nguoiNop: "Nguyễn Văn A", canHo: "P.805", thoiGian: "20/12/2023 08:30", trangThai: "Chờ xác nhận", soTien: "500,000" },
-    { id: 2, tenKhoanThu: "Tiền điện T11", nguoiNop: "Trần Thị B", canHo: "P.102", thoiGian: "19/12/2023 15:45", trangThai: "Đã nộp", soTien: "1,250,000" },
-    { id: 3, tenKhoanThu: "Phí gửi xe T12", nguoiNop: "Lê Văn C", canHo: "P.304", thoiGian: "-", trangThai: "Chưa nộp", soTien: "100,000" },
-    { id: 4, tenKhoanThu: "Tiền nước T11", nguoiNop: "Phạm Minh D", canHo: "P.501", thoiGian: "21/12/2023 10:20", trangThai: "Chờ xác nhận", soTien: "210,000" },
-  ]);
+  // Quản lý state của các hàng
+  const [rows, setRows] = useState([]);
 
-  // Hàm xử lý xác nhận nộp tiền
-  const handleVerify = (id) => {
-    setRows(prevRows => 
-      prevRows.map(row => 
-        row.id === id ? { ...row, trangThai: "Đã nộp" } : row
-      )
-    );
-    alert("Đã xác nhận thanh toán thành công!");
+  // State điều khiển dialog xem minh chứng
+  const [openMinhChung, setOpenMinhChung] = useState(false);
+
+  // Lấy dữ liệu các khoản thu đang chờ xác nhận
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await KiemTraKhoanThu();
+        if (response.data && response.data.data) {
+          const mappedRows = response.data.data.map((item) => ({
+            id: item.maThuPhi,
+            tenKhoanThu: item.TenKhoanThu,
+            soTien: item.soTien,
+            canHo: item.MaCanHo,
+            nguoiNop: item.ChuHo,
+            thoiGian: item.NgayGioNop
+              ? new Date(item.NgayGioNop).toLocaleString("vi-VN")
+              : "",
+            // Trạng thái luôn là chờ xác nhận
+            trangThai: "Chờ xác nhận",
+          }));
+          setRows(mappedRows);
+        }
+      } catch (error) {
+        console.error("Lỗi: ", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Kiểm tra xác nhận
+  const handleVerify = async (id) => {
+    if (!window.confirm("Bạn có chắc muốn xác nhận khoản thu này?")) return;
+
+    try {
+      await xacNhanKhoanThu(id);
+      setRows((prev) =>
+        prev.map((row) =>
+          row.id === id ? { ...row, trangThai: "Đã nộp" } : row
+        )
+      );
+    } catch (error) {
+      console.error("Lỗi :", error);
+      alert("Xác nhận thất bại!");
+    }
+  };
+
+  // Xử lý từ chối
+  const handleReject = async (id) => {
+    if (!window.confirm("Bạn có chắc muốn TỪ CHỐI khoản thu này?")) return;
+
+    try {
+      await tuChoiKhoanThu(id);
+      setRows((prev) =>
+        prev.map((row) =>
+          row.id === id ? { ...row, trangThai: "Từ chối" } : row
+        )
+      );
+    } catch (error) {
+      console.error("Lỗi khi từ chối:", error);
+      alert("Từ chối thất bại!");
+    }
+  };
+
+  // Mở dialog xem minh chứng
+  const handleOpenMinhChung = () => {
+    setOpenMinhChung(true);
+  };
+
+  // Đóng dialog xem minh chứng
+  const handleCloseMinhChung = () => {
+    setOpenMinhChung(false);
   };
 
   const columns = [
-    { field: 'tenKhoanThu', headerName: 'Tên khoản thu', width: 200 },
-    { field: 'soTien', headerName: 'Số tiền (VNĐ)', width: 130 },
-    { field: 'canHo', headerName: 'Căn hộ', width: 100, align: 'center' },
-    { field: 'nguoiNop', headerName: 'Người nộp/Chủ hộ', width: 180 },
-    { field: 'thoiGian', headerName: 'Ngày giờ nộp', width: 180 },
-    { 
-      field: 'trangThai', 
-      headerName: 'Trạng thái', 
+    { field: "tenKhoanThu", headerName: "Tên khoản thu", width: 200 },
+    { field: "soTien", headerName: "Số tiền (VNĐ)", width: 140 },
+    { field: "canHo", headerName: "Căn hộ", width: 100 },
+    { field: "nguoiNop", headerName: "Người nộp", width: 180 },
+    { field: "thoiGian", headerName: "Ngày giờ nộp", width: 180 },
+    {
+      field: "trangThai",
+      headerName: "Trạng thái",
       width: 150,
       renderCell: (params) => {
         let color = "default";
         if (params.value === "Đã nộp") color = "success";
-        if (params.value === "Chưa nộp") color = "error";
+        if (params.value === "Từ chối") color = "error";
         if (params.value === "Chờ xác nhận") color = "warning";
         return <Chip label={params.value} color={color} size="small" />;
-      }
+      },
     },
     {
-      field: 'actions',
-      headerName: 'Thao tác xác nhận',
+      field: "actions",
+      headerName: "Thao tác",
       width: 180,
       sortable: false,
       renderCell: (params) => (
         <Stack direction="row" spacing={1}>
           {params.row.trangThai === "Chờ xác nhận" && (
-            <Tooltip title="Xác nhận đã nhận tiền">
-              <IconButton color="success" onClick={() => handleVerify(params.id)}>
-                <CheckCircleIcon />
-              </IconButton>
-            </Tooltip>
+            <>
+              <Tooltip title="Xác nhận đã thu tiền">
+                <IconButton
+                  color="success"
+                  onClick={() => handleVerify(params.id)}
+                >
+                  <CheckCircleIcon />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Từ chối khoản thu">
+                <IconButton
+                  color="error"
+                  onClick={() => handleReject(params.id)}
+                >
+                  <DoDisturbIcon />
+                </IconButton>
+              </Tooltip>
+            </>
           )}
+
           <Tooltip title="Xem minh chứng">
-            <IconButton size="small"><VisibilityIcon /></IconButton>
-          </Tooltip>
-          <Tooltip title="Từ chối/Lỗi">
-            <IconButton color="error" size="small"><DoDisturbIcon /></IconButton>
+            <IconButton size="small" onClick={handleOpenMinhChung}>
+              <VisibilityIcon />
+            </IconButton>
           </Tooltip>
         </Stack>
       ),
@@ -71,29 +165,43 @@ const KiemTraKhoanThuPage = () => {
   ];
 
   return (
-    <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100vh', width: '100%', boxSizing: 'border-box'  }}>
-      <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3 }}>
+    <Box sx={{ p: 3, height: "100vh" }}>
+      <Typography variant="h5" fontWeight="bold" mb={3}>
         Kiểm tra & Xác nhận khoản thu
       </Typography>
 
-      <Box sx={{ flexGrow: 1, width: '100%', backgroundColor: '#fff' }}>
-              <DataGrid
-                rows={rows}
-                columns={columns}
-                slots={{ toolbar: GridToolbar }}
-                initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-                pageSizeOptions={[10, 20]}
-                disableRowSelectionOnClick
-                sx={{
-                  height: '100%', // Bảng sẽ cao bằng đúng Box cha (flexGrow: 1)
-                  width: '100%',  // Bảng rộng 100%
-                  border: '1px solid #e0e0e0',
-                  '& .MuiDataGrid-columnHeaders': {
-                    backgroundColor: '#f8f9fa',
-                  }
-                }}
-              />
-      </Box>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        slots={{ toolbar: GridToolbar }}
+        pageSizeOptions={[10, 20]}
+        initialState={{
+          pagination: { paginationModel: { pageSize: 10 } },
+        }}
+        disableRowSelectionOnClick
+      />
+
+      {/* Dialog hiển thị minh chứng chuyển khoản */}
+      <Dialog
+        open={openMinhChung}
+        onClose={handleCloseMinhChung}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Minh chứng chuyển khoản</DialogTitle>
+        <DialogContent>
+          <Box
+            component="img"
+            src={minhChungImg}
+            alt="Minh chứng chuyển khoản"
+            sx={{
+              width: "100%",
+              maxHeight: 400,
+              objectFit: "contain",
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };

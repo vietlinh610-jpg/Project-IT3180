@@ -1,60 +1,100 @@
-// src/pages/BillingHistoryPage.jsx
-import React from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { 
   Box, Typography, Paper, Table, TableBody, TableCell, 
   TableContainer, TableHead, TableRow, Chip, IconButton, Stack 
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import HistoryIcon from '@mui/icons-material/History';
 import { useNavigate } from 'react-router-dom';
+
+// API
+import { layLSTT } from "../services/dongPhiAPi";
 
 const LichSuThanhToanPage = () => {
   const navigate = useNavigate();
 
-  // Dữ liệu mẫu lịch sử (Các khoản đã hoàn thành cách đây 2 tháng)
-  const historyData = [
-    { id: 101, ten: "Tiền điện tháng 10", loai: "Biến đổi", soTien: "1,100,000", ngayNop: "12/10/2023", trangThai: "Đã nộp" },
-    { id: 102, ten: "Tiền nước tháng 10", loai: "Biến đổi", soTien: "150,000", ngayNop: "12/10/2023", trangThai: "Đã nộp" },
-    { id: 103, ten: "Phí quản lý tháng 10", loai: "Bắt buộc", soTien: "500,000", ngayNop: "05/10/2023", trangThai: "Đã nộp" },
-    { id: 104, ten: "Tiền điện tháng 09", loai: "Biến đổi", soTien: "950,000", ngayNop: "10/09/2023", trangThai: "Đã nộp" },
-  ];
+  const [historyData, setHistoryData] = useState([]);
+
+  const userId = localStorage.getItem("userID");
+
+  // * Fetch lịch sử 
+  const fetchLichSu = async () => {
+    try {
+      const res = await layLSTT(userId);
+
+      const data = res.data.data.map((item, index) => ({
+        id: index + 1,
+        ten: item.TenKhoanThu,
+        loai: item.Loai,
+        soTien: item.SoTienPhaiThu.toLocaleString("vi-VN"),
+        ngayNop: new Date(item.NgayDong).toLocaleDateString("vi-VN"),
+        trangThai: "Đã nộp",
+      }));
+
+      setHistoryData(data);
+    } catch (err) {
+      console.error("Lỗi lấy lịch sử thanh toán:", err);
+    }
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchLichSu();
+  }, []);
 
   return (
     <Box sx={{ p: 4, backgroundColor: '#f4f7f6', minHeight: '100vh' }}>
+      {/* ===== HEADER ===== */}
       <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
         <IconButton onClick={() => navigate('/khoan-thu')}>
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#2c3e50' }}>
+        <Typography variant="h5" fontWeight="bold">
           Lịch sử thanh toán
         </Typography>
       </Stack>
 
-      <Paper elevation={1} sx={{ borderRadius: '15px', overflow: 'hidden' }}>
-
+      {/* ===== TABLE ===== */}
+      <Paper elevation={1} sx={{ borderRadius: 3, overflow: 'hidden' }}>
         <TableContainer>
           <Table>
             <TableHead sx={{ backgroundColor: '#fafafa' }}>
               <TableRow>
-                <TableCell sx={{ fontWeight: 'bold' }}>Tên khoản thu</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Loại phí</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Số tiền (VNĐ)</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Ngày nộp</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Trạng thái</TableCell>
+                <TableCell fontWeight="bold">Tên khoản thu</TableCell>
+                <TableCell fontWeight="bold">Loại phí</TableCell>
+                <TableCell fontWeight="bold">Số tiền (VNĐ)</TableCell>
+                <TableCell fontWeight="bold">Ngày nộp</TableCell>
+                <TableCell fontWeight="bold">Trạng thái</TableCell>
               </TableRow>
             </TableHead>
+
             <TableBody>
-              {historyData.map((item) => (
-                <TableRow key={item.id} hover>
-                  <TableCell>{item.ten}</TableCell>
-                  <TableCell>{item.loai}</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>{item.soTien}</TableCell>
-                  <TableCell>{item.ngayNop}</TableCell>
-                  <TableCell>
-                    <Chip label={item.trangThai} color="success" size="small" variant="outlined" />
+              {historyData.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} align="center">
+                    Không có lịch sử thanh toán
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                historyData.map((item) => (
+                  <TableRow key={item.id} hover>
+                    <TableCell>{item.ten}</TableCell>
+                    <TableCell>{item.loai}</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>
+                      {item.soTien}
+                    </TableCell>
+                    <TableCell>{item.ngayNop}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={item.trangThai}
+                        color="success"
+                        size="small"
+                        variant="outlined"
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>

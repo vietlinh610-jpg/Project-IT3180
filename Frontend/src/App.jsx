@@ -24,9 +24,14 @@ import CreateKhoanThuPage from './pages/CreateKhoanThuPage';
 import CreateTamTruPage from './pages/CreateTamTruPage';
 import CreateTamVangPage from './pages/CreateTamVangPage';
 import CreateTaiKhoanPage from './pages/CreateTaiKhoanPage';
+// Thêm chức năng thống kê
 import NhanKhauAllPage from './pages/NhanKhauAllPage';
 import ThongKeKhoanThuPage from './pages/ThongKeKhoanThuPage';
 import ThongKeNhanKhauPage from './pages/ThongKeNhanKhauPage';
+
+// Thêm quản lý gửi xe
+import GuiXePage from './pages/GuiXePage';
+import CreateGuiXePage from './pages/CreateGuiXePage';
 
 function App() {
   return (
@@ -71,8 +76,10 @@ function App() {
                   <Route path="/quan-ly-nhan-dan/nhan-khau/tat-ca" element={<NhanKhauAllPage />} />
                   <Route path="/quan-ly-khoan-thu/thong-ke" element={<ThongKeKhoanThuPage />} />
                   <Route path="/ho-gia-dinh/ho-khau/thong-ke" element={<ThongKeNhanKhauPage />} />
-                  
-                  
+
+                  {/* Thêm trang gửi xe và gắn vào ban quản trị*/}
+                  <Route path='/quan-ly-gui-xe' element={<GuiXePage/>} />
+                  <Route path='/quan-ly-gui-xe/create' element={<CreateGuiXePage/>} />
                   {/* Nếu gõ đường dẫn lạ bên trong khu vực này, tự về dashboard */}
                   <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 </Routes>

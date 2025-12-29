@@ -12,13 +12,13 @@ import '../styles/Sidebar.css';
 
 const Sidebar = () => {
   // 1. Lấy ROLE từ localStorage
-  const [role, setRole] = useState(() => {
+  const [role] = useState(() => {
     return localStorage.getItem('userRole') || '';
   });
 
   // 2. [THÊM MỚI] Lấy TÊN NGƯỜI DÙNG từ localStorage
   // Lưu ý: Trong trang Đăng Nhập (Login), bạn phải có lệnh: localStorage.setItem('fullName', 'Tên User');
-  const [fullName, setFullName] = useState(() => {
+  const [fullName] = useState(() => {
     // Nếu không tìm thấy tên thì hiển thị mặc định là "Cư dân" hoặc "Admin"
     return localStorage.getItem('fullName') || 'Người dùng';
   });
@@ -145,6 +145,18 @@ const Sidebar = () => {
               </Link>
             </li>
           )}
+
+          {role === 'admin' && (
+            <li>
+              <Link to="/quan-ly-gui-xe" className={`nav-link ${
+                  location.pathname === "/quan-ly-gui-xe" ? "active" : ""
+                }`}
+              >
+                Quản lý gửi xe
+              </Link>
+            </li>
+          )}
+            
 
           <li className="logout-item" style={{ marginTop: '20px' }}>
             <button onClick={handleOpenLogout} className="nav-link logout-btn" style={{ width: '100%', border: 'none', background: 'none', cursor: 'pointer', color: '#dc3545', textAlign: 'left', padding: '10px 15px' }}>

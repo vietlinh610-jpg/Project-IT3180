@@ -1,98 +1,195 @@
-// src/pages/FamilyMembersPage.jsx
-import React from 'react';
-import { 
-  Box, Typography, Paper, Grid, Divider, 
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
-  Chip, Stack 
-} from '@mui/material';
-import HomeIcon from '@mui/icons-material/Home';
-import GroupsIcon from '@mui/icons-material/Groups';
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Typography,
+  Paper,
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Chip,
+  Stack,
+} from "@mui/material";
+import HomeIcon from "@mui/icons-material/Home";
+import GroupsIcon from "@mui/icons-material/Groups";
+
+// API
+import { layTTChung, layTTGD } from "../services/ttcnApi";
+
+// Tiện tích format ngày tháng
+const formatDate = (dateStr) => {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("vi-VN");
+};
 
 const ThanhVienGiaDinhPage = () => {
-  // Dữ liệu mẫu hộ gia đình
-  const familyData = {
-    maHoKhau: "HK26960674",
-    tenCanHo: "P.805", // Thêm mới
-    tang: "8",         // Thêm mới
-    diaChi: "Căn hộ P.805, Tòa nhà BlueMoon, Thanh Xuân, Hà Nội",
-    chuHo: "Nguyễn Văn A",
-    members: [
-      { id: 1, hoTen: "Nguyễn Văn A", quanHe: "Chủ hộ", ngaySinh: "15/05/1980", gioiTinh: "Nam", danToc: "Kinh", tonGiao: "Không", ngheNghiep: "Kỹ sư" },
-      { id: 2, hoTen: "Trần Thị B", quanHe: "Vợ", ngaySinh: "20/10/1985", gioiTinh: "Nữ", danToc: "Kinh", tonGiao: "Không", ngheNghiep: "Giáo viên" },
-      { id: 3, hoTen: "Đại Đào", quanHe: "Con", ngaySinh: "05/12/2010", gioiTinh: "Nam", danToc: "Kinh", tonGiao: "Không", ngheNghiep: "Học sinh" },
-    ]
-  };
+  const userId = localStorage.getItem("userID");
+
+  // quản lý thông tin chung
+  const [ttChung, setTtChung] = useState({
+    maHoKhau: "",
+    canHo: "",
+    tang: "",
+    chuHo: "",
+    diaChiThuongTru: "",
+  });
+
+  const [members, setMembers] = useState([]);
+
+  // Load thông tin chung
+  useEffect(() => {
+    const fetchTTChung = async () => {
+      try {
+        const res = await layTTChung(userId);
+        const data = res.data.data;
+
+        setTtChung({
+          maHoKhau: data.maHoKhau,
+          canHo: data.canHo,
+          tang: data.tang,
+          chuHo: data.chuHo,
+          diaChiThuongTru: data.diaChiThuongTru,
+        });
+      } catch (err) {
+        console.error("Lỗi lấy thông tin chung:", err);
+      }
+    };
+
+    fetchTTChung();
+  }, [userId]);
+
+  // Load thông tin gia đình
+  useEffect(() => {
+    const fetchTTGD = async () => {
+      try {
+        const res = await layTTGD(userId);
+
+        const data = res.data.data.map((item) => ({
+          id: item.MaNhanKhau,
+          hoTen: item.HoTen,
+          quanHe: item.QuanHeVoiChuHo,
+          ngaySinh: formatDate(item.NgaySinh),
+          gioiTinh: item.GioiTinh,
+          danToc: item.DanToc,
+          tonGiao: item.TonGiao,
+          ngheNghiep: item.NgheNghiep,
+        }));
+
+        setMembers(data);
+      } catch (err) {
+        console.error("Lỗi lấy thông tin gia đình:", err);
+      }
+    };
+
+    fetchTTGD();
+  }, [userId]);
 
   return (
-    <Box sx={{ p: 4, backgroundColor: '#f4f7f6', minHeight: '100vh' }}>
-      <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3, color: '#2c3e50' }}>
+    <Box sx={{ p: 4, backgroundColor: "#f4f7f6", minHeight: "100vh" }}>
+      <Typography
+        variant="h5"
+        sx={{ fontWeight: "bold", mb: 3, color: "#2c3e50" }}
+      >
         Thông tin hộ gia đình
       </Typography>
 
-      {/* Phần 1: Thông tin chung của hộ khẩu */}
-      <Paper elevation={1} sx={{ p: 3, borderRadius: '12px', mb: 4 }}>
+      {/* Hiển thị thông tin chung */}
+      <Paper elevation={1} sx={{ p: 3, borderRadius: "12px", mb: 4 }}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
-              <HomeIcon sx={{ color: '#008ecc' }} />
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Thông tin chung</Typography>
+              <HomeIcon sx={{ color: "#008ecc" }} />
+              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                Thông tin chung
+              </Typography>
             </Stack>
-            <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Mã hộ khẩu:</strong> <span style={{ color: '#008ecc', fontWeight: 'bold' }}>{familyData.maHoKhau}</span>
+
+            <Typography sx={{ mb: 1 }}>
+              <strong>Mã hộ khẩu:</strong>{" "}
+              <span style={{ color: "#008ecc", fontWeight: "bold" }}>
+                {ttChung.maHoKhau}
+              </span>
             </Typography>
-            <Typography variant="body1">
-              <strong>Chủ hộ:</strong> {familyData.chuHo}
+
+            <Typography>
+              <strong>Chủ hộ:</strong> {ttChung.chuHo}
             </Typography>
           </Grid>
 
-          <Grid item xs={12} md={7} sx={{ mt: 1 }} >
-            {/* Hiển thị Tên căn hộ và Tầng nổi bật hơn */}
-            <Stack direction="row" spacing={4} sx={{ mt: { xs: 0, md: 5 }, mb: 1 }}>
-               <Typography variant="body1">
-                <strong>Căn hộ:</strong> {familyData.tenCanHo}
+          <Grid item xs={12} md={6} sx={{ mt: 1 }}>
+            <Stack
+              direction="row"
+              spacing={4}
+              sx={{ mt: { xs: 0, md: 5 }, mb: 1 }}
+            >
+              <Typography>
+                <strong>Căn hộ:</strong> {ttChung.canHo}
               </Typography>
-              <Typography variant="body1">
-                <strong>Tầng:</strong> {familyData.tang}
+              <Typography>
+                <strong>Tầng:</strong> {ttChung.tang}
               </Typography>
             </Stack>
 
-            <Typography variant="body1">
-              <strong>Địa chỉ thường trú:</strong> {familyData.diaChi}
+            <Typography>
+              <strong>Địa chỉ thường trú:</strong>{" "}
+              {ttChung.diaChiThuongTru}
             </Typography>
           </Grid>
         </Grid>
       </Paper>
 
-      {/* Phần 2: Danh sách thành viên */}
-      <Paper elevation={1} sx={{ borderRadius: '12px', overflow: 'hidden' }}>
-        <Box sx={{ p: 2, bgcolor: '#f8f9fa', display: 'flex', alignItems: 'center', gap: 1, borderBottom: '1px solid #eee' }}>
-          <GroupsIcon sx={{ color: '#008ecc' }} />
-          <Typography sx={{ fontWeight: 'bold' }}>Thành viên trong gia đình</Typography>
+      {/* Hiển thị thông tin gia đình */}
+      <Paper elevation={1} sx={{ borderRadius: "12px", overflow: "hidden" }}>
+        <Box
+          sx={{
+            p: 2,
+            bgcolor: "#f8f9fa",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            borderBottom: "1px solid #eee",
+          }}
+        >
+          <GroupsIcon sx={{ color: "#008ecc" }} />
+          <Typography sx={{ fontWeight: "bold" }}>
+            Thành viên trong gia đình
+          </Typography>
         </Box>
 
         <TableContainer>
           <Table sx={{ minWidth: 800 }}>
-            <TableHead sx={{ backgroundColor: '#fafafa' }}>
+            <TableHead sx={{ backgroundColor: "#fafafa" }}>
               <TableRow>
-                <TableCell sx={{ fontWeight: 'bold' }}>Họ và tên</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Quan hệ</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Ngày sinh</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Giới tính</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Dân tộc</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Tôn giáo</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Nghề nghiệp</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Họ và tên</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Quan hệ</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Ngày sinh</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Giới tính</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Dân tộc</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Tôn giáo</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Nghề nghiệp</TableCell>
               </TableRow>
             </TableHead>
+
             <TableBody>
-              {familyData.members.map((member) => (
+              {members.map((member) => (
                 <TableRow key={member.id} hover>
-                  <TableCell sx={{ fontWeight: '500' }}>{member.hoTen}</TableCell>
+                  <TableCell sx={{ fontWeight: "500" }}>
+                    {member.hoTen}
+                  </TableCell>
                   <TableCell>
-                    <Chip 
-                      label={member.quanHe} 
-                      size="small" 
-                      color={member.quanHe === 'Chủ hộ' ? 'primary' : 'default'}
-                      variant={member.quanHe === 'Chủ hộ' ? 'filled' : 'outlined'}
+                    <Chip
+                      label={member.quanHe}
+                      size="small"
+                      color={
+                        member.quanHe === "Chủ hộ" ? "primary" : "default"
+                      }
+                      variant={
+                        member.quanHe === "Chủ hộ" ? "filled" : "outlined"
+                      }
                     />
                   </TableCell>
                   <TableCell>{member.ngaySinh}</TableCell>
@@ -102,6 +199,14 @@ const ThanhVienGiaDinhPage = () => {
                   <TableCell>{member.ngheNghiep}</TableCell>
                 </TableRow>
               ))}
+
+              {members.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    Không có dữ liệu thành viên
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </TableContainer>
