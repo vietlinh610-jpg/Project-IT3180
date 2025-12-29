@@ -1,6 +1,6 @@
 // Hoàn thiện tạo khoản thu mới
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -20,10 +20,11 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
 import { taoKhoanThu } from "../services/khoaThuApi";
 
-// Thư viện dùng để pick ngày
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+
+const KHONG_NHAP_TIEN = ["Phí dịch vụ", "Phí gửi xe"];
 
 const CreateKhoanThuPage = () => {
   const navigate = useNavigate();
@@ -36,6 +37,19 @@ const CreateKhoanThuPage = () => {
     ngayBatDau: dayjs(),
     ngayKetThuc: dayjs(),
   });
+
+  const isDisabledSoTien = KHONG_NHAP_TIEN.includes(formData.loaiKhoanThu);
+
+  // Khi chọn loại không cần nhập tiền → set soTien = 0
+  useEffect(() => {
+    if (isDisabledSoTien) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setFormData((prev) => ({
+        ...prev,
+        soTien: 0,
+      }));
+    }
+  }, [formData.loaiKhoanThu, isDisabledSoTien]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,7 +64,7 @@ const CreateKhoanThuPage = () => {
         TenKhoanThu: formData.tenKhoanThu,
         GhiChu: formData.ghiChu,
         Loai: formData.loaiKhoanThu,
-        SoTien: Number(formData.soTien),
+        SoTien: isDisabledSoTien ? 0 : Number(formData.soTien),
         NgayBatDau: formData.ngayBatDau.format("YYYY-MM-DD"),
         NgayKetThuc: formData.ngayKetThuc.format("YYYY-MM-DD"),
       };
@@ -129,7 +143,8 @@ const CreateKhoanThuPage = () => {
                 variant="filled"
                 value={formData.soTien}
                 onChange={handleChange}
-                required
+                disabled={isDisabledSoTien}
+                required={!isDisabledSoTien}
               />
             </Grid>
 
