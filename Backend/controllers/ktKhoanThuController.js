@@ -31,7 +31,7 @@ const kiemTraThuPhi = async (req, res) =>  {
     from thu_phi tp
       join vw_phi_gui_xe_theo_ho vx 
         on tp.MaHoKhau = vx.MaHoKhau
-      join khoan_thu kt on kt.MaKhoanThu = tp.MaKhoanThu
+      join khoan_thu kt on kt.MaKhoanThu = tp.MaKhoanThu and kt.SoTien = 0
     where tp.DaXacNhan = 0
       and tp.tuChoi = 0
       and vx.PhiGuiXe > 0
