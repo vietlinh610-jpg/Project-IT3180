@@ -1,9 +1,9 @@
 // src/pages/TaiKhoanPage.jsx
 import React, { useState, useEffect } from 'react';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { 
-  Box, Typography, Button, Stack, IconButton, Chip, 
-  Dialog, DialogTitle, DialogContent, DialogActions, TextField 
+import {
+  Box, Typography, Button, Stack, IconButton, Chip,
+  Dialog, DialogTitle, DialogContent, DialogActions, TextField
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -14,7 +14,7 @@ import { getTaiKhoan, deleteTaiKhoan, updateTaiKhoan } from '../services/taikhoa
 
 const TaiKhoanPage = () => {
   const navigate = useNavigate();
-  
+
   // State
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,13 +28,13 @@ const TaiKhoanPage = () => {
     try {
       setLoading(true);
       // Gọi qua axios service
-      const response = await getTaiKhoan(); 
+      const response = await getTaiKhoan();
       // Axios trả dữ liệu trong response.data
-      const data = response.data; 
-      
+      const data = response.data;
+
       const formattedData = data.map(item => ({
         ...item,
-        maHoKhau: item.maHoKhau || '---' 
+        maHoKhau: item.maHoKhau || '---'
       }));
 
       setRows(formattedData);
@@ -117,7 +117,8 @@ const TaiKhoanPage = () => {
 
       // Gọi API update qua service
       await updateTaiKhoan(editData.id, payload);
-
+      localStorage.setItem('fullName', editData.hoTen.trim());
+      window.dispatchEvent(new Event('userInfoUpdated'));
       alert("Cập nhật thành công!");
       setOpenEdit(false);
       fetchTaiKhoan(); // Load lại dữ liệu
@@ -131,27 +132,27 @@ const TaiKhoanPage = () => {
 
   // --- CẤU HÌNH CỘT (Giữ nguyên) ---
   const columns = [
-    { 
-      field: 'maHoKhau', 
-      headerName: 'Mã HK', 
-      flex: 0.8, 
+    {
+      field: 'maHoKhau',
+      headerName: 'Mã HK',
+      flex: 0.8,
       minWidth: 100
     },
     { field: 'hoTen', headerName: 'Họ tên', flex: 1.2, minWidth: 180 },
     { field: 'SoCCCD', headerName: 'Số CCCD', flex: 1, minWidth: 150 },
     { field: 'tenDangNhap', headerName: 'Tên đăng nhập', flex: 1, minWidth: 150 },
-    { field: 'matKhau', headerName: 'Mật khẩu', flex: 0.8, minWidth: 100 }, 
-    { 
-      field: 'quyenTaiKhoan', 
-      headerName: 'Quyền tài khoản', 
-      flex: 1, 
+    { field: 'matKhau', headerName: 'Mật khẩu', flex: 0.8, minWidth: 100 },
+    {
+      field: 'quyenTaiKhoan',
+      headerName: 'Quyền tài khoản',
+      flex: 1,
       minWidth: 140,
       renderCell: (params) => {
         let color = 'default';
-        if (params.value === 'Admin') color = 'error';       
-        if (params.value === 'Kế toán') color = 'primary';   
-        if (params.value === 'Người dùng') color = 'success'; 
-        
+        if (params.value === 'Admin') color = 'error';
+        if (params.value === 'Kế toán') color = 'primary';
+        if (params.value === 'Người dùng') color = 'success';
+
         return (
           <Chip label={params.value} size="small" variant="outlined" color={color} />
         );
@@ -183,13 +184,13 @@ const TaiKhoanPage = () => {
         Danh sách tài khoản
       </Typography>
 
-      <Button 
-        variant="contained" 
+      <Button
+        variant="contained"
         onClick={() => navigate('/quan-ly-tai-khoan/create')}
-        sx={{ 
-          mb: 3, 
-          backgroundColor: '#008ecc', 
-          textTransform: 'none', 
+        sx={{
+          mb: 3,
+          backgroundColor: '#008ecc',
+          textTransform: 'none',
           fontWeight: 'bold',
           width: 'fit-content'
         }}
@@ -222,44 +223,44 @@ const TaiKhoanPage = () => {
         </DialogTitle>
         <DialogContent sx={{ mt: 2 }}>
           <Stack spacing={2} sx={{ paddingTop: 1 }}>
-            
-            <TextField 
-              label="Tên đăng nhập" 
-              fullWidth 
+
+            <TextField
+              label="Tên đăng nhập"
+              fullWidth
               value={editData.tenDangNhap}
-              onChange={(e) => setEditData({...editData, tenDangNhap: e.target.value})}
+              onChange={(e) => setEditData({ ...editData, tenDangNhap: e.target.value })}
             />
 
-            <TextField 
-              label="Mật khẩu" 
-              fullWidth 
+            <TextField
+              label="Mật khẩu"
+              fullWidth
               value={editData.matKhau}
-              onChange={(e) => setEditData({...editData, matKhau: e.target.value})}
+              onChange={(e) => setEditData({ ...editData, matKhau: e.target.value })}
             />
 
-            <TextField 
-              label="Họ và tên" 
-              fullWidth 
+            <TextField
+              label="Họ và tên"
+              fullWidth
               value={editData.hoTen}
               // Logic khóa ô nhập liệu
-              disabled={editData.quyenTaiKhoan === 'Người dùng'} 
+              disabled={editData.quyenTaiKhoan === 'Người dùng'}
               helperText={
-                editData.quyenTaiKhoan === 'Người dùng' 
-                ? "Dữ liệu được đồng bộ từ Chủ hộ (Không thể sửa)." 
-                : "Nhập tên nhân viên quản lý."
+                editData.quyenTaiKhoan === 'Người dùng'
+                  ? "Dữ liệu được đồng bộ từ Chủ hộ (Không thể sửa)."
+                  : "Nhập tên nhân viên quản lý."
               }
-              onChange={(e) => setEditData({...editData, hoTen: e.target.value})}
+              onChange={(e) => setEditData({ ...editData, hoTen: e.target.value })}
             />
 
-            <TextField 
-              label="Số CCCD" 
-              fullWidth 
+            <TextField
+              label="Số CCCD"
+              fullWidth
               value={editData.SoCCCD}
               disabled={editData.quyenTaiKhoan === 'Người dùng'}
-              onChange={(e) => setEditData({...editData, SoCCCD: e.target.value})}
+              onChange={(e) => setEditData({ ...editData, SoCCCD: e.target.value })}
             />
 
-            <TextField 
+            <TextField
               label="Quyền hiện tại"
               fullWidth
               value={editData.quyenTaiKhoan}

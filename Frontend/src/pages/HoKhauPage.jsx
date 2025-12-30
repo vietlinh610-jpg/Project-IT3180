@@ -127,6 +127,9 @@ const HoKhauPage = () => {
       };
 
       await updateHoKhau(newRow.id, updatedData);
+      setRows((prevRows) => 
+        prevRows.map((row) => (row.id === newRow.id ? newRow : row))
+      );
       return newRow; // Cập nhật thành công
     } catch (error) {
       console.error("Lỗi cập nhật:", error);
