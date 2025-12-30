@@ -158,3 +158,142 @@ ORDER BY NEWID();
 
 PRINT N'=== THÀNH CÔNG: Tạm trú chỉ lấy người có trong hộ khẩu! ===';
 GO
+
+-- Sinh dữ liệu mẫu cho các khoản thu
+INSERT INTO khoan_thu
+    (TenKhoanThu , Loai, SoTien, NgayBatDau, NgayKetThuc)
+VALUES
+    (N'Phí dịch vụ tháng 10 2024', N'Bắt buộc', 100000, '2024-10-01', '2024-10-31'),
+    (N'Phí dịch vụ tháng 11 2024', N'Bắt buộc', 100000, '2024-11-01', '2024-11-30'),
+    (N'Phí dịch vụ tháng 12 2024', N'Bắt buộc', 100000, '2024-12-01', '2024-12-31'),
+    (N'Phí dịch vụ tháng 1 2025',  N'Bắt buộc', 100000, '2025-01-01', '2025-01-31'),
+    (N'Phí dịch vụ tháng 2 2025',  N'Bắt buộc', 100000, '2025-02-01', '2025-02-28'),
+    (N'Phí dịch vụ tháng 3 2025',  N'Bắt buộc', 100000, '2025-03-01', '2025-03-31'),
+    (N'Phí dịch vụ tháng 4 2025',  N'Bắt buộc', 100000, '2025-04-01', '2025-04-30'),
+    (N'Phí dịch vụ tháng 5 2025',  N'Bắt buộc', 100000, '2025-05-01', '2025-05-31'),
+    (N'Phí dịch vụ tháng 6 2025',  N'Bắt buộc', 100000, '2025-06-01', '2025-06-30'),
+    (N'Phí dịch vụ tháng 7 2025',  N'Bắt buộc', 100000, '2025-07-01', '2025-07-31'),
+    (N'Phí dịch vụ tháng 8 2025',  N'Bắt buộc', 100000, '2025-08-01', '2025-08-31'),
+    (N'Phí dịch vụ tháng 9 2025',  N'Bắt buộc', 100000, '2025-09-01', '2025-09-30'),
+    (N'Phí dịch vụ tháng 10 2025', N'Bắt buộc', 100000, '2025-10-01', '2025-10-31'),
+    (N'Phí dịch vụ tháng 11 2025', N'Bắt buộc', 100000, '2025-11-01', '2025-11-30'),
+    (N'Phí dịch vụ tháng 12 2025', N'Bắt buộc', 100000, '2025-12-01', '2025-12-31'),
+
+
+    (N'Phí quản lý tháng 10 2024', N'Bắt buộc', 250000, '2024-10-01', '2024-10-31'),
+    (N'Phí quản lý tháng 11 2024', N'Bắt buộc', 250000, '2024-11-01', '2024-11-30'),
+    (N'Phí quản lý tháng 12 2024', N'Bắt buộc', 250000, '2024-12-01', '2024-12-31'),
+    (N'Phí quản lý tháng 1 2025',  N'Bắt buộc', 250000, '2025-01-01', '2025-01-31'),
+    (N'Phí quản lý tháng 2 2025',  N'Bắt buộc', 250000, '2025-02-01', '2025-02-28'),
+    (N'Phí quản lý tháng 3 2025',  N'Bắt buộc', 250000, '2025-03-01', '2025-03-31'),
+    (N'Phí quản lý tháng 4 2025',  N'Bắt buộc', 250000, '2025-04-01', '2025-04-30'),
+    (N'Phí quản lý tháng 5 2025',  N'Bắt buộc', 250000, '2025-05-01', '2025-05-31'),
+    (N'Phí quản lý tháng 6 2025',  N'Bắt buộc', 250000, '2025-06-01', '2025-06-30'),
+    (N'Phí quản lý tháng 7 2025',  N'Bắt buộc', 250000, '2025-07-01', '2025-07-31'),
+    (N'Phí quản lý tháng 8 2025',  N'Bắt buộc', 250000, '2025-08-01', '2025-08-31'),
+    (N'Phí quản lý tháng 9 2025',  N'Bắt buộc', 250000, '2025-09-01', '2025-09-30'),
+    (N'Phí quản lý tháng 10 2025', N'Bắt buộc', 250000, '2025-10-01', '2025-10-31'),
+    (N'Phí quản lý tháng 11 2025', N'Bắt buộc', 250000, '2025-11-01', '2025-11-30'),
+    (N'Phí quản lý tháng 12 2025', N'Bắt buộc', 250000, '2025-12-01', '2025-12-31'),
+
+    (N'Ủng hộ đồng bào bão lũ T10/2024', N'Phí đóng góp', 50000,  '2024-10-01', '2024-10-31'),
+    (N'Quyên góp quỹ PCCC T11/2024',     N'Phí đóng góp', 150000, '2024-11-01', '2024-11-30'),
+    (N'Trang trí Noel & Năm mới 2024',   N'Phí đóng góp', 200000, '2024-12-01', '2024-12-31'),
+    (N'Quỹ mừng thọ người cao tuổi 2025',N'Phí đóng góp', 100000, '2025-01-01', '2025-01-31'),
+    (N'Trang trí Tết Nguyên Đán 2025',   N'Phí đóng góp', 300000, '2025-02-01', '2025-02-28'),
+    (N'Ủng hộ ngày Qte Phụ nữ 8/3',      N'Phí đóng góp', 50000,  '2025-03-01', '2025-03-31'),
+    (N'Tổ chức tiệc 30/4 & 1/5',         N'Phí đóng góp', 250000, '2025-04-01', '2025-04-30'),
+    (N'Quỹ trồng cây xanh mùa hè',       N'Phí đóng góp', 120000, '2025-05-01', '2025-05-31'),
+    (N'Quà 1/6 cho thiếu nhi',           N'Phí đóng góp', 150000, '2025-06-01', '2025-06-30'),
+    (N'Tri ân thương binh liệt sĩ 27/7', N'Phí đóng góp', 100000, '2025-07-01', '2025-07-31'),
+    (N'Quỹ Khuyến học 2025',             N'Phí đóng góp', 200000, '2025-08-01', '2025-08-31'),
+    (N'Tổ chức Trung thu cho bé 2025',   N'Phí đóng góp', 180000, '2025-09-01', '2025-09-30'),
+    (N'Bảo trì ghế đá công viên',        N'Phí đóng góp', 80000,  '2025-10-01', '2025-10-31'),
+    (N'Tổ chức ngày Đại đoàn kết',       N'Phí đóng góp', 150000, '2025-11-01', '2025-11-30'),
+    (N'Tiệc tất niên xóm 2025',          N'Phí đóng góp', 500000, '2025-12-01', '2025-12-31'),
+
+    (N'Phí gửi xe tháng 10 2024', N'Phí gửi xe', 0, '2024-10-01', '2024-10-31'),
+    (N'Phí gửi xe tháng 11 2024', N'Phí gửi xe', 0, '2024-11-01', '2024-11-30'),
+    (N'Phí gửi xe tháng 12 2024', N'Phí gửi xe', 0, '2024-12-01', '2024-12-31'),
+    (N'Phí gửi xe tháng 1 2025',  N'Phí gửi xe', 0, '2025-01-01', '2025-01-31'),
+    (N'Phí gửi xe tháng 2 2025',  N'Phí gửi xe', 0, '2025-02-01', '2025-02-28'),
+    (N'Phí gửi xe tháng 3 2025',  N'Phí gửi xe', 0, '2025-03-01', '2025-03-31'),
+    (N'Phí gửi xe tháng 4 2025',  N'Phí gửi xe', 0, '2025-04-01', '2025-04-30'),
+    (N'Phí gửi xe tháng 5 2025',  N'Phí gửi xe', 0, '2025-05-01', '2025-05-31'),
+    (N'Phí gửi xe tháng 6 2025',  N'Phí gửi xe', 0, '2025-06-01', '2025-06-30'),
+    (N'Phí gửi xe tháng 7 2025',  N'Phí gửi xe', 0, '2025-07-01', '2025-07-31'),
+    (N'Phí gửi xe tháng 8 2025',  N'Phí gửi xe', 0, '2025-08-01', '2025-08-31'),
+    (N'Phí gửi xe tháng 9 2025',  N'Phí gửi xe', 0, '2025-09-01', '2025-09-30'),
+    (N'Phí gửi xe tháng 10 2025', N'Phí gửi xe', 0, '2025-10-01', '2025-10-31'),
+    (N'Phí gửi xe tháng 11 2025', N'Phí gửi xe', 0, '2025-11-01', '2025-11-30'),
+    (N'Phí gửi xe tháng 12 2025', N'Phí gửi xe', 0, '2025-12-01', '2025-12-31');
+
+-- Sinh dữ liệu mẫu cho các phương tiện!
+DECLARE @i INT = 1;
+-- Tạo 50 xe
+WHILE @i <= 50
+BEGIN
+    -- A. Lấy ngẫu nhiên 1 Mã hộ khẩu bất kỳ trong bảng ho_khau
+    DECLARE @RandomMaHoKhau VARCHAR(20);
+    SELECT TOP 1 @RandomMaHoKhau = MaHoKhau FROM ho_khau ORDER BY NEWID();
+
+    -- B. Random Loại xe (30% ra Ô tô, 70% ra Xe máy)
+    DECLARE @LoaiXe NVARCHAR(20);
+    IF (ABS(CHECKSUM(NEWID())) % 100) < 30 
+        SET @LoaiXe = N'Ô tô';
+    ELSE 
+        SET @LoaiXe = N'Xe máy';
+
+    -- C. Sinh Biển số xe (Format: 29X-NNN.NN)
+    -- Đầu biển: 29, 30, 31
+    DECLARE @DauBien INT = 29 + (ABS(CHECKSUM(NEWID())) % 3);
+    -- Chữ cái: A-Z
+    DECLARE @ChuCai CHAR(1) = CHAR(65 + (ABS(CHECKSUM(NEWID())) % 26));
+    -- Số: 5 chữ số ngẫu nhiên
+    DECLARE @So5ChuSo INT = 10000 + (ABS(CHECKSUM(NEWID())) % 89999); -- Đảm bảo luôn 5 chữ số
+    
+    -- Ghép chuỗi: Ví dụ 30A-567.89
+    DECLARE @BKS NVARCHAR(20) = CAST(@DauBien AS VARCHAR) + @ChuCai + '-' + 
+                                LEFT(CAST(@So5ChuSo AS VARCHAR), 3) + '.' + 
+                                RIGHT(CAST(@So5ChuSo AS VARCHAR), 2);
+
+    -- D. Insert vào bảng
+    INSERT INTO dang_ky_gui_xe (MaHoKhau, LoaiXe, BienKiemSoat)
+    VALUES (@RandomMaHoKhau, @LoaiXe, @BKS);
+
+    SET @i = @i + 1;
+END
+
+-- Sinh dữ liệu mẫu cho thu phí
+
+-- Định nghĩa đơn giá gửi xe
+DECLARE @GiaXeMay INT = 70000;
+DECLARE @GiaOTo INT = 1200000;
+
+INSERT INTO thu_phi (MaHoKhau, MaKhoanThu, SoTienPhaiThu, DaXacNhan, TuChoi, NgayDong)
+SELECT TOP 150
+    HK.MaHoKhau,
+    KT.MaKhoanThu,
+    CASE 
+        WHEN KT.Loai = N'Phí gửi xe' THEN 
+            (ISNULL(Xe.SoXeMay, 0) * @GiaXeMay) + (ISNULL(Xe.SoOTo, 0) * @GiaOTo)
+        ELSE KT.SoTien 
+    END AS SoTienPhaiThu,
+    1 AS DaXacNhan, 
+    0 AS TuChoi,
+    -- LOGIC NGÀY ĐÓNG: Random từ ngày bắt đầu + (0 đến 28 ngày)
+    DATEADD(DAY, ABS(CHECKSUM(NEWID()) % 28), KT.NgayBatDau) AS NgayDong
+FROM 
+    ho_khau HK
+    CROSS JOIN khoan_thu KT -- Tổ hợp tất cả Hộ với tất cả Khoản thu
+    -- Join để lấy số lượng xe của từng hộ
+    LEFT JOIN (
+        SELECT MaHoKhau, 
+               SUM(CASE WHEN LoaiXe = N'Xe máy' THEN 1 ELSE 0 END) AS SoXeMay,
+               SUM(CASE WHEN LoaiXe = N'Ô tô' THEN 1 ELSE 0 END) AS SoOTo
+        FROM dang_ky_gui_xe
+        GROUP BY MaHoKhau
+    ) Xe ON HK.MaHoKhau = Xe.MaHoKhau
+WHERE 
+    (KT.Loai <> N'Phí gửi xe' OR (ISNULL(Xe.SoXeMay, 0) + ISNULL(Xe.SoOTo, 0)) > 0)
+ORDER BY NEWID(); -- Lấy ngẫu nhiên 100 dòng bất kỳ
