@@ -1,4 +1,4 @@
-// Hoàn thiện tạo khoản thu mới
+// CreateKhoanThuPage.jsx
 
 import React, { useState, useEffect } from "react";
 import {
@@ -24,7 +24,8 @@ import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 
-const KHONG_NHAP_TIEN = ["Phí dịch vụ", "Phí gửi xe"];
+// Các loại khoản thu KHÔNG nhập số tiền
+const KHONG_NHAP_TIEN = ["Phí gửi xe"];
 
 const CreateKhoanThuPage = () => {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ const CreateKhoanThuPage = () => {
 
   const isDisabledSoTien = KHONG_NHAP_TIEN.includes(formData.loaiKhoanThu);
 
-  // Khi chọn loại không cần nhập tiền → set soTien = 0
+  // Khi chọn Phí gửi xe → tự động set số tiền = 0
   useEffect(() => {
     if (isDisabledSoTien) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -49,11 +50,14 @@ const CreateKhoanThuPage = () => {
         soTien: 0,
       }));
     }
-  }, [formData.loaiKhoanThu, isDisabledSoTien]);
+  }, [isDisabledSoTien]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSave = async (e) => {
@@ -146,9 +150,13 @@ const CreateKhoanThuPage = () => {
                 disabled={isDisabledSoTien}
                 required={!isDisabledSoTien}
               />
+              {isDisabledSoTien && (
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  Phí gửi xe sẽ được tính tự động theo số phương tiện của từng hộ.
+                </Typography>
+              )}
             </Grid>
 
-            {/* Ngày bắt đầu */}
             <Grid item>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
@@ -161,16 +169,12 @@ const CreateKhoanThuPage = () => {
                     }))
                   }
                   slotProps={{
-                    textField: {
-                      fullWidth: true,
-                      variant: "filled",
-                    },
+                    textField: { fullWidth: true, variant: "filled" },
                   }}
                 />
               </LocalizationProvider>
             </Grid>
 
-            {/* Ngày kết thúc */}
             <Grid item>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
@@ -184,10 +188,7 @@ const CreateKhoanThuPage = () => {
                     }))
                   }
                   slotProps={{
-                    textField: {
-                      fullWidth: true,
-                      variant: "filled",
-                    },
+                    textField: { fullWidth: true, variant: "filled" },
                   }}
                 />
               </LocalizationProvider>

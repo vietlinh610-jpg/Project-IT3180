@@ -8,16 +8,35 @@ const kiemTraThuPhi = async (req, res) =>  {
     const pool = await connectDB();
 
     // Mã thu phí cần thiết cho xác nhận khoản thu
+    // * Chưa tính phí gửi xe
     query = `
     select tp.maThuPhi as maThuPhi, kt.TenKhoanThu as TenKhoanThu, kt.SoTien as soTien,
       ch.MaCanHo as MaCanHo, nk.HoTen as ChuHo, tp.NgayDong as NgayGioNop
     from thu_phi tp
-      join khoan_thu kt on tp.MaKhoanThu = kt.makhoanthu
+      join khoan_thu kt on tp.MaKhoanThu = kt.makhoanthu and kt.SoTien > 0
       join ho_khau hk on tp.MaHoKhau = hk.MaHoKhau
       join nhan_khau nk on hk.MaHoKhau = nk.MaHoKhau and nk.QuanHeVoiChuHo = N'Chủ hộ'
       join can_ho ch on ch.MaHoKhau = hk.MaHoKhau
     where tp.DaXacNhan = 0 and tp.tuChoi = 0
-    order by tp.maThuPhi desc;
+
+    UNION ALL -- Tính thêm phí gửi xe
+
+    select 
+      tp.maThuPhi as maThuPhi,
+      kt.TenKhoanThu as TenKhoanThu,
+      vx.PhiGuiXe as soTien,
+      vx.MaCanHo as MaCanHo,
+      vx.ChuHo as ChuHo,
+      tp.NgayDong as NgayGioNop
+    from thu_phi tp
+      join vw_phi_gui_xe_theo_ho vx 
+        on tp.MaHoKhau = vx.MaHoKhau
+      join khoan_thu kt on kt.MaKhoanThu = tp.MaKhoanThu
+    where tp.DaXacNhan = 0
+      and tp.tuChoi = 0
+      and vx.PhiGuiXe > 0
+
+    order by tp.maThuPhi desc
     `
     const result = await pool.request().query(query);
     // Truy vấn những khoản thu đang chờ xác nhận và trả về kết quả

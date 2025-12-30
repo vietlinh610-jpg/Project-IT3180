@@ -3,14 +3,14 @@ require('dotenv').config();
 
 const config =
 {
-    user: process.env.DB_USER,      // Lấy user từ .env (thường là 'sa')
-    password: process.env.DB_PASS,  // Lấy pass từ .env (ví dụ '123456')
-    server: process.env.DB_SERVER,  // Lấy tên server từ .env
-    database: process.env.DB_NAME,  // Lấy tên DB (BlueMoonDB)
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    server: process.env.DB_SERVER,
+    database: process.env.DB_NAME,
     options: 
     {
-        encrypt: false,             // Để false khi chạy localhost (quan trọng)
-        trustServerCertificate: true // Bỏ qua lỗi chứng chỉ bảo mật
+        encrypt: false, 
+        trustServerCertificate: true
     }
 };
 

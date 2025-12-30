@@ -1,4 +1,4 @@
-const { connectDB, sql } = require("../../../../BE QLCC/Project-IT3180/config/db");
+const { connectDB, sql } = require("../config/db");
 
 // 1. Tạo khoản thu mới
 const taoKhoanThu = async (req, res) => {
@@ -7,8 +7,7 @@ const taoKhoanThu = async (req, res) => {
     const { TenKhoanThu, GhiChu, Loai, SoTien, NgayBatDau, NgayKetThuc } =
       req.body;
 
-    // Kiểm tra kiểu đơn giản
-    if (!TenKhoanThu || !Loai || !SoTien || !NgayBatDau || !NgayKetThuc) {
+    if (!TenKhoanThu || !Loai || SoTien == null || SoTien == undefined || !NgayBatDau || !NgayKetThuc) {
       return res.status(400).json({
         message: "Thiếu thông tin bắt buộc",
       });

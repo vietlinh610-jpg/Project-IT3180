@@ -61,8 +61,7 @@ const xoaGuiXe = async (req, res) => {
 };
 
 // Route: //.../api/guixe/dsgx
-// 3. Lấy tất cả danh sách gửi xe để hiện lên bảng QLGX
-// dựa theo 2 cái trên, làm cho tôi
+// 3. Lấy tất cả danh sách gửi xe
 const layDSGX = async (req, res) => {
   try {
     const pool = await connectDB();

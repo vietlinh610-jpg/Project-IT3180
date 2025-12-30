@@ -17,3 +17,9 @@ export const getTrangThaiThuPhi = (maKhoanThu) => {
 export const kiemTraKhoanThu = () => {
   return axios.get(`${API_URL}/kiem-tra`);
 };
+
+
+// Lấy doanh thu theo tháng/ năm để phục vụ thống kê
+export const layDoanhThu = (thang, nam) => {
+  return axios.get(`${API_URL}/thong-ke/${thang}/${nam}`);
+}

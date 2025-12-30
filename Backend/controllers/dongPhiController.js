@@ -31,7 +31,37 @@ const layDSKT = async (req, res) => {
       AND (
           tp.MaThuPhi IS NULL
           OR tp.DaXacNhan = 0
-      );
+      ) AND kt.SoTien > 0 -- Day khong tinh khoan phi gui xe!
+
+      UNION ALL -- Tính thêm phần phí gửi xe vào
+
+      SELECT
+          kt.MaKhoanThu,
+          kt.TenKhoanThu,
+          kt.Loai,
+          ViewGx.PhiGuiXe AS SoTien,
+          kt.NgayKetThuc AS HanNop,
+          CASE
+              WHEN tp.MaThuPhi IS NULL THEN N'Chưa nộp'
+              WHEN tp.TuChoi = 1 THEN N'Từ chối'
+              ELSE N'Chờ xác nhận'
+          END AS TrangThai
+      FROM nhan_khau nk
+      JOIN ho_khau hk 
+          ON nk.MaHoKhau = hk.MaHoKhau
+      JOIN khoan_thu kt 
+          ON kt.SoTien = 0  -- Phí gửi xe
+      JOIN vw_phi_gui_xe_theo_ho ViewGx
+          ON ViewGx.MaHoKhau = hk.MaHoKhau
+      LEFT JOIN thu_phi tp
+          ON tp.MaHoKhau = hk.MaHoKhau
+        AND tp.MaKhoanThu = kt.MaKhoanThu
+      WHERE nk.MaNhanKhau = @id
+        AND ViewGx.PhiGuiXe > 0
+        AND (
+              tp.MaThuPhi IS NULL
+              OR tp.DaXacNhan = 0
+            );
     `;
 
     const result = await pool

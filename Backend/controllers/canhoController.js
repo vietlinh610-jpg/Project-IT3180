@@ -107,7 +107,7 @@ const deleteCanHo = async (req, res) => {
 
         // BƯỚC 3: Xóa
         await pool.request()
-            .input('MaCanHo', sql.VarChar, id) // --- SỬA: sql.VarChar ---
+            .input('MaCanHo', sql.VarChar, id) // SỬA: sql.VarChar
             .query('DELETE FROM can_ho WHERE MaCanHo = @MaCanHo');
 
         res.status(200).json({ message: "Đã xóa căn hộ thành công!" });
