@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useNavigate, useParams } from 'react-router-dom'; // Thêm useParams
+import { useNavigate, useParams } from 'react-router-dom'; 
 import { createNhanKhau, getCanHoCount, getNhanKhauByCanHo } from '../services/nhankhauApi'; // Import API
 
 const CreateNhanKhauPage = () => {
@@ -68,7 +68,7 @@ const CreateNhanKhauPage = () => {
         MaNhanKhau: formData.maNhanKhau,
         MaHoKhau: maHoKhau, // Lấy từ URL
         HoTen: formData.hoTen,
-        GioiTinh: formData.gioiTinh, // Lưu ý: Bạn cần thêm Select cho Giới tính ở giao diện
+        GioiTinh: formData.gioiTinh,
         NgaySinh: formData.ngaySinh || null,
         DanToc: formData.danToc,
         TonGiao: formData.tonGiao,
@@ -228,7 +228,7 @@ const CreateNhanKhauPage = () => {
               />
             </Grid>
             
-            {/* Dòng 5: Tôn giáo & Quốc tịch (Thêm cho đủ DB) */}
+            {/* Dòng 5: Tôn giáo & Quốc tịch */}
             <Grid size={6}>
               <TextField
                 fullWidth

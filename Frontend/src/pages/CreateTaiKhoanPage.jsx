@@ -36,7 +36,7 @@ const CreateTaiKhoanPage = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     
-    // Nếu đổi Vai trò -> Reset dữ liệu form cho sạch
+    // Nếu đổi Vai trò -> Reset dữ liệu form
     if (name === 'quyen') {
         setFormData({
             ...formData,
@@ -50,8 +50,6 @@ const CreateTaiKhoanPage = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
-
-  // --- HÀM TỰ ĐỘNG KIỂM TRA MÃ HỘ KHẨU ---
   const handleCheckMaHoKhau = async () => {
     // Chỉ kiểm tra khi đang là User và đã nhập mã HK
     if (isUser && formData.maHoKhau) {
@@ -78,7 +76,7 @@ const CreateTaiKhoanPage = () => {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (hkError) return; // Đang lỗi thì chặn luôn
+    if (hkError) return;
 
     try {
         const payload = {
@@ -114,7 +112,6 @@ const CreateTaiKhoanPage = () => {
 
       <Paper elevation={0} sx={{ p: 4, borderRadius: '12px', border: '1px solid #e0e0e0', maxWidth: '800px', mx: 'auto' }}>
         <form onSubmit={handleSave}>
-          {/* SỬ DỤNG GRID CONTAINER CHIỀU DỌC (column) ĐỂ XẾP TỪ TRÊN XUỐNG */}
           <Grid container spacing={3} direction="column">
 
             {/* 1. VAI TRÒ */}
@@ -172,7 +169,6 @@ const CreateTaiKhoanPage = () => {
                 // Logic hiển thị:
                 disabled={isUser} // Nếu là User thì KHÓA (để bắt buộc dùng mã HK lấy ra)
                 
-                // Quan trọng: shrink: true để nhãn không bị đè khi tự điền
                 InputLabelProps={{ shrink: true }} 
                 placeholder={isUser ? "Tự động điền theo mã HK..." : "Nhập họ tên nhân viên"}
               />

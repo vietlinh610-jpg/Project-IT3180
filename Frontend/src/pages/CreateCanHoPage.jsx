@@ -1,4 +1,3 @@
-// src/pages/CreateCanHoPage.jsx
 import React, { useState } from 'react';
 import { 
   Box, Typography, TextField, Button, Grid, Paper,
@@ -37,9 +36,7 @@ const CreateCanHoPage = () => {
     try {
       setLoading(true);
 
-      // --- SỬA QUAN TRỌNG TẠI ĐÂY ---
       const payload = {
-        // Giữ nguyên là chuỗi (String), KHÔNG dùng parseInt nữa
         MaCanHo: formData.maCanHo.trim(), 
         
         TenCanHo: formData.tenCanHo,
@@ -87,13 +84,11 @@ const CreateCanHoPage = () => {
         <form onSubmit={handleSave}>
           <Grid container spacing={3} direction="column">
             
-            {/* --- SỬA QUAN TRỌNG: Ô NHẬP MÃ CĂN HỘ --- */}
             <Grid size={12}>
               <TextField
                 fullWidth
                 label="Mã căn hộ (ID) *"
                 name="maCanHo"
-                // BỎ type="number" để nhập được chữ (VD: P101)
                 type="text" 
                 variant="filled"
                 value={formData.maCanHo}

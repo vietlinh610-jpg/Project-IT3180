@@ -22,13 +22,12 @@ const CanHoPage = () => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // --- THÊM STATE TÌM KIẾM ---
+  // state quản lý tìm kiếm
   const [searchText, setSearchText] = useState('');
   
   // State quản lý chế độ sửa
   const [rowModesModel, setRowModesModel] = useState({});
 
-  // --- LOGIC LỌC DỮ LIỆU TÌM KIẾM ---
   // Lọc dựa trên mã căn hộ, tên căn hộ hoặc mã hộ khẩu
   const filteredRows = rows.filter((row) => {
     const searchLower = searchText.toLowerCase();
@@ -40,7 +39,7 @@ const CanHoPage = () => {
     );
   });
 
-  // --- CÁC HÀM XỬ LÝ SỰ KIỆN CLICK ---
+  // xử lý các sự kiện click
   const handleEditClick = (id) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   };
@@ -89,7 +88,6 @@ const CanHoPage = () => {
     setRowModesModel(newRowModesModel);
   };
 
-  // --- CẤU HÌNH CỘT ---
   const columns = [
     { field: 'maCanHo', headerName: 'Mã căn hộ', flex: 1, minWidth: 100, editable: false }, 
     { field: 'tenCanHo', headerName: 'Tên căn hộ', flex: 1, minWidth: 120, editable: false },
@@ -175,7 +173,7 @@ const CanHoPage = () => {
         Danh sách căn hộ
       </Typography>
 
-      {/* --- CẬP NHẬT GIAO DIỆN HÀNG NÚT VÀ TÌM KIẾM --- */}
+      {/* CẬP NHẬT GIAO DIỆN HÀNG NÚT VÀ TÌM KIẾM */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Button 
           variant="contained" 
@@ -208,7 +206,7 @@ const CanHoPage = () => {
 
       <Box sx={{ flexGrow: 1, width: '100%', backgroundColor: '#fff' }}>
         <DataGrid
-          rows={filteredRows} // Dùng dữ liệu đã lọc
+          rows={filteredRows}
           columns={columns}
           loading={loading}
           slots={{ toolbar: GridToolbar }}

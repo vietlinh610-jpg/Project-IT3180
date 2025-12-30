@@ -5,7 +5,6 @@ const { connectDB, sql } = require('../config/db');
 const getTaiKhoan = async (req, res) => {
     try {
         const pool = await connectDB();
-        // Câu query lấy danh sách (User lấy ngày sinh chủ hộ, Admin thì null)
         const result = await pool.request().query(`
             SELECT 
                 t.ID as id,

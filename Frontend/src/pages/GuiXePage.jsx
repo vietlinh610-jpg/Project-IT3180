@@ -10,9 +10,6 @@ const GuiXePage = () => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // =========================
-  // FETCH DANH SÁCH GỬI XE
-  // =========================
   useEffect(() => {
     fetchDSGX();
   }, []);
@@ -23,7 +20,7 @@ const GuiXePage = () => {
       const res = await layDSGX();
 
       const mappedRows = res.data.data.map((item, index) => ({
-        id: index + 1, // DataGrid bắt buộc có id
+        id: index + 1,
         hoKhau: item.MaHoKhau,
         chuHo: item.hoTenChuHo,
         loaiXe: item.LoaiXe,
@@ -38,9 +35,6 @@ const GuiXePage = () => {
     }
   };
 
-  // =========================
-  // NGỪNG GỬI XE (XÓA THEO BIỂN SỐ)
-  // =========================
   const handleNgungGui = async (row) => {
     const isConfirm = window.confirm(
       `Bạn có chắc muốn ngừng gửi xe biển số ${row.bienSo} không?`
@@ -60,9 +54,6 @@ const GuiXePage = () => {
     }
   };
 
-  // =========================
-  // CỘT DATA GRID
-  // =========================
   const columns = [
     {
       field: "hoKhau",
@@ -141,9 +132,6 @@ const GuiXePage = () => {
 
 export default GuiXePage;
 
-// =========================
-// STYLE
-// =========================
 const styles = {
   page: { p: 3, height: "100vh" },
   title: { fontWeight: "bold", mb: 2 },

@@ -107,7 +107,7 @@ const deleteCanHo = async (req, res) => {
 
         // BƯỚC 3: Xóa
         await pool.request()
-            .input('MaCanHo', sql.VarChar, id) // SỬA: sql.VarChar
+            .input('MaCanHo', sql.VarChar, id)
             .query('DELETE FROM can_ho WHERE MaCanHo = @MaCanHo');
 
         res.status(200).json({ message: "Đã xóa căn hộ thành công!" });
@@ -115,7 +115,6 @@ const deleteCanHo = async (req, res) => {
     } catch (err) {
         console.error("Lỗi xóa căn hộ:", err.message);
         
-        // Lỗi khóa ngoại (Ví dụ: Căn hộ này đang dính ở bảng Tạm Trú)
         if (err.message.includes('REFERENCE constraint')) {
              return res.status(400).json({ 
                 message: "Không thể xóa! Căn hộ này đang có dữ liệu liên quan (Hóa đơn).", 

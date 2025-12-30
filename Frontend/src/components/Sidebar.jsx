@@ -16,7 +16,7 @@ const Sidebar = () => {
     return localStorage.getItem('userRole') || '';
   });
 
-  // 2. [THÊM MỚI] Lấy TÊN NGƯỜI DÙNG từ localStorage
+  // 2. Lấy TÊN NGƯỜI DÙNG từ localStorage
   const [fullName, setFullName] = useState(() => {
     // Nếu không tìm thấy tên thì hiển thị mặc định là "Cư dân" hoặc "Admin"
     return localStorage.getItem('fullName') || 'Người dùng';
@@ -28,10 +28,8 @@ const Sidebar = () => {
       if (newName) setFullName(newName);
     };
 
-    // Đăng ký lắng nghe sự kiện có tên "userInfoUpdated"
     window.addEventListener('userInfoUpdated', handleUserInfoChange);
 
-    // Dọn dẹp khi component bị hủy
     return () => {
       window.removeEventListener('userInfoUpdated', handleUserInfoChange);
     };
@@ -76,14 +74,13 @@ const Sidebar = () => {
         </div>
         <hr className="sidebar-divider" />
         
-        {/* HIỂN THỊ THÔNG TIN ĐỘNG */}
         <div className="user-info">
           <span className="user-name">
-            {/* Hiển thị tên lấy từ localStorage */}
+
             {fullName}
           </span>
           <p className="user-role">
-            {/* Hiển thị chức vụ dựa trên role */}
+
             {getRoleDisplayName(role)}
           </p>
         </div>

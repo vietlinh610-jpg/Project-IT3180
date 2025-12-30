@@ -43,7 +43,6 @@ const CreateTamTruPage = () => {
     });
   };
 
-  // --- HÀM TÌM NHÂN KHẨU (LOGIC MỚI) ---
   const handleFindNhanKhau = async () => {
     const maCanTim = formData.maNhanKhau.trim();
     if (!maCanTim) return;
@@ -52,7 +51,6 @@ const CreateTamTruPage = () => {
       const res = await findNhanKhau(maCanTim);
       const { HoTen, SoCCCD, DanhSachCanHo } = res.data;
 
-      // --- LOGIC KIỂM TRA CĂN HỘ ---
       if (!DanhSachCanHo || DanhSachCanHo.length === 0) {
           alert("THẤT BẠI: Nhân khẩu này chưa thuê/sở hữu căn hộ nào trong hệ thống!");
           // Xóa thông tin để chặn người dùng đi tiếp
@@ -80,6 +78,7 @@ const CreateTamTruPage = () => {
         canHo: DanhSachCanHo.length === 1 ? DanhSachCanHo[0] : ''
       }));
 
+    // eslint-disable-next-line no-unused-vars
     } catch (err) {
       alert("Không tìm thấy nhân khẩu này trong hệ thống!");
       setFormData(prev => ({ ...prev, hoTen: '', SoCCCD: '', canHo: '' }));

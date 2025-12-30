@@ -18,7 +18,7 @@ const CreateHoKhauPage = () => {
     maHoKhau: '',
     diaChiThuongTru: '',
     noiCap: '',
-    ngayCap: '', // Để rỗng để người dùng tự chọn
+    ngayCap: '', 
   });
 
   const handleChange = (e) => {
@@ -38,7 +38,7 @@ const CreateHoKhauPage = () => {
     try {
       setLoading(true); // Bật loading
 
-      // 2. Chuẩn bị dữ liệu gửi lên Backend (Mapping sang PascalCase)
+      // 2. Chuẩn bị dữ liệu gửi lên Backend
       const payload = {
         MaHoKhau: formData.maHoKhau.trim(),
         DiaChiThuongTru: formData.diaChiThuongTru,
@@ -58,7 +58,7 @@ const CreateHoKhauPage = () => {
       const message = error.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại!";
       alert(message);
     } finally {
-      setLoading(false); // Tắt loading dù thành công hay thất bại
+      setLoading(false);
     }
   };
 
