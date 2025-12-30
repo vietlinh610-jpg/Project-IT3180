@@ -97,7 +97,6 @@ const ThongKeNhanKhauPage = () => {
 
   return (
     <Box sx={{ p: 4, backgroundColor: '#f8f9fa', minHeight: '100vh', width: '100%', boxSizing: 'border-box' }}>
-      {/* ... (Giữ nguyên phần Header cũ của bạn) ... */}
       <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 5 }}>
         <IconButton onClick={() => navigate('/quan-ly-nhan-dan/nhan-khau')}>
           <ArrowBackIcon />
@@ -118,15 +117,15 @@ const ThongKeNhanKhauPage = () => {
             </Typography>
             <Box sx={{
               width: '100%',
-              height: 450,          // Chiều cao cố định
-              minHeight: 400,       // Đảm bảo không bao giờ bị co nhỏ hơn 400px
+              height: 450,         
+              minHeight: 400,       
               minWidth: 300,
               position: 'relative'
             }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={genderData} // <--- DÙNG DATA THẬT
+                    data={genderData} 
                     cx="50%" cy="50%"
                     innerRadius="55%" outerRadius="85%"
                     paddingAngle={2}
@@ -152,15 +151,15 @@ const ThongKeNhanKhauPage = () => {
             </Typography>
             <Box sx={{
               width: '100%',
-              height: 450,          // Chiều cao cố định
-              minHeight: 400,       // Đảm bảo không bao giờ bị co nhỏ hơn 400px
+              height: 450,      
+              minHeight: 400,     
               minWidth: 300,
               position: 'relative'
             }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={ageData} // <--- DÙNG DATA THẬT
+                    data={ageData} 
                     cx="50%" cy="50%"
                     outerRadius="100%"
                     dataKey="value"

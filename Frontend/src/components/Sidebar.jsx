@@ -17,7 +17,6 @@ const Sidebar = () => {
   });
 
   // 2. [THÊM MỚI] Lấy TÊN NGƯỜI DÙNG từ localStorage
-  // Lưu ý: Trong trang Đăng Nhập (Login), bạn phải có lệnh: localStorage.setItem('fullName', 'Tên User');
   const [fullName, setFullName] = useState(() => {
     // Nếu không tìm thấy tên thì hiển thị mặc định là "Cư dân" hoặc "Admin"
     return localStorage.getItem('fullName') || 'Người dùng';
@@ -59,7 +58,6 @@ const Sidebar = () => {
     window.location.reload();
   };
 
-  // 3. [THÊM MỚI] Hàm hiển thị tên chức vụ cho đẹp (thay vì viết ternary operator dài dòng)
   const getRoleDisplayName = (currentRole) => {
     switch(currentRole) {
         case 'admin': return 'Ban quản trị';
@@ -78,7 +76,7 @@ const Sidebar = () => {
         </div>
         <hr className="sidebar-divider" />
         
-        {/* PHẦN SỬA ĐỔI: HIỂN THỊ THÔNG TIN ĐỘNG */}
+        {/* HIỂN THỊ THÔNG TIN ĐỘNG */}
         <div className="user-info">
           <span className="user-name">
             {/* Hiển thị tên lấy từ localStorage */}
@@ -89,7 +87,6 @@ const Sidebar = () => {
             {getRoleDisplayName(role)}
           </p>
         </div>
-        {/* KẾT THÚC PHẦN SỬA ĐỔI */}
 
         <hr className="sidebar-divider" />
       </div>
@@ -101,8 +98,7 @@ const Sidebar = () => {
               <i className="fas fa-home"></i> Trang chủ
             </Link>
           </li>
-
-          {/* --- CÁC MENU KHÁC GIỮ NGUYÊN --- */}
+          
           {role === 'admin' && (
             <>
               <li className={`has-submenu ${openMenus.hoKhau ? 'open' : ''}`}>
