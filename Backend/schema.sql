@@ -1,16 +1,3 @@
-GO
-
-
-IF OBJECT_ID('dbo.tam_tru', 'U') IS NOT NULL DROP TABLE dbo.tam_tru;
-IF OBJECT_ID('dbo.tam_vang', 'U') IS NOT NULL DROP TABLE dbo.tam_vang;
-IF OBJECT_ID('dbo.nhan_khau', 'U') IS NOT NULL DROP TABLE dbo.nhan_khau;
-IF OBJECT_ID('dbo.can_ho', 'U') IS NOT NULL DROP TABLE dbo.can_ho;
-IF OBJECT_ID('dbo.ho_khau', 'U') IS NOT NULL DROP TABLE dbo.ho_khau;
-IF OBJECT_ID('dbo.thu_phi', 'U') IS NOT NULL DROP TABLE dbo.thu_phi;
-IF OBJECT_ID('dbo.khoan_thu', 'U') IS NOT NULL DROP TABLE dbo.khoan_thu;
-IF OBJECT_ID('dbo.tai_khoan', 'U') IS NOT NULL DROP TABLE dbo.tai_khoan;
-GO
-
 CREATE TABLE ho_khau (
     MaHoKhau VARCHAR(20) PRIMARY KEY,
     DiaChiThuongTru NVARCHAR(200),
@@ -157,40 +144,74 @@ BEGIN
         END
     END
 END;
-
 GO
-CREATE TABLE loai_phi (
-    MaLoaiPhi VARCHAR(20) PRIMARY KEY,      -- Do kế toán đặt liên quan tới loại phí gì
-    TenLoaiPhi NVARCHAR(100) NOT NULL,
-    BatBuoc BIT DEFAULT 1,
-    DonGia DECIMAL(18,2),
-    DonVi NVARCHAR(50),                      -- 1 xe, ...?
-    GhiChu NVARCHAR(255)
+
+create table khoan_thu (
+	makhoanthu int identity(1,1) primary key,
+	TenKhoanThu NVARCHAR(200) NOT NULL,
+	GhiChu NVARCHAR(255),
+	Loai NVARCHAR(20) NOT NULL, -- bat buoc hoac tu nguyen
+	SoTien DECIMAL(18,2) NOT NULL,
+	NgayBatDau DATE NOT NULL,
+	NgayKetThuc DATE NOT NULL
 );
 GO
 
 CREATE TABLE thu_phi (
-    ID INT PRIMARY KEY IDENTITY(1,1),
-
+    MaThuPhi INT IDENTITY(1,1) PRIMARY KEY,
     MaHoKhau VARCHAR(20) NOT NULL,
-    MaLoaiPhi VARCHAR(20) NOT NULL,
-
-    Thang INT NOT NULL,
-    Nam INT NOT NULL,
-
-    SoLuong FLOAT DEFAULT 1,                 -- m2, số xe, số tháng
-    DonGia DECIMAL(18,2),
-    ThanhTien DECIMAL(18,2) NOT NULL,
-
-    DaDong BIT DEFAULT 0,
+    MaKhoanThu INT NOT NULL,
+    SoTienPhaiThu DECIMAL(18,2) NOT NULL,
+    DaXacNhan BIT DEFAULT 0,
     NgayDong DATE NULL,
-    HinhThuc NVARCHAR(50),                   -- Tiền mặt, CK
     GhiChu NVARCHAR(255),
-
-    FOREIGN KEY (MaHoKhau) REFERENCES ho_khau(MaHoKhau)
+	TuChoi BIT DEFAULT 0,
+    CONSTRAINT FK_ThuPhi_HoKhau
+        FOREIGN KEY (MaHoKhau) REFERENCES ho_khau(MaHoKhau)
         ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (MaLoaiPhi) REFERENCES loai_phi(MaLoaiPhi),
 
-    CONSTRAINT UQ_ThuPhi UNIQUE (MaHoKhau, MaLoaiPhi, Thang, Nam)
+    CONSTRAINT FK_ThuPhi_KhoanThu
+        FOREIGN KEY (MaKhoanThu) REFERENCES khoan_thu(MaKhoanThu)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+
+    CONSTRAINT UQ_ThuPhi UNIQUE (MaHoKhau, MaKhoanThu)
 );
+GO
+
+create table dang_ky_gui_xe (
+    ID INT IDENTITY(1,1) PRIMARY KEY,
+    MaHoKhau VARCHAR(20) NOT NULL,
+    LoaiXe NVARCHAR(20) NOT NULL,
+    bienkiemsoat varchar(20) not null,
+    CONSTRAINT GUIXE_HoKhau
+        FOREIGN KEY (MaHoKhau) REFERENCES ho_khau(MaHoKhau)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+GO
+
+CREATE VIEW vw_phi_gui_xe_theo_ho
+AS
+SELECT
+    hk.MaHoKhau,
+    ch.MaCanHo,
+    nk.HoTen AS ChuHo,
+    SUM(
+        CASE 
+            WHEN gx.LoaiXe = N'Xe máy' THEN 70000
+            WHEN gx.LoaiXe = N'Ô tô'   THEN 1200000
+            ELSE 0
+        END
+    ) AS PhiGuiXe
+FROM ho_khau hk
+JOIN can_ho ch
+    ON ch.MaHoKhau = hk.MaHoKhau
+JOIN nhan_khau nk
+    ON nk.MaHoKhau = hk.MaHoKhau
+   AND nk.QuanHeVoiChuHo = N'Chủ hộ'
+LEFT JOIN dang_ky_gui_xe gx
+    ON gx.MaHoKhau = hk.MaHoKhau
+GROUP BY
+    hk.MaHoKhau,
+    ch.MaCanHo,
+    nk.HoTen;
 GO

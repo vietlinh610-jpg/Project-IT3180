@@ -1,37 +1,3 @@
-
-SET NOCOUNT ON;
-
-PRINT N'Đang dọn dẹp dữ liệu cũ...';
-
--- Tắt ràng buộc để xóa nhanh
-EXEC sp_msforeachtable 'ALTER TABLE ? NOCHECK CONSTRAINT all';
-
-DELETE FROM thu_phi;
-DELETE FROM tam_tru;
-DELETE FROM tam_vang;
-DELETE FROM nhan_khau; 
-DELETE FROM can_ho; 
-DELETE FROM ho_khau; 
-DELETE FROM tai_khoan WHERE Quyen IN (N'Người dùng'); -- Giữ lại admin/ketoan
-
--- Bật lại ràng buộc
-EXEC sp_msforeachtable 'ALTER TABLE ? WITH CHECK CHECK CONSTRAINT all';
-
--- Reset ID tự tăng
-DBCC CHECKIDENT ('tam_tru', RESEED, 0);
-DBCC CHECKIDENT ('tam_vang', RESEED, 0);
-DBCC CHECKIDENT ('thu_phi', RESEED, 0);
-
--- Reset Loại phí
-DELETE FROM loai_phi;
-INSERT INTO loai_phi (MaLoaiPhi, TenLoaiPhi, BatBuoc, DonGia, DonVi, GhiChu) VALUES
-('PQL', N'Phí Quản Lý', 1, 6000, N'm2', N'Bắt buộc'),
-('GUIMAY', N'Phí Gửi Xe Máy', 0, 80000, N'xe', N'Tùy chọn'),
-('GUIOTO', N'Phí Gửi Ô tô', 0, 1000000, N'xe', N'Tùy chọn');
-
--- ==================================================================================
--- 2. KHỞI TẠO DỮ LIỆU MẪU (HỌ TÊN, NGHỀ...)
--- ==================================================================================
 DECLARE @Ho TABLE (Val NVARCHAR(50));
 INSERT INTO @Ho VALUES (N'Nguyễn'),(N'Trần'),(N'Lê'),(N'Phạm'),(N'Hoàng'),(N'Huỳnh'),(N'Phan'),(N'Vũ'),(N'Võ'),(N'Đặng'),(N'Bùi'),(N'Đỗ'),(N'Hồ'),(N'Ngô');
 
@@ -163,9 +129,6 @@ BEGIN
             VALUES (@MaNK_CM, @MaHoKhau, @HoTenCM, @GioiTinhCM, DATEADD(YEAR, -@TuoiCM, GETDATE()), N'Kinh', N'Không', N'Việt Nam', N'Về hưu', @CCCD_CM, @NoiSinhCH, @VaiVes);
         END
         
-        -- F. Thu Phí
-        INSERT INTO thu_phi (MaHoKhau, MaLoaiPhi, Thang, Nam, SoLuong, DonGia, ThanhTien, DaDong, HinhThuc)
-        VALUES (@MaHoKhau, 'PQL', MONTH(GETDATE()), YEAR(GETDATE()), @DienTich, 6000, @DienTich * 6000, 0, NULL);
 
         SET @Phong = @Phong + 1;
     END
