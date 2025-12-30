@@ -38,13 +38,14 @@ const LichSuThanhToanPage = () => {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     fetchLichSu();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <Box sx={{ p: 4, backgroundColor: '#f4f7f6', minHeight: '100vh' }}>
-      {/* ===== HEADER ===== */}
+      {/* HEADER*/}
       <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
         <IconButton onClick={() => navigate('/khoan-thu')}>
           <ArrowBackIcon />
@@ -54,7 +55,7 @@ const LichSuThanhToanPage = () => {
         </Typography>
       </Stack>
 
-      {/* ===== TABLE ===== */}
+      {/* TABLE*/}
       <Paper elevation={1} sx={{ borderRadius: 3, overflow: 'hidden' }}>
         <TableContainer>
           <Table>
