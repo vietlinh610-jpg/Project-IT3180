@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Dialog, 
@@ -17,11 +17,24 @@ const Sidebar = () => {
   });
 
   // 2. [THÊM MỚI] Lấy TÊN NGƯỜI DÙNG từ localStorage
-  // Lưu ý: Trong trang Đăng Nhập (Login), bạn phải có lệnh: localStorage.setItem('fullName', 'Tên User');
   const [fullName, setFullName] = useState(() => {
-    // Nếu không tìm thấy tên thì hiển thị mặc định là "Cư dân" hoặc "Admin"
     return localStorage.getItem('fullName') || 'Người dùng';
   });
+  
+  useEffect(() => {
+  const handleUserInfoChange = () => {
+      const newName = localStorage.getItem('fullName');
+      if (newName) setFullName(newName);
+    };
+
+    // Đăng ký lắng nghe sự kiện có tên "userInfoUpdated"
+    window.addEventListener('userInfoUpdated', handleUserInfoChange);
+
+    // Dọn dẹp khi component bị hủy
+    return () => {
+      window.removeEventListener('userInfoUpdated', handleUserInfoChange);
+    };
+  }, []);
 
   const [openMenus, setOpenMenus] = useState({ hoKhau: false, nhanDan: false });
   const [openLogoutModal, setOpenLogoutModal] = useState(false);
