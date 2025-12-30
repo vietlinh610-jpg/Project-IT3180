@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/dongphi';
+const API_URL = '/api/dongphi';
 
 // Lấy các khoản thu
 export const layDSKT = (id) => {

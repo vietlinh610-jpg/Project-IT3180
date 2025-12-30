@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/hokhau'; // Đổi port nếu cần
+const API_URL = '/api/hokhau'; // Đổi port nếu cần
 
 export const getHoKhauList = () => axios.get(API_URL);
 export const createHoKhau = (data) => axios.post(`${API_URL}`, data);

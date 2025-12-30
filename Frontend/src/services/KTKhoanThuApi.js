@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/kt-khoanthu';
+const API_URL = '/api/kt-khoanthu';
 
 export const KiemTraKhoanThu = () => {
     return axios.get(`${API_URL}`);

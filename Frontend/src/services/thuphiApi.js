@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/thu-phi";
+const API_URL = "/api/thu-phi";
 
 /**
  * @param {number} maKhoanThu

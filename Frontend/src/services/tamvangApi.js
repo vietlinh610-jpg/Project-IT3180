@@ -1,5 +1,5 @@
 import axios from 'axios';
-const API_URL = 'http://localhost:5000/api/tamvang';
+const API_URL = '/api/tamvang';
 
 export const getListTamVang = () => axios.get(`${API_URL}`);
 export const createTamVang = (data) => axios.post(`${API_URL}`, data);

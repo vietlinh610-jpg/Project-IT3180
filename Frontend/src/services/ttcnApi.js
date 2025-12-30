@@ -1,5 +1,5 @@
 import axios from 'axios';
-const API_URL = 'http://localhost:5000/api/ttcn';
+const API_URL = '/api/ttcn';
 
 // Lấy thông tin cá nhân
 export const layTTCN = (id) => {
