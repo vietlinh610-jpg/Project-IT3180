@@ -202,20 +202,13 @@ BEGIN
     ELSE 
         SET @LoaiXe = N'Xe máy';
 
-    -- C. Sinh Biển số xe (Format: 29X-NNN.NN)
-    -- Đầu biển: 29, 30, 31
     DECLARE @DauBien INT = 29 + (ABS(CHECKSUM(NEWID())) % 3);
-    -- Chữ cái: A-Z
     DECLARE @ChuCai CHAR(1) = CHAR(65 + (ABS(CHECKSUM(NEWID())) % 26));
-    -- Số: 5 chữ số ngẫu nhiên
     DECLARE @So5ChuSo INT = 10000 + (ABS(CHECKSUM(NEWID())) % 89999); -- Đảm bảo luôn 5 chữ số
-    
-    -- Ghép chuỗi: Ví dụ 30A-567.89
     DECLARE @BKS NVARCHAR(20) = CAST(@DauBien AS VARCHAR) + @ChuCai + '-' + 
                                 LEFT(CAST(@So5ChuSo AS VARCHAR), 3) + '.' + 
                                 RIGHT(CAST(@So5ChuSo AS VARCHAR), 2);
 
-    -- D. Insert vào bảng
     INSERT INTO dang_ky_gui_xe (MaHoKhau, LoaiXe, BienKiemSoat)
     VALUES (@RandomMaHoKhau, @LoaiXe, @BKS);
 
@@ -256,3 +249,56 @@ WHERE
     (KT.Loai <> N'Phí gửi xe' OR (ISNULL(Xe.SoXeMay, 0) + ISNULL(Xe.SoOTo, 0)) > 0)
 ORDER BY NEWID(); -- Lấy ngẫu nhiên 100 dòng bất kỳ
 
+-- Sinh ra khoảnh 10 khoản thu đang chờ xác nhận
+INSERT INTO thu_phi (MaHoKhau, MaKhoanThu, SoTienPhaiThu, DaXacNhan, TuChoi, NgayDong)
+SELECT TOP 10
+    HK.MaHoKhau,
+    KT.MaKhoanThu,
+    CASE 
+        WHEN KT.Loai = N'Phí gửi xe' THEN 
+            (ISNULL(Xe.SoXeMay, 0) * @GiaXeMay) + (ISNULL(Xe.SoOTo, 0) * @GiaOTo)
+        ELSE KT.SoTien 
+    END AS SoTienPhaiThu,
+    0 AS DaXacNhan,   -- CHỜ XÁC NHẬN
+    0 AS TuChoi,
+    DATEADD(DAY, ABS(CHECKSUM(NEWID()) % 28), KT.NgayBatDau) AS NgayDong
+FROM 
+    ho_khau HK
+    CROSS JOIN khoan_thu KT
+    LEFT JOIN (
+        SELECT MaHoKhau, 
+               SUM(CASE WHEN LoaiXe = N'Xe máy' THEN 1 ELSE 0 END) AS SoXeMay,
+               SUM(CASE WHEN LoaiXe = N'Ô tô' THEN 1 ELSE 0 END) AS SoOTo
+        FROM dang_ky_gui_xe
+        GROUP BY MaHoKhau
+    ) Xe ON HK.MaHoKhau = Xe.MaHoKhau
+WHERE 
+    (KT.Loai <> N'Phí gửi xe' OR (ISNULL(Xe.SoXeMay, 0) + ISNULL(Xe.SoOTo, 0)) > 0)
+ORDER BY NEWID();
+
+-- Sinh ra khoảng 10 khoản thu bị từ chối
+INSERT INTO thu_phi (MaHoKhau, MaKhoanThu, SoTienPhaiThu, DaXacNhan, TuChoi, NgayDong)
+SELECT TOP 10
+    HK.MaHoKhau,
+    KT.MaKhoanThu,
+    CASE 
+        WHEN KT.Loai = N'Phí gửi xe' THEN 
+            (ISNULL(Xe.SoXeMay, 0) * @GiaXeMay) + (ISNULL(Xe.SoOTo, 0) * @GiaOTo)
+        ELSE KT.SoTien 
+    END AS SoTienPhaiThu,
+    0 AS DaXacNhan,
+    1 AS TuChoi,      -- BỊ TỪ CHỐI
+    DATEADD(DAY, ABS(CHECKSUM(NEWID()) % 28), KT.NgayBatDau) AS NgayDong
+FROM 
+    ho_khau HK
+    CROSS JOIN khoan_thu KT
+    LEFT JOIN (
+        SELECT MaHoKhau, 
+               SUM(CASE WHEN LoaiXe = N'Xe máy' THEN 1 ELSE 0 END) AS SoXeMay,
+               SUM(CASE WHEN LoaiXe = N'Ô tô' THEN 1 ELSE 0 END) AS SoOTo
+        FROM dang_ky_gui_xe
+        GROUP BY MaHoKhau
+    ) Xe ON HK.MaHoKhau = Xe.MaHoKhau
+WHERE 
+    (KT.Loai <> N'Phí gửi xe' OR (ISNULL(Xe.SoXeMay, 0) + ISNULL(Xe.SoOTo, 0)) > 0)
+ORDER BY NEWID();
