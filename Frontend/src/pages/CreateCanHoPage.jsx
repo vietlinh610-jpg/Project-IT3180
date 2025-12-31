@@ -1,4 +1,4 @@
-// src/pages/CreateCanHoPage.jsx
+
 import React, { useState } from 'react';
 import { 
   Box, Typography, TextField, Button, Grid, Paper,
@@ -28,7 +28,7 @@ const CreateCanHoPage = () => {
   const handleSave = async (e) => {
     e.preventDefault();
     
-    // Validate
+    
     if (!formData.maCanHo || !formData.tenCanHo) {
       alert("Vui lòng điền mã và tên căn hộ!");
       return;
@@ -37,9 +37,9 @@ const CreateCanHoPage = () => {
     try {
       setLoading(true);
 
-      // --- SỬA QUAN TRỌNG TẠI ĐÂY ---
+      
       const payload = {
-        // Giữ nguyên là chuỗi (String), KHÔNG dùng parseInt nữa
+        
         MaCanHo: formData.maCanHo.trim(), 
         
         TenCanHo: formData.tenCanHo,
@@ -55,7 +55,7 @@ const CreateCanHoPage = () => {
 
     } catch (error) {
       console.error("Lỗi:", error);
-      // Hiển thị thông báo lỗi chi tiết từ Backend (VD: Trùng mã căn hộ)
+      
       const message = error.response?.data?.message || "Có lỗi xảy ra!";
       alert(message);
     } finally {
@@ -73,7 +73,7 @@ const CreateCanHoPage = () => {
         boxSizing: 'border-box'  
       }}>
       
-      {/* Header */}
+      {}
       <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
         <IconButton onClick={() => navigate('/ho-gia-dinh/can-ho')}>
           <ArrowBackIcon />
@@ -87,13 +87,13 @@ const CreateCanHoPage = () => {
         <form onSubmit={handleSave}>
           <Grid container spacing={3} direction="column">
             
-            {/* --- SỬA QUAN TRỌNG: Ô NHẬP MÃ CĂN HỘ --- */}
+            {}
             <Grid size={12}>
               <TextField
                 fullWidth
                 label="Mã căn hộ (ID) *"
                 name="maCanHo"
-                // BỎ type="number" để nhập được chữ (VD: P101)
+                
                 type="text" 
                 variant="filled"
                 value={formData.maCanHo}
@@ -104,7 +104,7 @@ const CreateCanHoPage = () => {
               />
             </Grid>
 
-            {/* Tên căn hộ */}
+            {}
             <Grid size={12}>
               <TextField
                 fullWidth
@@ -118,7 +118,7 @@ const CreateCanHoPage = () => {
               />
             </Grid>
 
-            {/* Tầng */}
+            {}
             <Grid size={12}>
               <TextField
                 fullWidth
@@ -132,7 +132,7 @@ const CreateCanHoPage = () => {
               />
             </Grid>
 
-            {/* Diện tích */}
+            {}
             <Grid size={12}>
               <TextField
                 fullWidth
@@ -143,11 +143,11 @@ const CreateCanHoPage = () => {
                 value={formData.dienTich}
                 onChange={handleChange}
                 required
-                inputProps={{ step: "0.1" }} // Cho phép nhập số lẻ
+                inputProps={{ step: "0.1" }} 
               />
             </Grid>
 
-            {/* Nút Lưu */}
+            {}
             <Grid size={12} sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
               <Button 
                 type="submit"

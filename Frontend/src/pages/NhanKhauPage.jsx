@@ -1,10 +1,10 @@
-// src/pages/NhanKhauPage.jsx
+
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   Box, Typography, Paper, Button, Dialog,
   DialogTitle, DialogContent, DialogActions, Chip, IconButton,
-  Stack, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel // <--- 1. Import thêm
+  Stack, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel 
 } from '@mui/material';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import GroupsIcon from '@mui/icons-material/Groups';
@@ -16,14 +16,14 @@ import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import PieChartIcon from '@mui/icons-material/PieChart';
 
-// Import API
+
 import { getCanHoCount, getNhanKhauByCanHo, deleteNhanKhau, updateNhanKhau } from '../services/nhankhauApi';
 
 const NhanKhauPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // --- STATE ---
+  
   const [apartmentRows, setApartmentRows] = useState([]);
   const [loadingApartments, setLoadingApartments] = useState(true);
 
@@ -35,14 +35,14 @@ const NhanKhauPage = () => {
   const [loadingMembers, setLoadingMembers] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  // --- STATE MỚI: CHO POPUP CHUYỂN CHỦ HỘ ---
+  
   const [openChangeHostModal, setOpenChangeHostModal] = useState(false);
-  const [candidates, setCandidates] = useState([]); // Danh sách ứng viên
-  const [newHostId, setNewHostId] = useState('');   // MaNhanKhau người được chọn
-  const [deletingMemberId, setDeletingMemberId] = useState(null); // ID người cần xóa
-  // -------------------------------------------
+  const [candidates, setCandidates] = useState([]); 
+  const [newHostId, setNewHostId] = useState('');   
+  const [deletingMemberId, setDeletingMemberId] = useState(null); 
+  
 
-  // --- 1. LOAD DANH SÁCH CĂN HỘ ---
+  
   const fetchApartments = async () => {
     try {
       setLoadingApartments(true);
@@ -76,7 +76,7 @@ const NhanKhauPage = () => {
     }
   }, [apartmentRows, location.state]);
 
-  // --- 2. XỬ LÝ MỞ MODAL ---
+  
   const handleOpenMembers = async (apartmentRow) => {
     setSelectedApartment(apartmentRow);
     setCurrentMembers([]);
@@ -116,7 +116,7 @@ const NhanKhauPage = () => {
     setOpenModal(false);
   };
 
-  // --- 3. XỬ LÝ LƯU KHI SỬA TRỰC TIẾP ---
+  
   const processRowUpdate = async (newRow, oldRow) => {
     const errorMessages = {
       hoTen: "Họ và tên",
@@ -145,7 +145,7 @@ const NhanKhauPage = () => {
 
         if (existingHost) {
             alert(`Thất bại: Hộ này đã có chủ hộ là "${existingHost.hoTen}".\n\nMột hộ khẩu chỉ được phép có 1 chủ hộ. Vui lòng đổi quan hệ của chủ hộ cũ trước.`);
-            return oldRow; // Trả về dữ liệu cũ, hủy bỏ thao tác
+            return oldRow; 
         }
     }
 
@@ -172,9 +172,9 @@ const NhanKhauPage = () => {
     }
   };
 
-  // --- 4. XỬ LÝ XÓA THÀNH VIÊN (LOGIC MỚI) ---
+  
   const handleDeleteMember = async (memberRow) => {
-    // Nếu KHÔNG PHẢI chủ hộ -> Xóa bình thường
+    
     const curRole = memberRow.quanHe.trim().toLowerCase();
     if (curRole !== 'chủ hộ') {
       if (window.confirm(`Bạn có chắc muốn xóa ${memberRow.hoTen}?`)) {
@@ -183,10 +183,10 @@ const NhanKhauPage = () => {
       return;
     }
 
-    // Nếu LÀ CHỦ HỘ
+    
     const otherMembers = currentMembers.filter(m => m.id !== memberRow.id);
 
-    // Trường hợp: Nhà chỉ còn 1 mình ông này
+    
     if (otherMembers.length === 0) {
       if (window.confirm("Đây là thành viên cuối cùng. Xóa người này sẽ xóa luôn hộ khẩu?")) {
         await executeDelete(memberRow.id);
@@ -194,26 +194,26 @@ const NhanKhauPage = () => {
       return;
     }
 
-    // Trường hợp: Còn người khác -> Bắt buộc chọn chủ hộ mới
+    
     setCandidates(otherMembers);
     setDeletingMemberId(memberRow.id);
     setNewHostId('');
     setOpenChangeHostModal(true);
   };
 
-  // Hàm thực hiện xóa (dùng chung)
+  
   const executeDelete = async (id) => {
     try {
       await deleteNhanKhau(id);
       setCurrentMembers((prev) => prev.filter(m => m.id !== id));
-      fetchApartments(); // Refresh bảng bên ngoài
+      fetchApartments(); 
       alert("Xóa thành công!");
     } catch (error) {
       alert("Lỗi khi xóa: " + (error.response?.data?.message || error.message));
     }
   };
 
-  // --- 5. XÁC NHẬN ĐỔI CHỦ HỘ VÀ XÓA ---
+  
   const confirmChangeHostAndDelete = async () => {
     if (!newHostId) {
       alert("Vui lòng chọn người làm chủ hộ mới!");
@@ -221,11 +221,11 @@ const NhanKhauPage = () => {
     }
 
     try {
-      // 1. Tìm thông tin người kế nhiệm
+      
       const newHost = candidates.find(c => c.maNhanKhau === newHostId);
       if (!newHost) return;
 
-      // 2. Chuẩn bị payload (Giữ nguyên thông tin cũ, chỉ đổi Quan hệ thành Chủ hộ)
+      
       const payload = {
         HoTen: newHost.hoTen,
         GioiTinh: newHost.gioiTinh,
@@ -234,20 +234,20 @@ const NhanKhauPage = () => {
         SoCCCD: newHost.cccd,
         NoiSinh: newHost.noiSinh,
         NgaySinh: newHost.ngaySinh ? dayjs(newHost.ngaySinh).format('YYYY-MM-DD') : null,
-        QuanHeVoiChuHo: 'Chủ hộ' // <--- QUAN TRỌNG
+        QuanHeVoiChuHo: 'Chủ hộ' 
       };
 
-      // 3. Update người kế nhiệm
+      
       await updateNhanKhau(newHost.id, payload);
 
-      // 4. Xóa chủ hộ cũ
+      
       await deleteNhanKhau(deletingMemberId);
 
-      // 5. Thành công
+      
       alert(`Đã chuyển quyền Chủ hộ cho ${newHost.hoTen} và xóa thành viên cũ!`);
       setOpenChangeHostModal(false);
       fetchApartments();
-      handleCloseModal(); // Đóng modal chi tiết để refresh lại dữ liệu
+      handleCloseModal(); 
 
     } catch (error) {
       console.error(error);
@@ -255,7 +255,7 @@ const NhanKhauPage = () => {
     }
   };
 
-  // --- CẤU HÌNH CỘT THÀNH VIÊN ---
+  
   const memberColumns = [
     {
       field: 'maNhanKhau', headerName: 'Mã NK', width: 90, editable: false,
@@ -286,7 +286,7 @@ const NhanKhauPage = () => {
     }
   ];
 
-  // Cột cho bảng danh sách căn hộ
+  
   const apartmentColumns = [
     { field: 'maCanHo', headerName: 'Mã căn hộ', flex: 1, minWidth: 120 },
     { field: 'tenCanHo', headerName: 'Tên căn hộ', flex: 1.5, minWidth: 200 },
@@ -345,7 +345,7 @@ const NhanKhauPage = () => {
         />
       </Paper>
 
-      {/* --- MODAL CHI TIẾT --- */}
+      {}
       <Dialog open={openModal} onClose={handleCloseModal} maxWidth="xl" fullWidth>
         <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 'bold', bgcolor: '#f8f9fa' }}>
           Thành viên - {selectedApartment?.tenCanHo} - {selectedHoKhau?.maHoKhau}
@@ -407,7 +407,7 @@ const NhanKhauPage = () => {
         </DialogActions>
       </Dialog>
 
-      {/* --- MODAL CHỌN CHỦ HỘ MỚI (MỚI THÊM) --- */}
+      {}
       <Dialog open={openChangeHostModal} onClose={() => setOpenChangeHostModal(false)}>
         <DialogTitle sx={{ bgcolor: '#fff3cd', color: '#856404' }}>
           ⚠️ Yêu cầu chọn Chủ hộ mới
@@ -426,7 +426,7 @@ const NhanKhauPage = () => {
               {candidates.map((mem) => (
                 <FormControlLabel
                   key={mem.id}
-                  value={mem.maNhanKhau} // Dùng mã NK để tìm kiếm
+                  value={mem.maNhanKhau} 
                   control={<Radio />}
                   label={`${mem.hoTen} (${mem.quanHe})`}
                 />

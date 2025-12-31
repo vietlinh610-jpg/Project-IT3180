@@ -1,4 +1,4 @@
-// src/pages/CanHoPage.jsx
+
 import React, { useEffect, useState } from 'react';
 import { 
   DataGrid, 
@@ -11,25 +11,25 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
-import SearchIcon from '@mui/icons-material/Search'; // Thêm icon tìm kiếm
+import SearchIcon from '@mui/icons-material/Search'; 
 import { useNavigate } from 'react-router-dom';
 import { getCanHoList, deleteCanHo, updateCanHo } from '../services/canhoApi'; 
 
 const CanHoPage = () => {
   const navigate = useNavigate();
   
-  // State dữ liệu gốc từ API
+  
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // --- THÊM STATE TÌM KIẾM ---
+  
   const [searchText, setSearchText] = useState('');
   
-  // State quản lý chế độ sửa
+  
   const [rowModesModel, setRowModesModel] = useState({});
 
-  // --- LOGIC LỌC DỮ LIỆU TÌM KIẾM ---
-  // Lọc dựa trên mã căn hộ, tên căn hộ hoặc mã hộ khẩu
+  
+  
   const filteredRows = rows.filter((row) => {
     const searchLower = searchText.toLowerCase();
     return (
@@ -40,7 +40,7 @@ const CanHoPage = () => {
     );
   });
 
-  // --- CÁC HÀM XỬ LÝ SỰ KIỆN CLICK ---
+  
   const handleEditClick = (id) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   };
@@ -89,7 +89,7 @@ const CanHoPage = () => {
     setRowModesModel(newRowModesModel);
   };
 
-  // --- CẤU HÌNH CỘT ---
+  
   const columns = [
     { field: 'maCanHo', headerName: 'Mã căn hộ', flex: 1, minWidth: 100, editable: false }, 
     { field: 'tenCanHo', headerName: 'Tên căn hộ', flex: 1, minWidth: 120, editable: false },
@@ -175,7 +175,7 @@ const CanHoPage = () => {
         Danh sách căn hộ
       </Typography>
 
-      {/* --- CẬP NHẬT GIAO DIỆN HÀNG NÚT VÀ TÌM KIẾM --- */}
+      {}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Button 
           variant="contained" 
@@ -208,7 +208,7 @@ const CanHoPage = () => {
 
       <Box sx={{ flexGrow: 1, width: '100%', backgroundColor: '#fff' }}>
         <DataGrid
-          rows={filteredRows} // Dùng dữ liệu đã lọc
+          rows={filteredRows} 
           columns={columns}
           loading={loading}
           slots={{ toolbar: GridToolbar }}

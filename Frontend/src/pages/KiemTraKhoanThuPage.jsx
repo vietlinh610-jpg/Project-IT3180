@@ -1,4 +1,4 @@
-// Hoàn thiện page khoản thu
+
 
 import React, { useState, useEffect } from "react";
 import {
@@ -18,8 +18,8 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import DoDisturbIcon from "@mui/icons-material/DoDisturb";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
-// Minh họa minh chứng chuyển khoản
-// Chú ý : Đây chỉ là minh họa, thực tế không nên lưu ảnh trên cơ sở dữ liệu
+
+
 import minhChungImg from "../assets/minhChung.png";
 
 import {
@@ -29,13 +29,13 @@ import {
 } from "../services/KTKhoanThuApi";
 
 const KiemTraKhoanThuPage = () => {
-  // Quản lý state của các hàng
+  
   const [rows, setRows] = useState([]);
 
-  // State điều khiển dialog xem minh chứng
+  
   const [openMinhChung, setOpenMinhChung] = useState(false);
 
-  // Lấy dữ liệu các khoản thu đang chờ xác nhận
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -50,7 +50,7 @@ const KiemTraKhoanThuPage = () => {
             thoiGian: item.NgayGioNop
               ? new Date(item.NgayGioNop).toLocaleString("vi-VN")
               : "",
-            // Trạng thái luôn là chờ xác nhận
+            
             trangThai: "Chờ xác nhận",
           }));
           setRows(mappedRows);
@@ -63,7 +63,7 @@ const KiemTraKhoanThuPage = () => {
     fetchData();
   }, []);
 
-  // Kiểm tra xác nhận
+  
   const handleVerify = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xác nhận khoản thu này?")) return;
 
@@ -80,7 +80,7 @@ const KiemTraKhoanThuPage = () => {
     }
   };
 
-  // Xử lý từ chối
+  
   const handleReject = async (id) => {
     if (!window.confirm("Bạn có chắc muốn TỪ CHỐI khoản thu này?")) return;
 
@@ -97,12 +97,12 @@ const KiemTraKhoanThuPage = () => {
     }
   };
 
-  // Mở dialog xem minh chứng
+  
   const handleOpenMinhChung = () => {
     setOpenMinhChung(true);
   };
 
-  // Đóng dialog xem minh chứng
+  
   const handleCloseMinhChung = () => {
     setOpenMinhChung(false);
   };
@@ -181,7 +181,7 @@ const KiemTraKhoanThuPage = () => {
         disableRowSelectionOnClick
       />
 
-      {/* Dialog hiển thị minh chứng chuyển khoản */}
+      {}
       <Dialog
         open={openMinhChung}
         onClose={handleCloseMinhChung}

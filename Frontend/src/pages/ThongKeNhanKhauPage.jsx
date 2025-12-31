@@ -5,40 +5,40 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 
-// Import API lấy danh sách nhân khẩu (giả sử bạn đã có hàm này)
+
 import { getAllNhanKhau } from '../services/nhankhauApi';
 
 const ThongKeNhanKhauPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
-  // State lưu dữ liệu biểu đồ
+  
   const [genderData, setGenderData] = useState([]);
   const [ageData, setAgeData] = useState([]);
 
-  const GENDER_COLORS = ['#3498db', '#e91e63', '#95a5a6']; // Thêm màu cho giới tính khác (nếu có)
+  const GENDER_COLORS = ['#3498db', '#e91e63', '#95a5a6']; 
   const AGE_COLORS = ['#1abc9c', '#f1c40f', '#e67e22'];
 
-  // --- HÀM TÍNH TOÁN DỮ LIỆU ---
+  
   const calculateStats = (dataList) => {
-    // 1. Thống kê Giới tính
+    
     let nam = 0;
     let nu = 0;
 
-    // 2. Thống kê Độ tuổi
-    let treEm = 0;      // < 18
-    let laoDong = 0;    // 18 - 60
-    let nguoiGia = 0;   // > 60
+    
+    let treEm = 0;      
+    let laoDong = 0;    
+    let nguoiGia = 0;   
 
     const currentYear = dayjs().year();
 
     dataList.forEach(person => {
-      // Đếm giới tính (Chuyển về chữ thường để so sánh cho chuẩn)
+      
       const gioitinh = person.GioiTinh ? person.GioiTinh.toLowerCase() : '';
       if (gioitinh === 'nam') nam++;
       else if (gioitinh === 'nữ' || gioitinh === 'nu') nu++;
 
-      // Tính tuổi và đếm nhóm tuổi
+      
       if (person.NgaySinh) {
         const birthYear = dayjs(person.NgaySinh).year();
         const age = currentYear - birthYear;
@@ -49,13 +49,13 @@ const ThongKeNhanKhauPage = () => {
       }
     });
 
-    // Cập nhật State cho biểu đồ Giới tính
+    
     setGenderData([
       { name: 'Nam', value: nam },
       { name: 'Nữ', value: nu },
     ]);
 
-    // Cập nhật State cho biểu đồ Độ tuổi
+    
     setAgeData([
       { name: 'Trẻ em (<18)', value: treEm },
       { name: 'Lao động (18-60)', value: laoDong },
@@ -63,15 +63,15 @@ const ThongKeNhanKhauPage = () => {
     ]);
   };
 
-  // --- GỌI API ---
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Gọi API lấy toàn bộ nhân khẩu
+        
         const response = await getAllNhanKhau();
 
-        // Kiểm tra cấu trúc dữ liệu trả về (response.data hay response)
+        
         const listNhanKhau = response.data || response;
 
         if (Array.isArray(listNhanKhau)) {
@@ -106,10 +106,10 @@ const ThongKeNhanKhauPage = () => {
         </Typography>
       </Stack>
 
-      {/* Grid Container */}
+      {}
       <Grid container spacing={5} justifyContent="center" sx={{ width: '100%', margin: 0 }}>
 
-        {/* Biểu đồ giới tính */}
+        {}
         <Grid size={{ xs: 12, md: 6, lg: 6 }} sx={{ display: 'flex', justifyContent: 'center' }}>
           <Paper elevation={0} sx={{ p: 4, borderRadius: '24px', border: '1px solid #e0e0e0', width: '100%', minWidth: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#34495e' }}>
@@ -143,7 +143,7 @@ const ThongKeNhanKhauPage = () => {
           </Paper>
         </Grid>
 
-        {/* Biểu đồ độ tuổi */}
+        {}
         <Grid size={{ xs: 12, md: 6, lg: 6 }} sx={{ display: 'flex', justifyContent: 'center' }}>
           <Paper elevation={0} sx={{ p: 4, borderRadius: '24px', border: '1px solid #e0e0e0', width: '100%', minWidth: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#34495e' }}>

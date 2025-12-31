@@ -1,4 +1,4 @@
-// Hoàn thiện khoản thu Page
+
 
 import React, { useEffect, useState } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
@@ -19,24 +19,24 @@ import CloseIcon from "@mui/icons-material/Close";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import { useNavigate } from "react-router-dom";
 
-// API
+
 import { layKhoanThu } from "../services/khoaThuApi";
 import { getTrangThaiThuPhi } from "../services/thuphiApi";
 
 const KhoanThuPage = () => {
   const navigate = useNavigate();
 
-  // State quản lý bảng các loại phí
+  
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
-  // State quản lý danh sách hộ
+  
   const [householdRows, setHouseholdRows] = useState([]);
   const [loadingHousehold, setLoadingHousehold] = useState(false);
-  // State quản lý đóng mở danh sách hộ
+  
   const [openModal, setOpenModal] = useState(false);
   const [selectedFee, setSelectedFee] = useState(null);
 
-  // Gọi API và fetch vào bảng thu phí
+  
   useEffect(() => {
     const fetchKhoanThu = async () => {
       try {
@@ -72,7 +72,7 @@ const KhoanThuPage = () => {
     fetchKhoanThu();
   }, []);
 
-  // Mở modal danh sách hộ và fetch dữ liệu vào
+  
   const handleOpenHouseholdList = async (fee) => {
     try {
       setSelectedFee(fee);
@@ -98,7 +98,7 @@ const KhoanThuPage = () => {
     }
   };
 
-  // Danh sách khoản thu
+  
   const columns = [
     { field: "tenKhoanThu", headerName: "Tên khoản thu", flex: 1.5 },
     { field: "loaiKhoanThu", headerName: "Loại khoản thu", flex: 1 },
@@ -139,7 +139,7 @@ const KhoanThuPage = () => {
     },
   ];
 
-  // Danh sách các hộ
+  
   const householdColumns = [
     { field: "canHo", headerName: "Căn hộ", width: 100 },
     { field: "chuHo", headerName: "Chủ hộ", flex: 1 },
@@ -174,7 +174,7 @@ const KhoanThuPage = () => {
           TẠO KHOẢN THU MỚI
         </Button>
 
-        {/* NÚT THỐNG KÊ KHOẢN THU */}
+        {}
         <Button
           variant="contained"
           startIcon={<BarChartIcon />}
@@ -198,7 +198,7 @@ const KhoanThuPage = () => {
         sx={styles.dataGrid}
       />
 
-      {/* MODAL */}
+      {}
       <Dialog
         open={openModal}
         onClose={() => setOpenModal(false)}

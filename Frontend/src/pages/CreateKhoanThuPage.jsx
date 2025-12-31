@@ -22,7 +22,7 @@ import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 
-// Các loại khoản thu KHÔNG nhập số tiền
+
 const KHONG_NHAP_TIEN = ["Phí gửi xe"];
 
 const CreateKhoanThuPage = () => {
@@ -39,10 +39,10 @@ const CreateKhoanThuPage = () => {
 
   const isDisabledSoTien = KHONG_NHAP_TIEN.includes(formData.loaiKhoanThu);
 
-  // Khi chọn Phí gửi xe → tự động set số tiền = 0
+  
   useEffect(() => {
     if (isDisabledSoTien) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+      
       setFormData((prev) => ({
         ...prev,
         soTien: 0,
@@ -83,7 +83,7 @@ const CreateKhoanThuPage = () => {
 
   return (
     <Box sx={styles.page}>
-      {/* Header */}
+      {}
       <Stack direction="row" alignItems="center" spacing={1} sx={styles.header}>
         <IconButton onClick={() => navigate("/quan-ly-khoan-thu")}>
           <ArrowBackIcon />

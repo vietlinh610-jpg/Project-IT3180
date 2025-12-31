@@ -5,16 +5,16 @@ import {
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useNavigate, useParams } from 'react-router-dom'; // Thêm useParams
-import { createNhanKhau, getCanHoCount, getNhanKhauByCanHo } from '../services/nhankhauApi'; // Import API
+import { useNavigate, useParams } from 'react-router-dom'; 
+import { createNhanKhau, getCanHoCount, getNhanKhauByCanHo } from '../services/nhankhauApi'; 
 
 const CreateNhanKhauPage = () => {
   const navigate = useNavigate();
-  const { maHoKhau } = useParams(); // Lấy mã hộ khẩu từ URL (VD: /nhan-khau/create/HK001)
+  const { maHoKhau } = useParams(); 
   const [loading, setLoading] = useState(false);
   
   const [formData, setFormData] = useState({
-    maNhanKhau: '', // Cần thêm trường này làm khóa chính
+    maNhanKhau: '', 
     hoTen: '',
     cccd: '',
     danToc: 'Kinh',
@@ -58,17 +58,17 @@ const CreateNhanKhauPage = () => {
             if (existingHost) {
                 alert(`Lỗi: Hộ này đã có chủ hộ là "${existingHost.HoTen}".\nKhông thể thêm chủ hộ thứ hai.`);
                 setLoading(false);
-                return; // Dừng lại ngay, không tạo mới nữa
+                return; 
             }
         }
       }
 
-      // Map dữ liệu sang chuẩn Backend
+      
       const payload = {
         MaNhanKhau: formData.maNhanKhau,
-        MaHoKhau: maHoKhau, // Lấy từ URL
+        MaHoKhau: maHoKhau, 
         HoTen: formData.hoTen,
-        GioiTinh: formData.gioiTinh, // Lưu ý: Bạn cần thêm Select cho Giới tính ở giao diện
+        GioiTinh: formData.gioiTinh, 
         NgaySinh: formData.ngaySinh || null,
         DanToc: formData.danToc,
         TonGiao: formData.tonGiao,
@@ -95,7 +95,7 @@ const CreateNhanKhauPage = () => {
 
   return (
     <Box sx={{ p: 4, backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
-      {/* Header */}
+      {}
       <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
         <IconButton onClick={() => navigate('/quan-ly-nhan-dan/nhan-khau', { state: { targetMaHoKhau: maHoKhau } })}>
           <ArrowBackIcon />
@@ -114,7 +114,7 @@ const CreateNhanKhauPage = () => {
         <form onSubmit={handleSave}>
           <Grid container spacing={3}>
             
-            {/* Dòng 1: Mã Nhân Khẩu & Họ Tên */}
+            {}
             <Grid size={4}>
               <TextField
                 fullWidth
@@ -139,9 +139,9 @@ const CreateNhanKhauPage = () => {
               />
             </Grid>
 
-            {/* Dòng 2: Giới tính & Ngày sinh */}
+            {}
             <Grid size={4}>
-               {/* Thay TextField bằng Select cho Giới tính để chuẩn dữ liệu */}
+               {}
                <TextField
                 select
                 fullWidth
@@ -172,7 +172,7 @@ const CreateNhanKhauPage = () => {
               />
             </Grid>
 
-            {/* Dòng 3: CCCD, Dân tộc, Quan hệ */}
+            {}
             <Grid size={4}>
               <TextField
                 fullWidth
@@ -206,7 +206,7 @@ const CreateNhanKhauPage = () => {
               />
             </Grid>
 
-            {/* Dòng 4: Nghề nghiệp & Nơi sinh */}
+            {}
             <Grid size={6}>
               <TextField
                 fullWidth
@@ -228,7 +228,7 @@ const CreateNhanKhauPage = () => {
               />
             </Grid>
             
-            {/* Dòng 5: Tôn giáo & Quốc tịch (Thêm cho đủ DB) */}
+            {}
             <Grid size={6}>
               <TextField
                 fullWidth
@@ -250,7 +250,7 @@ const CreateNhanKhauPage = () => {
               />
             </Grid>
 
-            {/* Nút thao tác */}
+            {}
             <Grid size={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
               <Button 
                 variant="outlined" 

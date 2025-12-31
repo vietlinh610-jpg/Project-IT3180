@@ -1,4 +1,4 @@
-// src/pages/CreateTamTruPage.jsx
+
 import React, { useState } from 'react';
 import { 
   Box, Typography, TextField, Button, Grid, Paper, 
@@ -9,7 +9,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SearchIcon from '@mui/icons-material/Search'; 
 import { useNavigate } from 'react-router-dom';
 
-// Import API
+
 import { createTamTru } from '../services/tamtruApi';
 import { findNhanKhau } from '../services/nhankhauApi';
 
@@ -17,7 +17,7 @@ const CreateTamTruPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   
-  // State lưu danh sách căn hộ tìm được
+  
   const [foundApartments, setFoundApartments] = useState([]);
 
   const [formData, setFormData] = useState({
@@ -34,7 +34,7 @@ const CreateTamTruPage = () => {
     const { name, value } = e.target;
     
     setFormData(prev => {
-        // Nếu đổi mã nhân khẩu, reset lại toàn bộ thông tin xác thực cũ
+        
         if (name === 'maNhanKhau') {
             setFoundApartments([]); 
             return { ...prev, [name]: value, hoTen: '', SoCCCD: '', canHo: '' };
@@ -43,7 +43,7 @@ const CreateTamTruPage = () => {
     });
   };
 
-  // --- HÀM TÌM NHÂN KHẨU (LOGIC MỚI) ---
+  
   const handleFindNhanKhau = async () => {
     const maCanTim = formData.maNhanKhau.trim();
     if (!maCanTim) return;
@@ -52,23 +52,23 @@ const CreateTamTruPage = () => {
       const res = await findNhanKhau(maCanTim);
       const { HoTen, SoCCCD, DanhSachCanHo } = res.data;
 
-      // --- LOGIC KIỂM TRA CĂN HỘ ---
+      
       if (!DanhSachCanHo || DanhSachCanHo.length === 0) {
           alert("THẤT BẠI: Nhân khẩu này chưa thuê/sở hữu căn hộ nào trong hệ thống!");
-          // Xóa thông tin để chặn người dùng đi tiếp
+          
           setFormData(prev => ({ 
               ...prev, 
-              maNhanKhau: maCanTim, // Giữ lại mã để họ biết đang tìm mã nào
-              hoTen: '',            // Xóa tên để hiển thị lỗi field đỏ
+              maNhanKhau: maCanTim, 
+              hoTen: '',            
               SoCCCD: '', 
               canHo: '' 
           }));
           setFoundApartments([]);
           return;
       }
-      // -----------------------------
+      
 
-      // Nếu có căn hộ -> Lưu danh sách và điền form
+      
       setFoundApartments(DanhSachCanHo); 
 
       setFormData(prev => ({
@@ -76,7 +76,7 @@ const CreateTamTruPage = () => {
         maNhanKhau: maCanTim,
         hoTen: HoTen,
         SoCCCD: SoCCCD,
-        // Nếu chỉ có 1 căn thì chọn luôn, nhiều căn thì để user chọn
+        
         canHo: DanhSachCanHo.length === 1 ? DanhSachCanHo[0] : ''
       }));
 
@@ -87,7 +87,7 @@ const CreateTamTruPage = () => {
     }
   };
 
-  // --- HÀM LƯU ---
+  
   const handleSave = async (e) => {
     e.preventDefault();
     if (!formData.maNhanKhau || !formData.hoTen) {
@@ -113,7 +113,7 @@ const CreateTamTruPage = () => {
       setLoading(true);
       await createTamTru({
         MaNhanKhau: formData.maNhanKhau,
-        // MaCanHo: formData.canHo, // (Bỏ comment nếu backend cần lưu cột này)
+        
         TuNgay: formData.ngayBatDau,
         DenNgay: formData.ngayKetThuc,
         LyDo: formData.lyDo + ` (Tại căn hộ: ${formData.canHo})`
@@ -143,7 +143,7 @@ const CreateTamTruPage = () => {
         <form onSubmit={handleSave}>
           <Grid container spacing={3} direction="column">
             
-            {/* Dòng 1: Mã Nhân Khẩu */}
+            {}
             <Grid item xs={12}>
                <TextField
                 fullWidth label="Mã Nhân Khẩu *" name="maNhanKhau" variant="filled"
@@ -162,7 +162,7 @@ const CreateTamTruPage = () => {
               />
             </Grid>
 
-            {/* Dòng 2: Thông tin ReadOnly */}
+            {}
             <Grid item xs={12}>
               <TextField
                 fullWidth label="Họ và tên" value={formData.hoTen}
@@ -176,10 +176,10 @@ const CreateTamTruPage = () => {
               />
             </Grid>
 
-            {/* Dòng 3: CĂN HỘ (Bắt buộc chọn từ danh sách tìm được) */}
+            {}
             <Grid item xs={12}>
               <TextField
-                select // Luôn là dạng Select để ép buộc chọn đúng
+                select 
                 fullWidth
                 label="Chọn căn hộ tạm trú *"
                 name="canHo"
@@ -187,7 +187,7 @@ const CreateTamTruPage = () => {
                 value={formData.canHo}
                 onChange={handleChange}
                 required
-                // Nếu chưa tìm thấy nhân khẩu hoặc list rỗng -> Disable ô này
+                
                 disabled={foundApartments.length === 0} 
                 helperText={
                     foundApartments.length === 0 
@@ -203,7 +203,7 @@ const CreateTamTruPage = () => {
               </TextField>
             </Grid>
 
-            {/* Dòng 4: Thời hạn */}
+            {}
             <Grid container item spacing={3}>
                 <Grid item xs={12} md={6}>
                 <TextField

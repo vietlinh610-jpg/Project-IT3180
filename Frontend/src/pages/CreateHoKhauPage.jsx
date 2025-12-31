@@ -1,4 +1,4 @@
-// src/pages/CreateHoKhauPage.jsx
+
 import React, { useState } from 'react';
 import { 
   Box, Typography, TextField, Button, Grid, Paper,
@@ -7,18 +7,18 @@ import {
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
-import { createHoKhau } from '../services/hokhauApi'; // Import API
+import { createHoKhau } from '../services/hokhauApi'; 
 
 const CreateHoKhauPage = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false); // State quản lý loading
+  const [loading, setLoading] = useState(false); 
   
-  // State quản lý dữ liệu form
+  
   const [formData, setFormData] = useState({
     maHoKhau: '',
     diaChiThuongTru: '',
     noiCap: '',
-    ngayCap: '', // Để rỗng để người dùng tự chọn
+    ngayCap: '', 
   });
 
   const handleChange = (e) => {
@@ -29,36 +29,36 @@ const CreateHoKhauPage = () => {
   const handleSave = async (e) => {
     e.preventDefault();
 
-    // 1. Validate cơ bản
+    
     if (!formData.maHoKhau) {
       alert("Vui lòng nhập Mã hộ khẩu!");
       return;
     }
 
     try {
-      setLoading(true); // Bật loading
+      setLoading(true); 
 
-      // 2. Chuẩn bị dữ liệu gửi lên Backend (Mapping sang PascalCase)
+      
       const payload = {
         MaHoKhau: formData.maHoKhau.trim(),
         DiaChiThuongTru: formData.diaChiThuongTru,
         NoiCap: formData.noiCap,
-        NgayCap: formData.ngayCap || null // Nếu không chọn ngày thì gửi null
+        NgayCap: formData.ngayCap || null 
       };
 
-      // 3. Gọi API
+      
       await createHoKhau(payload);
       
       alert("Đăng ký hộ khẩu thành công!");
-      navigate('/ho-gia-dinh/ho-khau'); // Quay lại trang danh sách
+      navigate('/ho-gia-dinh/ho-khau'); 
 
     } catch (error) {
       console.error("Lỗi thêm mới:", error);
-      // Hiển thị thông báo lỗi từ Backend (VD: Trùng mã hộ khẩu)
+      
       const message = error.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại!";
       alert(message);
     } finally {
-      setLoading(false); // Tắt loading dù thành công hay thất bại
+      setLoading(false); 
     }
   };
 
@@ -72,7 +72,7 @@ const CreateHoKhauPage = () => {
         boxSizing: 'border-box'  
       }}>
       
-      {/* Tiêu đề và nút quay lại */}
+      {}
       <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
         <IconButton onClick={() => navigate('/ho-gia-dinh/ho-khau')}>
           <ArrowBackIcon />
@@ -86,7 +86,7 @@ const CreateHoKhauPage = () => {
         <form onSubmit={handleSave}>
           <Grid container spacing={3} direction="column">
             
-            {/* Mã hộ khẩu */}
+            {}
             <Grid size={12}>
               <TextField
                 fullWidth
@@ -97,11 +97,11 @@ const CreateHoKhauPage = () => {
                 onChange={handleChange}
                 placeholder="Nhập mã hộ khẩu..."
                 required
-                autoFocus // Tự động focus vào ô này
+                autoFocus 
               />
             </Grid>
 
-            {/* Địa chỉ thường trú */}
+            {}
             <Grid size={12}>
               <TextField
                 fullWidth
@@ -112,11 +112,11 @@ const CreateHoKhauPage = () => {
                 onChange={handleChange}
                 placeholder="Số nhà, đường, phường, quận..."
                 multiline
-                rows={2} // Cho phép nhập nhiều dòng địa chỉ
+                rows={2} 
               />
             </Grid>
 
-            {/* Nơi cấp */}
+            {}
             <Grid size={12}>
               <TextField
                 fullWidth
@@ -129,7 +129,7 @@ const CreateHoKhauPage = () => {
               />
             </Grid>
 
-            {/* Ngày cấp */}
+            {}
             <Grid size={12}>
               <TextField
                 fullWidth
@@ -143,12 +143,12 @@ const CreateHoKhauPage = () => {
               />
             </Grid>
 
-            {/* Nút lưu */}
+            {}
             <Grid size={12} sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
               <Button 
                 type="submit"
                 variant="contained" 
-                disabled={loading} // Khóa nút khi đang load
+                disabled={loading} 
                 startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
                 sx={{ 
                   bgcolor: '#008ecc', 

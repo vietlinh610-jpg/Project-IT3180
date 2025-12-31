@@ -1,4 +1,4 @@
-// src/pages/TamVangPage.jsx
+
 import React, { useState, useEffect } from 'react';
 import {
   DataGrid, GridToolbar, GridRowModes, GridActionsCellItem
@@ -8,37 +8,37 @@ import {
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField
 } from '@mui/material';
 
-// Icons
+
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
-import InfoIcon from '@mui/icons-material/Info'; // Icon xem chi tiết
+import InfoIcon from '@mui/icons-material/Info'; 
 
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 
-// Import API
+
 import {
   getListTamVang, deleteTamVang, updateTamVang
-} from '../services/tamvangApi'; // Đảm bảo đúng đường dẫn
+} from '../services/tamvangApi'; 
 
 const TamVangPage = () => {
   const navigate = useNavigate();
 
-  // --- STATE ---
+  
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [rowModesModel, setRowModesModel] = useState({});
 
-  // State cho Modal xem/sửa lý do
+  
   const [openDetail, setOpenDetail] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [isEditingReason, setIsEditingReason] = useState(false);
   const [tempReason, setTempReason] = useState('');
 
-  // --- 1. CALL API ---
+  
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -65,7 +65,7 @@ const TamVangPage = () => {
 
   useEffect(() => { fetchData(); }, []);
 
-  // --- 2. XỬ LÝ MODAL (LÝ DO) ---
+  
   const handleViewDetail = (row) => {
     setSelectedRow(row);
     setTempReason(row.lyDo || '');
@@ -97,7 +97,7 @@ const TamVangPage = () => {
     }
   };
 
-  // --- 3. XỬ LÝ GRID (INLINE EDIT & DELETE) ---
+  
   const handleDeleteClick = (id) => async () => {
     if (window.confirm("Bạn có chắc chắn muốn xóa hồ sơ này?")) {
       try {
@@ -118,13 +118,13 @@ const TamVangPage = () => {
 
     if (dateVe.isBefore(dateDi)) {
       alert("Lỗi vô lý: Ngày về dự kiến không được phép trước Ngày đi!");
-      return oldRow; // Hủy thay đổi, quay về giá trị cũ
+      return oldRow; 
     }
 
     try {
       const payload = {
         NgayDi: dayjs(newRow.ngayDi).format('YYYY-MM-DD'),
-        NgayVe: dayjs(newRow.ngayVeDuKien).format('YYYY-MM-DD'), // Map lại tên đúng với Backend
+        NgayVe: dayjs(newRow.ngayVeDuKien).format('YYYY-MM-DD'), 
         LyDo: newRow.lyDo
       };
 
@@ -137,33 +137,33 @@ const TamVangPage = () => {
     }
   };
 
-  // Handlers cho chế độ Edit
+  
   const handleEditClick = (id) => () => setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   const handleSaveClick = (id) => () => setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   const handleCancelClick = (id) => () => setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View, ignoreModifications: true } });
 
-  // --- 4. CẤU HÌNH CỘT ---
+  
   const columns = [
     { field: 'maNhanKhau', headerName: 'Mã NK', width: 90, editable: false },
     { field: 'hoTen', headerName: 'Họ tên', flex: 1.2, minWidth: 180, editable: false },
     { field: 'SoCCCD', headerName: 'Số CCCD', flex: 1, minWidth: 150, editable: false },
     { field: 'maHoKhau', headerName: 'Mã hộ khẩu', flex: 0.8, align: 'center', editable: false },
 
-    // Cột Ngày đi (Sửa được)
+    
     {
       field: 'ngayDi', headerName: 'Ngày đi', flex: 1, minWidth: 120,
       editable: true, type: 'date',
       valueFormatter: (v) => v ? dayjs(v).format('DD/MM/YYYY') : ''
     },
 
-    // Cột Ngày về dự kiến (Sửa được)
+    
     {
       field: 'ngayVeDuKien', headerName: 'Ngày về dự kiến', flex: 1, minWidth: 120,
       editable: true, type: 'date',
       valueFormatter: (v) => v ? dayjs(v).format('DD/MM/YYYY') : ''
     },
 
-    // ẨN CỘT LÝ DO KHỎI BẢNG (Đưa vào modal)
+    
 
     {
       field: 'trangThai',
@@ -178,7 +178,7 @@ const TamVangPage = () => {
         let label = 'Đang vắng';
         let color = 'warning';
 
-        // Nếu quá ngày về -> Đã về (hoặc hết hạn vắng)
+        
         if (today.isAfter(returnDate)) {
           label = 'Đã về';
           color = 'default';
@@ -263,7 +263,7 @@ const TamVangPage = () => {
         />
       </Box>
 
-      {/* MODAL CHI TIẾT & SỬA LÝ DO */}
+      {}
       <Dialog open={openDetail} onClose={() => setOpenDetail(false)} fullWidth maxWidth="sm">
         <DialogTitle sx={{ fontWeight: 'bold', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           {isEditingReason ? "Chỉnh sửa lý do tạm vắng" : "Chi tiết lý do"}

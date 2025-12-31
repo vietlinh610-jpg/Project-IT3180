@@ -1,4 +1,4 @@
-// src/pages/CreateTamVangPage.jsx
+
 import React, { useState } from 'react';
 import { 
   Box, Typography, TextField, Button, Grid, Paper, 
@@ -9,8 +9,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SearchIcon from '@mui/icons-material/Search'; 
 import { useNavigate } from 'react-router-dom';
 
-// Import API
-import { createTamVang } from '../services/tamvangApi'; // Kiểm tra lại tên file service
+
+import { createTamVang } from '../services/tamvangApi'; 
 import { findNhanKhau } from '../services/nhankhauApi';
 
 const CreateTamVangPage = () => {
@@ -21,7 +21,7 @@ const CreateTamVangPage = () => {
     maNhanKhau: '', 
     hoTen: '',
     SoCCCD: '',
-    maHoKhau: '', // Sẽ tự điền
+    maHoKhau: '', 
     ngayDi: new Date().toISOString().split('T')[0], 
     ngayVeDuKien: '',
     lyDo: ''
@@ -31,7 +31,7 @@ const CreateTamVangPage = () => {
     const { name, value } = e.target;
     
     setFormData(prev => {
-        // Nếu đổi mã nhân khẩu, reset hết thông tin cũ
+        
         if (name === 'maNhanKhau') {
             return { ...prev, [name]: value, hoTen: '', SoCCCD: '', maHoKhau: '' };
         }
@@ -39,7 +39,7 @@ const CreateTamVangPage = () => {
     });
   };
 
-  // --- HÀM TÌM NHÂN KHẨU ---
+  
   const handleFindNhanKhau = async () => {
     const maCanTim = formData.maNhanKhau.trim();
     if (!maCanTim) return;
@@ -47,10 +47,10 @@ const CreateTamVangPage = () => {
     try {
       const res = await findNhanKhau(maCanTim);
       
-      // Lấy MaHoKhau từ API trả về
+      
       const { HoTen, SoCCCD, MaHoKhau } = res.data;
 
-      // Logic kiểm tra: Người này phải có hộ khẩu mới khai báo tạm vắng được
+      
       if (!MaHoKhau) {
           alert("Người này chưa có Hộ khẩu thường trú trong hệ thống nên không thể khai báo Tạm vắng!");
           setFormData(prev => ({ ...prev, hoTen: '', SoCCCD: '', maHoKhau: '' }));
@@ -62,7 +62,7 @@ const CreateTamVangPage = () => {
         maNhanKhau: maCanTim,
         hoTen: HoTen,
         SoCCCD: SoCCCD,
-        maHoKhau: MaHoKhau // Tự động điền
+        maHoKhau: MaHoKhau 
       }));
 
     } catch (err) {
@@ -72,7 +72,7 @@ const CreateTamVangPage = () => {
     }
   };
 
-  // --- HÀM LƯU ---
+  
   const handleSave = async (e) => {
     e.preventDefault();
     
@@ -130,7 +130,7 @@ const CreateTamVangPage = () => {
         <form onSubmit={handleSave}>
           <Grid container spacing={3} direction="column">
 
-            {/* Dòng 1: Tìm kiếm Mã Nhân Khẩu */}
+            {}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -156,7 +156,7 @@ const CreateTamVangPage = () => {
               />
             </Grid>
 
-            {/* Dòng 2: Họ tên (ReadOnly) */}
+            {}
             <Grid item xs={12}>
               <TextField
                 fullWidth label="Họ và tên" value={formData.hoTen}
@@ -164,7 +164,7 @@ const CreateTamVangPage = () => {
               />
             </Grid>
 
-            {/* Dòng 3: Số CCCD (ReadOnly) */}
+            {}
             <Grid item xs={12}>
               <TextField
                 fullWidth label="Số CCCD" value={formData.SoCCCD}
@@ -172,7 +172,7 @@ const CreateTamVangPage = () => {
               />
             </Grid>
 
-            {/* Dòng 4: Mã hộ khẩu (TỰ ĐỘNG ĐIỀN & KHÓA LẠI) */}
+            {}
             <Grid item xs={12}>
               <TextField
                 fullWidth 
@@ -180,14 +180,14 @@ const CreateTamVangPage = () => {
                 name="maHoKhau" 
                 variant="filled"
                 value={formData.maHoKhau}
-                // KHÔNG CẦN onChange vì người dùng không được sửa
+                
                 InputProps={{ readOnly: true }} 
-                sx={{ bgcolor: '#f5f5f5' }} // Màu xám để thể hiện là tự động
+                sx={{ bgcolor: '#f5f5f5' }} 
                 helperText={formData.hoTen && !formData.maHoKhau ? "Lỗi: Người này chưa có mã hộ khẩu" : ""}
               />
             </Grid>
 
-            {/* Dòng 5: Thời gian */}
+            {}
             <Grid container item spacing={3}>
                 <Grid item xs={12} md={6}>
                 <TextField
@@ -205,7 +205,7 @@ const CreateTamVangPage = () => {
                 </Grid>
             </Grid>
 
-            {/* Dòng 6: Lý do */}
+            {}
             <Grid item xs={12}>
               <TextField
                 fullWidth label="Lý do tạm vắng" name="lyDo" multiline rows={3} variant="filled"
@@ -214,7 +214,7 @@ const CreateTamVangPage = () => {
               />
             </Grid>
 
-            {/* Nút lưu */}
+            {}
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
               <Button 
                 type="submit" variant="contained" 

@@ -7,7 +7,7 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 
-// API
+
 import { layLSTT } from "../services/dongPhiAPi";
 
 const LichSuThanhToanPage = () => {
@@ -17,7 +17,7 @@ const LichSuThanhToanPage = () => {
 
   const userId = localStorage.getItem("userID");
 
-  // * Fetch lịch sử 
+  
   const fetchLichSu = async () => {
     try {
       const res = await layLSTT(userId);
@@ -40,12 +40,12 @@ const LichSuThanhToanPage = () => {
   useEffect(() => {
      
     fetchLichSu();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  
   }, []);
 
   return (
     <Box sx={{ p: 4, backgroundColor: '#f4f7f6', minHeight: '100vh' }}>
-      {/* HEADER*/}
+      {}
       <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
         <IconButton onClick={() => navigate('/khoan-thu')}>
           <ArrowBackIcon />
@@ -55,7 +55,7 @@ const LichSuThanhToanPage = () => {
         </Typography>
       </Stack>
 
-      {/* TABLE*/}
+      {}
       <Paper elevation={1} sx={{ borderRadius: 3, overflow: 'hidden' }}>
         <TableContainer>
           <Table>

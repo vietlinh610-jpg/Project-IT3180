@@ -1,4 +1,4 @@
-// src/pages/TaiKhoanPage.jsx
+
 import React, { useState, useEffect } from 'react';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import {
@@ -9,13 +9,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 
-// 1. IMPORT SERVICE (Nhớ chỉnh lại đường dẫn cho đúng với project của bạn)
+
 import { getTaiKhoan, deleteTaiKhoan, updateTaiKhoan } from '../services/taikhoanApi';
 
 const TaiKhoanPage = () => {
   const navigate = useNavigate();
 
-  // State
+  
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openEdit, setOpenEdit] = useState(false);
@@ -23,13 +23,13 @@ const TaiKhoanPage = () => {
     id: '', hoTen: '', SoCCCD: '', tenDangNhap: '', matKhau: '', quyenTaiKhoan: ''
   });
 
-  // --- 2. GỌI API LẤY DANH SÁCH (Sử dụng Service) ---
+  
   const fetchTaiKhoan = async () => {
     try {
       setLoading(true);
-      // Gọi qua axios service
+      
       const response = await getTaiKhoan();
-      // Axios trả dữ liệu trong response.data
+      
       const data = response.data;
 
       const formattedData = data.map(item => ({
@@ -50,13 +50,13 @@ const TaiKhoanPage = () => {
     fetchTaiKhoan();
   }, []);
 
-  // --- 3. XÓA TÀI KHOẢN (Sử dụng Service) ---
+  
   const handleDelete = async (id) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa tài khoản này?")) {
       try {
         await deleteTaiKhoan(id);
         alert("Xóa thành công!");
-        fetchTaiKhoan(); // Load lại bảng
+        fetchTaiKhoan(); 
       } catch (error) {
         console.error("Lỗi xóa:", error);
         alert("Xóa thất bại!");
@@ -64,7 +64,7 @@ const TaiKhoanPage = () => {
     }
   };
 
-  // --- 4. SỬA TÀI KHOẢN (Sử dụng Service) ---
+  
   const handleEditClick = (row) => {
     setEditData({
       id: row.id,
@@ -78,59 +78,59 @@ const TaiKhoanPage = () => {
   };
 
   const handleSaveEdit = async () => {
-    // --- 1. VALIDATION (Kiểm tra dữ liệu rỗng) ---
-    // Kiểm tra Tên đăng nhập
+    
+    
     if (!editData.tenDangNhap || editData.tenDangNhap.toString().trim() === '') {
       alert("Lỗi: Tên đăng nhập không được để trống!");
-      return; // Dừng hàm ngay lập tức
+      return; 
     }
 
-    // Kiểm tra Mật khẩu 
-    // (Lưu ý: Nếu logic của bạn là "để trống nghĩa là không đổi pass" thì bỏ đoạn if này đi)
+    
+    
     if (!editData.matKhau || editData.matKhau.toString().trim() === '') {
       alert("Lỗi: Mật khẩu không được để trống!");
       return;
     }
 
-    // Kiểm tra Họ tên
+    
     if (!editData.hoTen || editData.hoTen.toString().trim() === '') {
       alert("Lỗi: Họ tên không được để trống!");
       return;
     }
 
-    // Kiểm tra Số CCCD
+    
     if (!editData.SoCCCD || editData.SoCCCD.toString().trim() === '') {
       alert("Lỗi: Số CCCD không được để trống!");
       return;
     }
 
-    // --- 2. GỬI DỮ LIỆU ---
+    
     try {
-      // Chuẩn bị dữ liệu gửi đi
+      
       const payload = {
-        tenDangNhap: editData.tenDangNhap.trim(), // Nên trim() để xóa khoảng thừa đầu đuôi
+        tenDangNhap: editData.tenDangNhap.trim(), 
         matKhau: editData.matKhau,
         hoTen: editData.hoTen.trim(),
         SoCCCD: editData.SoCCCD.toString().trim(),
         quyen: editData.quyenTaiKhoan
       };
 
-      // Gọi API update qua service
+      
       await updateTaiKhoan(editData.id, payload);
       localStorage.setItem('fullName', editData.hoTen.trim());
       window.dispatchEvent(new Event('userInfoUpdated'));
       alert("Cập nhật thành công!");
       setOpenEdit(false);
-      fetchTaiKhoan(); // Load lại dữ liệu
+      fetchTaiKhoan(); 
     } catch (error) {
       console.error("Lỗi cập nhật:", error);
-      // Lấy thông báo lỗi từ backend trả về (nếu có)
+      
       const message = error.response?.data?.message || "Đã xảy ra lỗi kết nối server";
       alert("Lỗi: " + message);
     }
   };
 
-  // --- CẤU HÌNH CỘT (Giữ nguyên) ---
+  
   const columns = [
     {
       field: 'maHoKhau',
@@ -216,7 +216,7 @@ const TaiKhoanPage = () => {
         />
       </Box>
 
-      {/* --- DIALOG MODAL SỬA --- */}
+      {}
       <Dialog open={openEdit} onClose={() => setOpenEdit(false)} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ fontWeight: 'bold', borderBottom: '1px solid #eee' }}>
           Cập nhật tài khoản
@@ -242,7 +242,7 @@ const TaiKhoanPage = () => {
               label="Họ và tên"
               fullWidth
               value={editData.hoTen}
-              // Logic khóa ô nhập liệu
+              
               disabled={editData.quyenTaiKhoan === 'Người dùng'}
               helperText={
                 editData.quyenTaiKhoan === 'Người dùng'

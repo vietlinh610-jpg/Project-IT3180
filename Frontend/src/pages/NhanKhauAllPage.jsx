@@ -1,4 +1,4 @@
-// src/pages/NhanKhauAllPage.jsx
+
 import React, { useState, useEffect } from 'react';
 import { 
   Box, Typography, Paper, TextField, InputAdornment, IconButton, Stack, Button 
@@ -8,8 +8,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
-// Giả sử bạn có hàm API lấy tất cả nhân khẩu (không theo căn hộ)
-// Nếu chưa có, bạn có thể gọi API cũ rồi gộp dữ liệu hoặc tạo API mới
+
+
 import { getAllNhanKhau } from '../services/nhankhauApi'; 
 
 const NhanKhauAllPage = () => {
@@ -21,7 +21,7 @@ const NhanKhauAllPage = () => {
   const fetchAllData = async () => {
     try {
       setLoading(true);
-      // Gọi API lấy toàn bộ danh sách nhân khẩu
+      
       const res = await getAllNhanKhau(); 
       const formatted = res.data.map((nk) => ({
         id: nk.MaNhanKhau,
@@ -34,7 +34,7 @@ const NhanKhauAllPage = () => {
         noiSinh: nk.NoiSinh,
         danToc: nk.DanToc,
         ngheNghiep: nk.NgheNghiep,
-        maCanHo: nk.MaCanHo // Để biết họ ở căn hộ nào
+        maCanHo: nk.MaCanHo 
       }));
       setRows(formatted);
     } catch (error) {
@@ -46,7 +46,7 @@ const NhanKhauAllPage = () => {
 
   useEffect(() => { fetchAllData(); }, []);
 
-  // --- LOGIC TÌM KIẾM ---
+  
   const filteredRows = rows.filter((row) => {
     const searchLower = searchText.toLowerCase();
     return (

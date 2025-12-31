@@ -1,4 +1,4 @@
-// src/pages/CreateTaiKhoanPage.jsx
+
 import React, { useState } from 'react';
 import { 
   Box, Typography, TextField, Button, Grid, Paper, 
@@ -10,7 +10,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useNavigate } from 'react-router-dom';
 
-// Import Service API
+
 import { createTaiKhoan } from '../services/taikhoanApi';
 import { getThongTinChuHo } from '../services/hokhauApi';
 
@@ -18,7 +18,7 @@ const CreateTaiKhoanPage = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   
-  // State lưu lỗi mã hộ khẩu
+  
   const [hkError, setHkError] = useState("");
 
   const [formData, setFormData] = useState({
@@ -26,24 +26,24 @@ const CreateTaiKhoanPage = () => {
     SoCCCD: '',
     tenDangNhap: '',
     matKhau: '',
-    quyen: 'Người dùng', // Mặc định chọn User
+    quyen: 'Người dùng', 
     maHoKhau: ''
   });
 
-  // Biến kiểm tra xem có phải là User không
+  
   const isUser = formData.quyen === 'Người dùng';
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     
-    // Nếu đổi Vai trò -> Reset dữ liệu form cho sạch
+    
     if (name === 'quyen') {
         setFormData({
             ...formData,
             quyen: value,
-            maHoKhau: '', // Xóa mã HK
-            hoTen: '',    // Xóa tên
-            SoCCCD: ''    // Xóa CCCD
+            maHoKhau: '', 
+            hoTen: '',    
+            SoCCCD: ''    
         });
         setHkError(""); 
     } else {
@@ -51,15 +51,15 @@ const CreateTaiKhoanPage = () => {
     }
   };
 
-  // --- HÀM TỰ ĐỘNG KIỂM TRA MÃ HỘ KHẨU ---
+  
   const handleCheckMaHoKhau = async () => {
-    // Chỉ kiểm tra khi đang là User và đã nhập mã HK
+    
     if (isUser && formData.maHoKhau) {
         try {
             const res = await getThongTinChuHo(formData.maHoKhau);
             const { HoTen, SoCCCD } = res.data;
             
-            // Tìm thấy -> Tự điền vào form
+            
             setFormData(prev => ({
                 ...prev,
                 hoTen: HoTen,
@@ -68,7 +68,7 @@ const CreateTaiKhoanPage = () => {
             setHkError(""); 
 
         } catch (error) {
-            // Không thấy -> Báo lỗi và xóa thông tin cũ
+            
             const msg = error.response?.data?.message || "Không tìm thấy hộ khẩu này!";
             setHkError(msg);
             setFormData(prev => ({ ...prev, hoTen: '', SoCCCD: '' }));
@@ -78,14 +78,14 @@ const CreateTaiKhoanPage = () => {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    if (hkError) return; // Đang lỗi thì chặn luôn
+    if (hkError) return; 
 
     try {
         const payload = {
             tenDangNhap: formData.tenDangNhap,
             matKhau: formData.matKhau,
             quyen: formData.quyen,
-            // Nếu là Admin thì maHoKhau gửi lên là null
+            
             maHoKhau: isUser ? formData.maHoKhau : null,
             hoTen: formData.hoTen,
             SoCCCD: formData.SoCCCD
@@ -102,7 +102,7 @@ const CreateTaiKhoanPage = () => {
 
   return (
     <Box sx={{ p: 4, backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
-      {/* Header */}
+      {}
       <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
         <IconButton onClick={() => navigate('/quan-ly-tai-khoan')}>
           <ArrowBackIcon />
@@ -114,10 +114,10 @@ const CreateTaiKhoanPage = () => {
 
       <Paper elevation={0} sx={{ p: 4, borderRadius: '12px', border: '1px solid #e0e0e0', maxWidth: '800px', mx: 'auto' }}>
         <form onSubmit={handleSave}>
-          {/* SỬ DỤNG GRID CONTAINER CHIỀU DỌC (column) ĐỂ XẾP TỪ TRÊN XUỐNG */}
+          {}
           <Grid container spacing={3} direction="column">
 
-            {/* 1. VAI TRÒ */}
+            {}
             <Grid item xs={12}>
               <FormControl fullWidth variant="filled">
                 <InputLabel>Vai trò hệ thống *</InputLabel>
@@ -134,7 +134,7 @@ const CreateTaiKhoanPage = () => {
               </FormControl>
             </Grid>
 
-            {/* 2. MÃ HỘ KHẨU */}
+            {}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -143,11 +143,11 @@ const CreateTaiKhoanPage = () => {
                 variant="filled"
                 value={formData.maHoKhau}
                 onChange={handleChange}
-                onBlur={handleCheckMaHoKhau} // Nhập xong tự kiểm tra
+                onBlur={handleCheckMaHoKhau} 
                 
-                // Logic hiển thị:
-                disabled={!isUser} // Nếu KHÔNG phải user thì khóa lại
-                required={isUser}  // Nếu là user thì bắt buộc nhập
+                
+                disabled={!isUser} 
+                required={isUser}  
                 
                 error={!!hkError}
                 helperText={
@@ -158,7 +158,7 @@ const CreateTaiKhoanPage = () => {
               />
             </Grid>
 
-            {/* 3. HỌ VÀ TÊN */}
+            {}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -169,16 +169,16 @@ const CreateTaiKhoanPage = () => {
                 onChange={handleChange}
                 required
                 
-                // Logic hiển thị:
-                disabled={isUser} // Nếu là User thì KHÓA (để bắt buộc dùng mã HK lấy ra)
                 
-                // Quan trọng: shrink: true để nhãn không bị đè khi tự điền
+                disabled={isUser} 
+                
+                
                 InputLabelProps={{ shrink: true }} 
                 placeholder={isUser ? "Tự động điền theo mã HK..." : "Nhập họ tên nhân viên"}
               />
             </Grid>
 
-            {/* 4. SỐ CCCD */}
+            {}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -189,15 +189,15 @@ const CreateTaiKhoanPage = () => {
                 onChange={handleChange}
                 required
                 
-                // Logic hiển thị:
-                disabled={isUser} // Tương tự họ tên
+                
+                disabled={isUser} 
                 
                 InputLabelProps={{ shrink: true }}
                 placeholder={isUser ? "Tự động điền theo mã HK..." : "Nhập số CCCD"}
               />
             </Grid>
 
-            {/* 5. TÊN ĐĂNG NHẬP */}
+            {}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -210,7 +210,7 @@ const CreateTaiKhoanPage = () => {
               />
             </Grid>
 
-            {/* 6. MẬT KHẨU */}
+            {}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -233,13 +233,13 @@ const CreateTaiKhoanPage = () => {
               />
             </Grid>
 
-            {/* NÚT LƯU (Căn phải) */}
+            {}
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
               <Button 
                 type="submit"
                 variant="contained" 
                 startIcon={<SaveIcon />}
-                disabled={!!hkError} // Nếu đang lỗi mã HK thì cấm lưu
+                disabled={!!hkError} 
                 sx={{ 
                   bgcolor: '#008ecc', 
                   px: 4, py: 1.2, fontWeight: 'bold', textTransform: 'none',

@@ -1,13 +1,13 @@
-// src/pages/LoginPage.jsx
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "../services/loginApi"; // Import API
+import { loginUser } from "../services/loginApi";
 import "../styles/LoginPage.css";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(""); // State để hiện lỗi nếu có
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const DEFAULT_ACCOUNT = {
@@ -24,26 +24,22 @@ const LoginPage = () => {
     e.preventDefault();
     setError("");
 
-    // KIỂM TRA TÀI KHOẢN MẶC ĐỊNH TRƯỚC
     if (
       username === DEFAULT_ACCOUNT.username &&
       password === DEFAULT_ACCOUNT.password
     ) {
       const { token, user } = DEFAULT_ACCOUNT;
-      handleSuccessLogin(token, user); // Tách hàm để dùng chung
+      handleSuccessLogin(token, user);
       return;
     }
 
-    // NẾU KHÔNG PHẢI ADMIN MẶC ĐỊNH -> GỌI API THẬT
     try {
       const payload = { tenDangNhap: username, matKhau: password };
       const res = await loginUser(payload);
 
-      // 3. Lấy dữ liệu từ Backend trả về
-      // Cấu trúc trả về: { message, token, user: { hoTen, quyen, ... } }
       const { token, user } = res.data;
 
-      // 4. Xóa dữ liệu cũ và Lưu dữ liệu mới vào localStorage
+      
       localStorage.clear();
       localStorage.setItem("userToken", token);
       let safeRole = user.quyen;
@@ -54,14 +50,14 @@ const LoginPage = () => {
       localStorage.setItem("userRole", safeRole);
       localStorage.setItem("userInfo", JSON.stringify(user));
       localStorage.setItem("fullName", user.hoTen);
-      // Thêm userID để tích hợp với tài khoản người dùng
+      
       localStorage.setItem("userID", user.id); 
       alert(`Đăng nhập thành công! Xin chào ${user.hoTen}`);
 
-      // 5. Điều hướng
+      
       navigate("/dashboard");
 
-      // Reload để App cập nhật lại Menu theo quyền mới
+      
       window.location.reload();
     } catch (err) {
       console.error("Lỗi đăng nhập:", err);
@@ -70,12 +66,12 @@ const LoginPage = () => {
     }
   };
 
-  // Hàm bổ trợ để tránh lặp code (DRY - Don't Repeat Yourself)
+  
   const handleSuccessLogin = (token, user) => {
     localStorage.clear();
     localStorage.setItem("userToken", token);
 
-    // Logic map quyền của bạn
+    
     const roleMap = {
       Admin: "admin",
       "Kế toán": "ketoan",
@@ -85,7 +81,7 @@ const LoginPage = () => {
 
     localStorage.setItem("userRole", safeRole);
     localStorage.setItem("userInfo", JSON.stringify(user));
-    // Thêm id của nhân khẩu để tích hợp tài khoản người dùng với BE
+    
     localStorage.setItem("userID", user.id);
 
     alert(`Đăng nhập thành công! Xin chào ${user.hoTen}`);
@@ -97,7 +93,7 @@ const LoginPage = () => {
       <form className="login-form" onSubmit={handleSubmit}>
         <h2>Đăng Nhập Hệ Thống</h2>
 
-        {/* Hiển thị lỗi nếu có */}
+        {}
         {error && <div className="error-message">{error}</div>}
 
         <div className="form-group">
