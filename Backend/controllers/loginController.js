@@ -1,7 +1,7 @@
 const { connectDB, sql } = require("../config/db");
 const jwt = require("jsonwebtoken");
 
-const JWT_SECRET = "mat_khau_bi_mat_123"; // Nên để chuỗi dài bảo mật
+const JWT_SECRET = "mat_khau_bi_mat_123"; // Demo
 
 const login = async (req, res) => {
   // Frontend gửi lên: tenDangNhap, matKhau
@@ -23,7 +23,7 @@ const login = async (req, res) => {
       return res.status(401).json({ message: "Tên đăng nhập không tồn tại!" });
     }
 
-    // Bonus*. Tìm mã nhân khẩu ứng với mã hộ khẩu
+    // Tìm mã nhân khẩu ứng với mã hộ khẩu
     const query = `
         select nk.MaNhanKhau
         from nhan_khau nk
@@ -37,10 +37,10 @@ const login = async (req, res) => {
       .query(query);
 
     // Lấy ra mã nhân khẩu của chủ hộ
-    const nhanKhau = nkRes.recordset[0] || { MaNhanKhau: "Not an user"};
+    const nhanKhau = nkRes.recordset[0] || { MaNhanKhau: "Not an user" };
 
-
-    // 3. Kiểm tra mật khẩu (So sánh chuỗi thường)
+    // 3. Kiểm tra mật khẩu (So sánh chuỗi thường, ko hash)
+    // Demo
     if (user.MatKhau !== matKhau) {
       return res.status(401).json({ message: "Mật khẩu không đúng!" });
     }
@@ -60,7 +60,7 @@ const login = async (req, res) => {
         hoTen: user.HoTen,
         quyen: user.Quyen,
         maHoKhau: user.MaHoKhau,
-        id: nhanKhau.MaNhanKhau , // Thêm userID để tích hợp với frontend
+        id: nhanKhau.MaNhanKhau, // Thêm userID để tích hợp với frontend
       },
     });
   } catch (error) {
