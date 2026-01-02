@@ -76,7 +76,11 @@ const CanHoPage = () => {
         MaHoKhau: newRow.maHoKhau || null 
       };
       await updateCanHo(newRow.id, updatedData);
-      return newRow;
+      setRows((prevRows) => 
+        prevRows.map((row) => (row.id === newRow.id ? newRow : row))
+      );
+      return newRow; 
+      
     } catch (error) {
       console.error("Lỗi cập nhật:", error);
       const message = error.response?.data?.message || "Cập nhật thất bại! Vui lòng thử lại.";
