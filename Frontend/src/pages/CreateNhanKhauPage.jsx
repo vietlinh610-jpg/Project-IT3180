@@ -6,7 +6,7 @@ import {
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router-dom'; 
-import { createNhanKhau, getCanHoCount, getNhanKhauByCanHo } from '../services/nhankhauApi'; 
+import { createNhanKhau, getCanHoCount, getNhanKhauByCanHo } from '../services/nhankhauApi';
 
 const CreateNhanKhauPage = () => {
   const navigate = useNavigate();
@@ -68,7 +68,7 @@ const CreateNhanKhauPage = () => {
         MaNhanKhau: formData.maNhanKhau,
         MaHoKhau: maHoKhau, 
         HoTen: formData.hoTen,
-        GioiTinh: formData.gioiTinh, 
+        GioiTinh: formData.gioiTinh,
         NgaySinh: formData.ngaySinh || null,
         DanToc: formData.danToc,
         TonGiao: formData.tonGiao,
@@ -228,7 +228,7 @@ const CreateNhanKhauPage = () => {
               />
             </Grid>
             
-            {}
+            
             <Grid size={6}>
               <TextField
                 fullWidth

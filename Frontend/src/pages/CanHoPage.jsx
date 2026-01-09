@@ -22,14 +22,13 @@ const CanHoPage = () => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  
+  // state quản lý tìm kiếm
   const [searchText, setSearchText] = useState('');
   
   
   const [rowModesModel, setRowModesModel] = useState({});
 
-  
-  
+  // Lọc dựa trên mã căn hộ, tên căn hộ hoặc mã hộ khẩu
   const filteredRows = rows.filter((row) => {
     const searchLower = searchText.toLowerCase();
     return (
@@ -40,7 +39,7 @@ const CanHoPage = () => {
     );
   });
 
-  
+  // xử lý các sự kiện click
   const handleEditClick = (id) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   };
@@ -93,7 +92,6 @@ const CanHoPage = () => {
     setRowModesModel(newRowModesModel);
   };
 
-  
   const columns = [
     { field: 'maCanHo', headerName: 'Mã căn hộ', flex: 1, minWidth: 100, editable: false }, 
     { field: 'tenCanHo', headerName: 'Tên căn hộ', flex: 1, minWidth: 120, editable: false },
@@ -179,7 +177,7 @@ const CanHoPage = () => {
         Danh sách căn hộ
       </Typography>
 
-      {}
+      {/* CẬP NHẬT GIAO DIỆN HÀNG NÚT VÀ TÌM KIẾM */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Button 
           variant="contained" 

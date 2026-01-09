@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Box, Typography, TextField, Button, Grid, Paper,
@@ -37,9 +36,7 @@ const CreateCanHoPage = () => {
     try {
       setLoading(true);
 
-      
       const payload = {
-        
         MaCanHo: formData.maCanHo.trim(), 
         
         TenCanHo: formData.tenCanHo,
@@ -87,13 +84,11 @@ const CreateCanHoPage = () => {
         <form onSubmit={handleSave}>
           <Grid container spacing={3} direction="column">
             
-            {}
             <Grid size={12}>
               <TextField
                 fullWidth
                 label="Mã căn hộ (ID) *"
                 name="maCanHo"
-                
                 type="text" 
                 variant="filled"
                 value={formData.maCanHo}

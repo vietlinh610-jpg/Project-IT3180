@@ -80,6 +80,7 @@ const CreateTamTruPage = () => {
         canHo: DanhSachCanHo.length === 1 ? DanhSachCanHo[0] : ''
       }));
 
+    // eslint-disable-next-line no-unused-vars
     } catch (err) {
       alert("Không tìm thấy nhân khẩu này trong hệ thống!");
       setFormData(prev => ({ ...prev, hoTen: '', SoCCCD: '', canHo: '' }));

@@ -1,31 +1,27 @@
 const sql = require("mssql");
-require('dotenv').config();
+require("dotenv").config();
 
-const config =
-{
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    server: process.env.DB_SERVER,
-    database: process.env.DB_NAME,
-    options: 
-    {
-        encrypt: false, 
-        trustServerCertificate: true
-    }
+// Khởi tạo kết nối tới db
+const config = {
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  server: process.env.DB_SERVER,
+  database: process.env.DB_NAME,
+  options: {
+    encrypt: false,
+    trustServerCertificate: true,
+  },
 };
 
-const connectDB = async () =>
-{
-    try
-    {
-        let pool = await sql.connect(config);
-        console.log("✅ Đã kết nối SQL Server thành công!");
-        return pool;
-    } 
-    catch (err) 
-    {
-        console.log("❌ Lỗi kết nối Database:", err.message);
-    }
+// Trả về kết nối
+const connectDB = async () => {
+  try {
+    let pool = await sql.connect(config);
+    console.log("✅ Đã kết nối SQL Server thành công!");
+    return pool;
+  } catch (err) {
+    console.log("❌ Lỗi kết nối Database:", err.message);
+  }
 };
 
 module.exports = { connectDB, sql };

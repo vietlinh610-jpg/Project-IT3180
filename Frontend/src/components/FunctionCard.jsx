@@ -1,6 +1,5 @@
-// src/components/FunctionCard.jsx
 import React from 'react';
-import '../styles/FunctionCard.css'; // Sẽ tạo ở Bước 3
+import '../styles/FunctionCard.css';
 
 const FunctionCard = ({ title, description, imageUrl, linkTo }) => {
   return (

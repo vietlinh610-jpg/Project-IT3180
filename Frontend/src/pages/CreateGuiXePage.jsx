@@ -66,7 +66,6 @@ const CreateGuiXePage = () => {
 
   return (
     <Box sx={styles.page}>
-      {}
       <Stack direction="row" alignItems="center" spacing={1} sx={styles.header}>
         <IconButton onClick={() => navigate("/quan-ly-gui-xe")}>
           <ArrowBackIcon />
@@ -79,7 +78,6 @@ const CreateGuiXePage = () => {
       <Paper sx={styles.paper}>
         <form onSubmit={handleSave}>
           <Grid container spacing={3} direction="column">
-            {}
             <Grid item>
               <TextField
                 fullWidth
@@ -92,7 +90,6 @@ const CreateGuiXePage = () => {
               />
             </Grid>
 
-            {}
             <Grid item>
               <FormControl fullWidth variant="filled">
                 <InputLabel>Loại xe</InputLabel>
@@ -107,7 +104,6 @@ const CreateGuiXePage = () => {
               </FormControl>
             </Grid>
 
-            {}
             <Grid item>
               <TextField
                 fullWidth
@@ -120,7 +116,6 @@ const CreateGuiXePage = () => {
               />
             </Grid>
 
-            {}
             <Grid item sx={styles.action}>
               <Button
                 type="submit"

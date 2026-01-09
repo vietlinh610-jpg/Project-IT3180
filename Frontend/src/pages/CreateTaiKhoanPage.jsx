@@ -168,11 +168,7 @@ const CreateTaiKhoanPage = () => {
                 value={formData.hoTen}
                 onChange={handleChange}
                 required
-                
-                
-                disabled={isUser} 
-                
-                
+                disabled={isUser}
                 InputLabelProps={{ shrink: true }} 
                 placeholder={isUser ? "Tự động điền theo mã HK..." : "Nhập họ tên nhân viên"}
               />

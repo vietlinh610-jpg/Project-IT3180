@@ -38,7 +38,7 @@ const CreateHoKhauPage = () => {
     try {
       setLoading(true); 
 
-      
+      // 2. Chuẩn bị dữ liệu gửi lên Backend
       const payload = {
         MaHoKhau: formData.maHoKhau.trim(),
         DiaChiThuongTru: formData.diaChiThuongTru,
@@ -58,7 +58,7 @@ const CreateHoKhauPage = () => {
       const message = error.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại!";
       alert(message);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
