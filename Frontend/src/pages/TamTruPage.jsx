@@ -1,4 +1,4 @@
-// src/pages/TamTruPage.jsx
+
 import React, { useState, useEffect } from 'react';
 import {
   DataGrid, GridToolbar, GridRowModes, GridActionsCellItem
@@ -8,7 +8,7 @@ import {
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField
 } from '@mui/material';
 
-// Icons
+
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PrintIcon from '@mui/icons-material/Print';
@@ -20,26 +20,26 @@ import InfoIcon from '@mui/icons-material/Info';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 
-// Import API
+
 import {
   getListTamTru, deleteTamTru, updateTamTru
-} from '../services/tamtruApi'; // Kiểm tra lại đường dẫn import đúng file service của bạn
+} from '../services/tamtruApi'; 
 
 const TamTruPage = () => {
   const navigate = useNavigate();
 
-  // --- STATE ---
+  
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [rowModesModel, setRowModesModel] = useState({});
 
-  // State cho Modal xem/sửa lý do
+  
   const [openDetail, setOpenDetail] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [isEditingReason, setIsEditingReason] = useState(false);
   const [tempReason, setTempReason] = useState('');
 
-  // --- 1. CALL API ---
+  
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -47,9 +47,9 @@ const TamTruPage = () => {
 
       const formattedData = res.data.map((item, index) => ({
         id: item.ID || index,
-        // --- THÊM DÒNG NÀY ---
+        
         maNhanKhau: item.MaNhanKhau,
-        // --------------------
+        
         hoTen: item.HoTen,
         SoCCCD: item.SoCCCD,
         maCanHo: item.MaCanHo || 'Chưa có',
@@ -68,7 +68,7 @@ const TamTruPage = () => {
 
   useEffect(() => { fetchData(); }, []);
 
-  // --- 2. XỬ LÝ MODAL (XEM VÀ SỬA LÝ DO) ---
+  
 
   const handleViewDetail = (row) => {
     setSelectedRow(row);
@@ -90,7 +90,7 @@ const TamTruPage = () => {
 
     if (dateVe.isBefore(dateDi)) {
       alert("Lỗi vô lý: Ngày kết thúc không được phép trước Ngày bắt đầu!");
-      return oldRow; // Hủy thay đổi, quay về giá trị cũ
+      return oldRow; 
     }
 
     try {
@@ -111,7 +111,7 @@ const TamTruPage = () => {
     }
   };
 
-  // --- 3. XỬ LÝ DATA GRID (INLINE EDIT NGÀY THÁNG) ---
+  
   const handleDeleteClick = (id) => async () => {
     if (window.confirm("Bạn có chắc chắn muốn xóa hồ sơ này?")) {
       try {
@@ -156,16 +156,16 @@ const TamTruPage = () => {
     });
   };
 
-  // --- 4. CẤU HÌNH CỘT ---
+  
   const columns = [
-    // --- CỘT MÃ NK MỚI THÊM ---
+    
     {
       field: 'maNhanKhau',
       headerName: 'Mã NK',
       width: 90,
-      editable: false // Không cho sửa mã NK
+      editable: false 
     },
-    // --------------------------
+    
     { field: 'hoTen', headerName: 'Họ tên', flex: 1.2, minWidth: 160 },
     { field: 'SoCCCD', headerName: 'Số CCCD', flex: 1, minWidth: 140 },
     { field: 'maCanHo', headerName: 'Mã căn hộ', flex: 0.8, align: 'center', editable: false },
@@ -273,7 +273,7 @@ const TamTruPage = () => {
         />
       </Box>
 
-      {/* MODAL HIỂN THỊ CHI TIẾT & SỬA LÝ DO */}
+      {}
       <Dialog open={openDetail} onClose={() => setOpenDetail(false)} fullWidth maxWidth="sm">
         <DialogTitle sx={{ fontWeight: 'bold', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           {isEditingReason ? "Chỉnh sửa lý do" : "Chi tiết lý do tạm trú"}

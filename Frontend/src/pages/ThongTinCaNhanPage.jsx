@@ -15,7 +15,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import { chinhSuaTTCN, layTTCN } from "../services/ttcnApi";
 
 const ThongTinCaNhanPage = () => {
-  // Lấy userID từ localStorage để map đúng đối tượng
+  
   const userId = localStorage.getItem("userID");
 
   const [isEditing, setIsEditing] = useState(false);
@@ -24,14 +24,14 @@ const ThongTinCaNhanPage = () => {
     cccd: "",
     gioiTinh: "",
     ngaySinh: "",
-    soDienThoai: "0900000000", // Fake do db lưu thiếu sđt :v
+    soDienThoai: "0900000000", 
     danToc: "",
     tonGiao: "",
     ngheNghiep: "",
     noiSinh: "",
   });
 
-  // Load thông tin cá nhân khi vừa mới tải lại trang
+  
   useEffect(() => {
     const fetchTTCN = async () => {
       try {
@@ -43,7 +43,7 @@ const ThongTinCaNhanPage = () => {
           cccd: data.SoCCCD,
           gioiTinh: data.GioiTinh,
           ngaySinh: data.NgaySinh?.slice(0, 10),
-          soDienThoai: "0900000000", // ! 
+          soDienThoai: "0900000000", 
           danToc: data.DanToc,
           tonGiao: data.TonGiao,
           ngheNghiep: data.NgheNghiep,
@@ -58,13 +58,13 @@ const ThongTinCaNhanPage = () => {
     fetchTTCN();
   }, [userId]);
 
-  // Xử lý thay đổi khi nhập
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUserInfo((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Xử lý lưu thông tin cá nhân thay đổi
+  
   const handleSave = async () => {
     try {
       const payload = {
@@ -99,7 +99,7 @@ const ThongTinCaNhanPage = () => {
         </Stack>
 
         <Grid container spacing={3}>
-          {/* Không cho sửa 1 số trường */}
+          {}
           <Grid item xs={12} sm={4}>
             <TextField fullWidth label="Họ và tên" value={userInfo.hoTen} disabled />
           </Grid>

@@ -1,4 +1,4 @@
-// src/pages/CanHoPage.jsx
+
 import React, { useEffect, useState } from 'react';
 import { 
   DataGrid, 
@@ -11,21 +11,21 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
-import SearchIcon from '@mui/icons-material/Search'; // Thêm icon tìm kiếm
+import SearchIcon from '@mui/icons-material/Search'; 
 import { useNavigate } from 'react-router-dom';
 import { getCanHoList, deleteCanHo, updateCanHo } from '../services/canhoApi'; 
 
 const CanHoPage = () => {
   const navigate = useNavigate();
   
-  // State dữ liệu gốc từ API
+  
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   
   // state quản lý tìm kiếm
   const [searchText, setSearchText] = useState('');
   
-  // State quản lý chế độ sửa
+  
   const [rowModesModel, setRowModesModel] = useState({});
 
   // Lọc dựa trên mã căn hộ, tên căn hộ hoặc mã hộ khẩu
@@ -75,7 +75,11 @@ const CanHoPage = () => {
         MaHoKhau: newRow.maHoKhau || null 
       };
       await updateCanHo(newRow.id, updatedData);
-      return newRow;
+      setRows((prevRows) => 
+        prevRows.map((row) => (row.id === newRow.id ? newRow : row))
+      );
+      return newRow; 
+      
     } catch (error) {
       console.error("Lỗi cập nhật:", error);
       const message = error.response?.data?.message || "Cập nhật thất bại! Vui lòng thử lại.";
@@ -206,7 +210,7 @@ const CanHoPage = () => {
 
       <Box sx={{ flexGrow: 1, width: '100%', backgroundColor: '#fff' }}>
         <DataGrid
-          rows={filteredRows}
+          rows={filteredRows} 
           columns={columns}
           loading={loading}
           slots={{ toolbar: GridToolbar }}

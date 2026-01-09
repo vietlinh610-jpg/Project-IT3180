@@ -1,5 +1,5 @@
 import axios from 'axios';
-const API_URL = 'http://localhost:5000/api/tamtru';
+const API_URL = '/api/tamtru';
 
 export const getListTamTru = () => axios.get(`${API_URL}`);
 export const createTamTru = (data) => axios.post(`${API_URL}`, data);

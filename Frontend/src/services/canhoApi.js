@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/canho';
+const API_URL = '/api/canho';
 
 export const getCanHoList = () => {
   return axios.get(API_URL);

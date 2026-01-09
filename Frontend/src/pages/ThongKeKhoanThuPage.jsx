@@ -25,7 +25,7 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
 
-// API
+
 import { layDoanhThu } from "../services/thuphiApi";
 
 const ThongKeKhoanThuPage = () => {
@@ -39,7 +39,7 @@ const ThongKeKhoanThuPage = () => {
     setSelectedYear(event.target.value);
   };
 
-  // Load doanh thu theo 12 tháng
+  
   useEffect(() => {
     const fetchDoanhThu = async () => {
       try {
@@ -78,7 +78,7 @@ const ThongKeKhoanThuPage = () => {
         boxSizing: "border-box",
       }}
     >
-      {/* Header */}
+      {}
       <Stack
         direction={{ xs: "column", sm: "row" }}
         justifyContent="space-between"
@@ -98,7 +98,7 @@ const ThongKeKhoanThuPage = () => {
           </Typography>
         </Stack>
 
-        {/* Chọn năm */}
+        {}
         <FormControl sx={{ minWidth: 150 }} size="small">
           <InputLabel>Chọn năm</InputLabel>
           <Select
@@ -114,7 +114,7 @@ const ThongKeKhoanThuPage = () => {
         </FormControl>
       </Stack>
 
-      {/* Chart */}
+      {}
       <Paper elevation={2} sx={{ p: { xs: 2, md: 4 }, borderRadius: "15px" }}>
         <Typography
           variant="h6"

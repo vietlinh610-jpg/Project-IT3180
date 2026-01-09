@@ -1,5 +1,5 @@
 import axios from 'axios';
-const API_URL = 'http://localhost:5000/api/nhankhau';
+const API_URL = '/api/nhankhau';
 
 export const getCanHoCount = () => axios.get(`${API_URL}/canho`);
 export const getNhanKhauByCanHo = (maCanHo) => axios.get(`${API_URL}/canho/${maCanHo}`);

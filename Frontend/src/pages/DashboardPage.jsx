@@ -6,21 +6,21 @@ const DashboardPage = () => {
   const [role, setRole] = useState('');
 
   useEffect(() => {
-    // Lấy role từ localStorage khi vào trang
+    
     const savedRole = localStorage.getItem('userRole');
-    console.log("Vai trò hiện tại:", savedRole); // Dùng để kiểm tra lỗi ở Console
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    console.log("Vai trò hiện tại:", savedRole); 
+    
     setRole(savedRole || 'user');
   }, []);
 
-  // 1. Định nghĩa tất cả các cards có thể có
+  
   const allCards = [
     {
       title: "Quản lý hộ khẩu",
       description: "Quản lý hộ khẩu và các khoản thu theo hộ",
       imageUrl: "/images/ho_khau.jpg",
       linkTo: "/ho-gia-dinh/ho-khau",
-      roles: ['admin'], // Chỉ dành cho admin
+      roles: ['admin'], 
     },
     {
       title: "Quản lý căn hộ",
@@ -34,7 +34,7 @@ const DashboardPage = () => {
       description: "Quản lý các khoản thu phí trong chung cư",
       imageUrl: "/images/thu_chi.png",
       linkTo: "/quan-ly-khoan-thu",
-      roles: ['admin', 'ketoan'], // Admin và Kế toán thấy
+      roles: ['admin', 'ketoan'], 
     },
     {
       title: "Quản lý nhân khẩu",
@@ -62,7 +62,7 @@ const DashboardPage = () => {
       description: "Xem và cập nhật thông tin cá nhân của bạn",
       imageUrl: "/images/ca_nhan.webp", 
       linkTo: "/thong-tin-ca-nhan",
-      roles: ['user'], // Chỉ cư dân thấy
+      roles: ['user'], 
     },
     {
       title: "Thành viên gia đình",
@@ -90,11 +90,11 @@ const DashboardPage = () => {
       description: "Quản lý gửi ô tô, xe máy của các hộ",
       imageUrl: "images/guiXe.jpg",
       linkTo: "/quan-ly-gui-xe",
-      roles: ['admin'], // chỉ admin mới có quyền quản lý gửi xe
+      roles: ['admin'], 
     }
   ];
 
-  // 2. Lọc danh sách card dựa trên vai trò của người dùng hiện tại
+  
   const filteredCards = allCards.filter(card => card.roles.includes(role));
 
   return (

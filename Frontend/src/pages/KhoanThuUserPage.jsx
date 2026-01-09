@@ -8,7 +8,7 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import HistoryIcon from '@mui/icons-material/History';
 import { useNavigate } from 'react-router-dom';
 
-// API
+
 import { layDSKT, nopKt } from "../services/dongPhiAPi";
 
 const KhoanThuUserPage = () => {
@@ -20,7 +20,7 @@ const KhoanThuUserPage = () => {
 
   const userId = localStorage.getItem("userID");
 
-  /* ================== LOAD DS KHOẢN THU ================== */
+  
   const fetchDSKT = async () => {
     try {
       const res = await layDSKT(userId);
@@ -45,11 +45,11 @@ const KhoanThuUserPage = () => {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    
     fetchDSKT();
   }, []);
 
-  /* ================== CHIP TRẠNG THÁI ================== */
+  
   const getStatusChip = (status) => {
     switch (status) {
       case "Đã nộp":
@@ -63,7 +63,7 @@ const KhoanThuUserPage = () => {
     }
   };
 
-  /* ================== ACTION ================== */
+  
   const renderAction = (bill) => {
     if (bill.trangThai === "Chưa nộp" || bill.trangThai === "Từ chối") {
       return (
@@ -87,11 +87,11 @@ const KhoanThuUserPage = () => {
     );
   };
 
-  /* ================== GỬI YÊU CẦU ĐÓNG PHÍ ================== */
+  
   const handleSubmitPayment = async () => {
     try {
       await nopKt({
-        id_nk: userId,                 // ✅ đúng controller
+        id_nk: userId,                 
         id_kt: selectedBill.id_kt,
         soTien: selectedBill.soTienRaw,
       });
@@ -125,13 +125,6 @@ const KhoanThuUserPage = () => {
             Lịch sử nộp tiền
           </Button>
 
-          <Button
-            variant="contained"
-            startIcon={<PaymentIcon />}
-            sx={{ bgcolor: '#008ecc', textTransform: 'none' }}
-          >
-            Thanh toán
-          </Button>
         </Stack>
       </Stack>
 
@@ -172,7 +165,7 @@ const KhoanThuUserPage = () => {
         </TableContainer>
       </Paper>
 
-      {/* ===== MODAL QR ===== */}
+      {}
       <Modal open={open} onClose={() => setOpen(false)}>
         <Box sx={{
           position: 'absolute',

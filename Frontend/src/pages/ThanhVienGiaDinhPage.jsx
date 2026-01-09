@@ -16,10 +16,10 @@ import {
 import HomeIcon from "@mui/icons-material/Home";
 import GroupsIcon from "@mui/icons-material/Groups";
 
-// API
+
 import { layTTChung, layTTGD } from "../services/ttcnApi";
 
-// Tiện tích format ngày tháng
+
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
   const d = new Date(dateStr);
@@ -29,7 +29,7 @@ const formatDate = (dateStr) => {
 const ThanhVienGiaDinhPage = () => {
   const userId = localStorage.getItem("userID");
 
-  // quản lý thông tin chung
+  
   const [ttChung, setTtChung] = useState({
     maHoKhau: "",
     canHo: "",
@@ -40,7 +40,7 @@ const ThanhVienGiaDinhPage = () => {
 
   const [members, setMembers] = useState([]);
 
-  // Load thông tin chung
+  
   useEffect(() => {
     const fetchTTChung = async () => {
       try {
@@ -62,7 +62,7 @@ const ThanhVienGiaDinhPage = () => {
     fetchTTChung();
   }, [userId]);
 
-  // Load thông tin gia đình
+  
   useEffect(() => {
     const fetchTTGD = async () => {
       try {
@@ -97,7 +97,7 @@ const ThanhVienGiaDinhPage = () => {
         Thông tin hộ gia đình
       </Typography>
 
-      {/* Hiển thị thông tin chung */}
+      {}
       <Paper elevation={1} sx={{ p: 3, borderRadius: "12px", mb: 4 }}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
@@ -142,7 +142,7 @@ const ThanhVienGiaDinhPage = () => {
         </Grid>
       </Paper>
 
-      {/* Hiển thị thông tin gia đình */}
+      {}
       <Paper elevation={1} sx={{ borderRadius: "12px", overflow: "hidden" }}>
         <Box
           sx={{

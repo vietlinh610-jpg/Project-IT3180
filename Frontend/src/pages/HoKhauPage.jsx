@@ -1,4 +1,4 @@
-// src/pages/HoKhauPage.jsx
+
 import React, { useEffect, useState } from 'react';
 import { 
   DataGrid, 
@@ -11,7 +11,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
-import SearchIcon from '@mui/icons-material/Search'; // Thêm icon tìm kiếm
+import SearchIcon from '@mui/icons-material/Search'; 
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { getHoKhauList, deleteHoKhau, updateHoKhau } from '../services/hokhauApi';
@@ -19,17 +19,17 @@ import { getHoKhauList, deleteHoKhau, updateHoKhau } from '../services/hokhauApi
 const HoKhauPage = () => {
   const navigate = useNavigate();
 
-  // State lưu dữ liệu
+  
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // --- THÊM STATE TÌM KIẾM ---
+  
   const [searchText, setSearchText] = useState('');
   
-  // State quản lý chế độ sửa (Edit Mode)
+  
   const [rowModesModel, setRowModesModel] = useState({});
 
-  // --- 1. CALL API LẤY DANH SÁCH ---
+  
   const fetchHoKhau = async () => {
     try {
       setLoading(true);
@@ -57,7 +57,7 @@ const HoKhauPage = () => {
     fetchHoKhau();
   }, []);
 
-  // --- LOGIC LỌC DỮ LIỆU TÌM KIẾM ---
+  
   const filteredRows = rows.filter((row) => {
     const searchLower = searchText.toLowerCase();
     return (
@@ -67,7 +67,7 @@ const HoKhauPage = () => {
     );
   });
 
-  // --- 2. XỬ LÝ SỰ KIỆN CLICK (Edit/Save/Cancel/Delete) ---
+  
   const handleEditClick = (id) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   };
@@ -96,48 +96,48 @@ const HoKhauPage = () => {
     }
   };
 
-  // --- 3. XỬ LÝ UPDATE KHI BẤM LƯU ---
-  const processRowUpdate = async (newRow, oldRow) => { // <-- 1. Thêm oldRow vào đây
-    // --- 2. VALIDATION (Kiểm tra dữ liệu rỗng) ---
+  
+  const processRowUpdate = async (newRow, oldRow) => { 
     
-    // Kiểm tra Địa chỉ thường trú
+    
+    
     if (!newRow.diaChi || newRow.diaChi.toString().trim() === '') {
       alert("Lỗi: Địa chỉ thường trú không được để trống!");
-      return oldRow; // Trả về dữ liệu cũ (Hủy thay đổi)
+      return oldRow; 
     }
 
-    // Kiểm tra Nơi cấp
+    
     if (!newRow.noiCap || newRow.noiCap.toString().trim() === '') {
       alert("Lỗi: Nơi cấp không được để trống!");
       return oldRow;
     }
 
-    // Kiểm tra Ngày cấp
+    
     if (!newRow.ngayCap) {
       alert("Lỗi: Ngày cấp không được để trống!");
       return oldRow;
     }
 
-    // --- 3. GỌI API (Nếu dữ liệu hợp lệ) ---
+    
     try {
       const updatedData = {
         DiaChiThuongTru: newRow.diaChi,
         NoiCap: newRow.noiCap,
-        NgayCap: newRow.ngayCap // Lưu ý: Cần format date nếu backend yêu cầu YYYY-MM-DD
+        NgayCap: newRow.ngayCap 
       };
 
       await updateHoKhau(newRow.id, updatedData);
       setRows((prevRows) => 
         prevRows.map((row) => (row.id === newRow.id ? newRow : row))
       );
-      return newRow; // Cập nhật thành công
+      return newRow; 
     } catch (error) {
       console.error("Lỗi cập nhật:", error);
       alert("Cập nhật thất bại: " + (error.response?.data?.message || error.message));
-      return oldRow; // API lỗi thì quay về dữ liệu cũ
+      return oldRow; 
     }
   };
-  // --- 4. CẤU HÌNH CỘT ---
+  
   const columns = [
     { field: 'maHoKhau', headerName: 'Mã hộ khẩu', flex: 1, minWidth: 150, editable: false },
     { 
@@ -233,7 +233,7 @@ const HoKhauPage = () => {
           ĐĂNG KÝ HỘ KHẨU
         </Button>
 
-        {/* --- Ô TÌM KIẾM TÙY CHỈNH --- */}
+        {}
         <TextField
           size="small"
           placeholder="Tìm theo mã HK, địa chỉ..."
@@ -257,7 +257,7 @@ const HoKhauPage = () => {
         backgroundColor: '#fff' 
       }}>
         <DataGrid
-          rows={filteredRows} // TRUYỀN DỮ LIỆU ĐÃ LỌC VÀO ĐÂY
+          rows={filteredRows} 
           columns={columns}
           loading={loading}
           slots={{ toolbar: GridToolbar }}

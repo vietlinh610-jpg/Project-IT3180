@@ -27,7 +27,7 @@ const CreateCanHoPage = () => {
   const handleSave = async (e) => {
     e.preventDefault();
     
-    // Validate
+    
     if (!formData.maCanHo || !formData.tenCanHo) {
       alert("Vui lòng điền mã và tên căn hộ!");
       return;
@@ -52,7 +52,7 @@ const CreateCanHoPage = () => {
 
     } catch (error) {
       console.error("Lỗi:", error);
-      // Hiển thị thông báo lỗi chi tiết từ Backend (VD: Trùng mã căn hộ)
+      
       const message = error.response?.data?.message || "Có lỗi xảy ra!";
       alert(message);
     } finally {
@@ -70,7 +70,7 @@ const CreateCanHoPage = () => {
         boxSizing: 'border-box'  
       }}>
       
-      {/* Header */}
+      {}
       <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
         <IconButton onClick={() => navigate('/ho-gia-dinh/can-ho')}>
           <ArrowBackIcon />
@@ -99,7 +99,7 @@ const CreateCanHoPage = () => {
               />
             </Grid>
 
-            {/* Tên căn hộ */}
+            {}
             <Grid size={12}>
               <TextField
                 fullWidth
@@ -113,7 +113,7 @@ const CreateCanHoPage = () => {
               />
             </Grid>
 
-            {/* Tầng */}
+            {}
             <Grid size={12}>
               <TextField
                 fullWidth
@@ -127,7 +127,7 @@ const CreateCanHoPage = () => {
               />
             </Grid>
 
-            {/* Diện tích */}
+            {}
             <Grid size={12}>
               <TextField
                 fullWidth
@@ -138,11 +138,11 @@ const CreateCanHoPage = () => {
                 value={formData.dienTich}
                 onChange={handleChange}
                 required
-                inputProps={{ step: "0.1" }} // Cho phép nhập số lẻ
+                inputProps={{ step: "0.1" }} 
               />
             </Grid>
 
-            {/* Nút Lưu */}
+            {}
             <Grid size={12} sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
               <Button 
                 type="submit"

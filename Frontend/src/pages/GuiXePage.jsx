@@ -10,6 +10,9 @@ const GuiXePage = () => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  
+  
+  
   useEffect(() => {
     fetchDSGX();
   }, []);
@@ -20,7 +23,7 @@ const GuiXePage = () => {
       const res = await layDSGX();
 
       const mappedRows = res.data.data.map((item, index) => ({
-        id: index + 1,
+        id: index + 1, 
         hoKhau: item.MaHoKhau,
         chuHo: item.hoTenChuHo,
         loaiXe: item.LoaiXe,
@@ -35,6 +38,9 @@ const GuiXePage = () => {
     }
   };
 
+  
+  
+  
   const handleNgungGui = async (row) => {
     const isConfirm = window.confirm(
       `Bạn có chắc muốn ngừng gửi xe biển số ${row.bienSo} không?`
@@ -54,6 +60,9 @@ const GuiXePage = () => {
     }
   };
 
+  
+  
+  
   const columns = [
     {
       field: "hoKhau",
@@ -131,6 +140,9 @@ const GuiXePage = () => {
 };
 
 export default GuiXePage;
+
+
+
 
 const styles = {
   page: { p: 3, height: "100vh" },

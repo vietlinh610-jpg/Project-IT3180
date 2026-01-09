@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/guixe";
+const API_URL = "/api/guixe";
 
 // Lấy danh sách gửi xe
 export const layDSGX = () => {
